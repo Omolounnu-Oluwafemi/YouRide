@@ -1,0 +1,141 @@
+import Joi from 'joi'
+
+enum Gender {
+  Male = 'Male',
+  Female = 'Female',
+  Other = 'Other'
+}
+enum Category {
+    PrivateDriver = 'Private Driver',
+    TAxiDriver = 'Taxi Driver',
+    DeliveryDriver = 'Delivery Driver'
+}
+enum vehicleYear {
+    TwentyFour = '2024',
+    TwentyThree = '2023',
+    TwentyTwo = '2022',
+    TwentyOne = '2021',
+    Twenty = '2020',
+    Nineteen = '2019',
+    Eighteen = '2018',
+}
+enum Manufacturer {
+    ACE = 'ACE',
+    Acura = 'Acura',
+    AIWAYS = 'AIWAYS',
+    AKT = 'AKT',
+    BMW = 'BMW',
+    BYD = 'BYD',
+    Chevrolet = 'Chevrolet'
+}
+enum Role {
+    Admin = 'Admin',
+    SuperAdmin = 'Super Admin',
+}
+
+export const initiialSignUpValidator = Joi.object().keys({
+    phoneNumber: Joi.string().pattern(/^[0-9]{11}$/).message('Invalid phone number format').required(),
+    email: Joi.string().email({ minDomainSegments: 2 }).lowercase().required().messages({
+      'string.email': 'email must be a valid email'
+    }),
+})
+export const finalSignUpValidator = Joi.object().keys({
+    firstName: Joi.string().required().messages({
+      'any.required': 'First name is required'
+    }),
+    lastName: Joi.string().required().messages({
+      'any.required': 'Last name is required'
+    }),
+})
+
+export const verificationCodeValidator = Joi.object().keys({
+  verificationCode: Joi.number().integer().min(1000).max(9999).required().messages({
+    'number.base': 'Verification code must be a number',
+    'number.integer': 'Verification code must be an integer',
+    'number.min': 'Verification code must be at least 1000',
+    'number.max': 'Verification code must be at most 9999',
+    'any.required': 'Verification code is required'
+  }),
+});
+
+export const DriverSignupValidator = Joi.object({
+    phoneNumber: Joi.string().pattern(/^[0-9]{11}$/).message('Invalid phone number format').required(),
+    email: Joi.string().email({ minDomainSegments: 2 }).lowercase().required().messages({
+      'string.email': 'email must be a valid email'
+    }),
+    firstName: Joi.string().required().messages({
+      'any.required': 'First name is required'
+    }),
+    lastName: Joi.string().required().messages({
+      'any.required': 'Last name is required'
+    }),
+    country: Joi.string().required().messages({
+      'any.required': 'Country is required'
+    }),
+    gender: Joi.string().valid(...Object.values(Gender)).required().messages({
+      'any.required': 'Gender is required',
+      'any.only': 'Invalid gender'
+    }),
+    category: Joi.string().valid(...Object.values(Category)).required().messages({
+      'any.required': 'Category is required',
+      'any.only': 'Invalid category'
+    }),
+    referralCode: Joi.string(),
+    vehicleYear: Joi.string().pattern(/^(19|20)\d{2}$/).valid(...Object.values(vehicleYear)).required().messages({
+      'any.required': 'Vehicle year is required',
+      'string.pattern.base': 'Invalid vehicle year',
+      'any.only': 'Invalid vehicle year'
+    }),
+    vehicleManufacturer: Joi.string().valid(...Object.values(Manufacturer)).required().messages({
+      'any.required': 'Vehicle manufacturer is required',
+      'any.only': 'Invalid vehicle manufacturer'
+    }),
+    vehicleColor: Joi.string().required().messages({
+      'any.required': 'Vehicle color is required'
+    }),
+    licensePlate: Joi.string().required().messages({
+      'any.required': 'License plate is required'
+    }),
+    vehicleNumber: Joi.string().required().messages({
+      'any.required': 'Vehicle number is required'
+    }),
+});
+
+export const AdminSignupValidator = Joi.object({
+    email: Joi.string().email({ minDomainSegments: 2 }).lowercase().required().messages({
+      'string.email': 'email must be a valid email'
+    }),
+    firstName: Joi.string().required().messages({
+      'any.required': 'First name is required'
+    }),
+    lastName: Joi.string().required().messages({
+      'any.required': 'Last name is required'
+    }),
+    role: Joi.string().valid(...Object.values(Role)).required().messages({
+      'any.required': 'Category is required',
+      'any.only': 'Invalid role'
+    }),
+});
+
+export const AdminSignInValidator = Joi.object().keys({
+    password: Joi.string().regex(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,30}$/).message('Password must contain at least one uppercase letter, one lowercase letter, one of these symbols (@$!%*?&#) , one digit, and be between 8 and 30 characters in length.').required(),
+    email: Joi.string().email({ minDomainSegments: 2 }).lowercase().required().messages({
+      'string.email': 'email must be a valid email'}),
+})
+
+export const AdminPasswordUpdate = Joi.object().keys({
+   tempPassword: Joi.string().regex(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,30}$/).message('Password must contain at least one uppercase letter, one lowercase letter, one of these symbols (@$!%*?&#) , one digit, and be between 8 and 30 characters in length.').required(),
+   newPassword: Joi.string().regex(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,30}$/).message('Password must contain at least one uppercase letter, one lowercase letter, one of these symbols (@$!%*?&#) , one digit, and be between 8 and 30 characters in length.').required(),
+   email: Joi.string().email({ minDomainSegments: 2 }).lowercase().required().messages({
+      'string.email': 'email must be a valid email'}),
+})
+
+export const options = {
+    abortEarly: false,
+    errors: {
+        wrap: {
+            label: "",
+        }
+    }
+}
+
