@@ -13,9 +13,17 @@ const config_1 = require("./config/config");
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const swagger_docs_1 = __importDefault(require("./swagger.docs"));
 const express_session_1 = __importDefault(require("express-session"));
+const passport_1 = __importDefault(require("passport"));
+const passport_2 = __importDefault(require("./config/passport"));
 const drivers_1 = __importDefault(require("./routes/drivers"));
 const usersRoute_1 = __importDefault(require("./routes/usersRoute"));
 const admin_1 = __importDefault(require("./routes/admin"));
+const app = (0, express_1.default)();
+app.use((0, express_session_1.default)({
+    secret: process.env.COOKIE_KEY,
+    resave: false,
+    saveUninitialized: false,
+}));
 config_1.sequelize
     .sync()
     .then(() => {
@@ -24,13 +32,12 @@ config_1.sequelize
     .catch((err) => {
     console.log(err);
 });
+// Initialize Passport.js
+app.use(passport_1.default.initialize());
+app.use(passport_1.default.session());
 (0, dotenv_1.config)();
-const app = (0, express_1.default)();
-app.use((0, express_session_1.default)({
-    secret: process.env.COOKIE_KEY,
-    resave: false,
-    saveUninitialized: false,
-}));
+(0, passport_2.default)(config_1.sequelize);
+// passportSetup();
 // view engine setup
 app.set('views', path_1.default.join(__dirname, 'views'));
 app.set('view engine', 'jade');

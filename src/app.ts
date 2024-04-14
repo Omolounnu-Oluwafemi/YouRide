@@ -8,21 +8,12 @@ import { sequelize } from './config/config';
 import swaggerUI from "swagger-ui-express";
 import swaggerSpec from "./swagger.docs";
 import session from 'express-session';
+import passport from 'passport';
+import authSetup from './config/passport'; 
 
 import driverRouter from './routes/drivers';
 import usersRouter from './routes/usersRoute';
 import adminRouter from './routes/admin';
-
-sequelize
-.sync()
-.then(()=>{
-  console.log("database synced sucessfully");
-})
-.catch((err)=>{
-  console.log(err)
-})
-
-config()
 
 const app = express();
 
@@ -33,6 +24,24 @@ app.use(
     saveUninitialized: false,
   }),
 );
+
+sequelize
+.sync()
+.then(()=>{
+  console.log("database synced sucessfully");
+})
+.catch((err)=>{
+  console.log(err)
+})
+
+// Initialize Passport.js
+app.use(passport.initialize());
+app.use(passport.session());
+
+config();
+authSetup(sequelize);
+// passportSetup();
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

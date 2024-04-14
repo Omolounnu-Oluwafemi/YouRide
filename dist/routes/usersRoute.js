@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const passport_1 = __importDefault(require("passport"));
 const usersController_1 = require("../controllers/usersController");
 const middleware_1 = require("../utils/middleware");
 const router = express_1.default.Router();
@@ -113,6 +114,28 @@ router.post('/signin', middleware_1.validateInitialSignUp, usersController_1.sig
  *         description: User verified succesfully
  */
 router.post('/verifysignin', middleware_1.validateVerificationCode, usersController_1.verifySigninCode);
+router.get('/google', passport_1.default.authenticate('google', { scope: ['profile', 'email'] }));
+// router.get('/google/redirect', function(req, res, next) {
+//   passport.authenticate('google', function(err, user, info) {
+//     if (err) { 
+//       console.error('Error in passport.authenticate:', err);
+//       return next(err); 
+//     }
+//     if (!user) { 
+//       console.log('No user returned from Google:', info);
+//       return res.redirect('/login'); 
+//     }
+//       req.logIn(user, function (err) {
+//         console.log('Logging in user:', user);
+//         if (err) { 
+//         console.error('Error logging in user:', err);
+//         return next(err); 
+//       }
+//       return res.redirect('/user/' + user.username);
+//     });
+//   })(req, res, next);
+// }, googleSignInUser);
+router.get('/google/redirect', passport_1.default.authenticate('google', { failureRedirect: '/' }), usersController_1.googleSignInUser);
 /**
  * @swagger
  * components:

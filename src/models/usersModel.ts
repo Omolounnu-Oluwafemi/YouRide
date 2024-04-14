@@ -6,6 +6,8 @@ interface UserAttributes {
   email: string;
   firstName: string;
   lastName: string;
+  ssoProvider: string;
+  googleId: string;
 }
 
 interface UserCreationAttributes extends Optional<UserAttributes, 'userId'> {}
@@ -16,6 +18,8 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   public email!: string;
   public firstName!: string;
   public lastName!: string;
+  public ssoProvider!: string;
+  public googleId!: string;
 
   // timestamps!
   public readonly createdAt!: Date;
@@ -32,7 +36,7 @@ const initUser = (sequelize: Sequelize) => {
       },
       phoneNumber: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
         unique: true,
       },
       email: {
@@ -48,10 +52,18 @@ const initUser = (sequelize: Sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      ssoProvider: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      googleId: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
     },
     {
       sequelize,
-      tableName: 'users',
+      tableName: 'Users',
     }
   );
 };

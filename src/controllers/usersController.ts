@@ -117,40 +117,63 @@ export async function finalSignUp(req: Request, res: Response) {
 export const signInUser = async (req: Request, res: Response) => {
   try {
 
-    const { phoneNumber, email } = req.body;
+      const { phoneNumber, email } = req.body;
+
+        // Check if the email and the phone number already exists in the database
+      const user = await User.findOne({ where: { email, phoneNumber } });
+      if (!user) {
+        return res.status(400).json({
+          message: "User not found"
+        });
+      }
+    
+      // Store phoneNumber and email in session
+      (req.session as SessionData).phoneNumber = phoneNumber;
+      (req.session as SessionData).email = email;
+
+      // Generate verification code
+      const verificationCode = generateVerificationCode();
+      (req.session as SessionData).verificationCode = verificationCode;
+
+      // Send verification code to user's email
+      await sendVerificationCode(email, verificationCode);
+
+      return res.status(200).json({
+        message: 'Verification code sent to email',
+        data: { verificationCode }
+      });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'An error occurred while sending code' });
+  }
+};
+export const googleSignInUser = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.user as Express.User & { email: string };
 
       // Check if the email and the phone number already exists in the database
-    const user = await User.findOne({ where: { email, phoneNumber } });
-    if (!user) {
-       return res.status(400).json({
-        message: "User not found"
-       });
-    }
-    
-    // Store phoneNumber and email in session
-    (req.session as SessionData).phoneNumber = phoneNumber;
-    (req.session as SessionData).email = email;
-
-    // Generate verification code
-    const verificationCode = generateVerificationCode();
-    (req.session as SessionData).verificationCode = verificationCode;
-
-    // Send verification code to user's email
-    await sendVerificationCode(email, verificationCode);
+      const user = await User.findOne({ where: { email } });
+      if (!user) {
+        return res.status(400).json({
+          message: "User not found"
+        });
+      }
+      const token = signToken(user.userId);
+      // Set the token in a cookie
+      res.cookie('token', token, { httpOnly: true });
 
     return res.status(200).json({
-      message: 'Verification code sent to email',
-      data: { verificationCode }
+      status: 'success',
+      message: 'User signed in successfully',
+      data: { user }
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'An error occurred while sending code' });
   }
 };
-
 export async function verifySigninCode(req: Request, res: Response) {
   try {
-
     const { verificationCode } = req.body;
 
     // Check if the verification code matches the one in the session
@@ -159,7 +182,6 @@ export async function verifySigninCode(req: Request, res: Response) {
         message: "Invalid verification code"
       });
     }
-
         // Check if user exists
     const user = await User.findOne({ where: { email: (req.session as SessionData).email, phoneNumber: (req.session as SessionData).phoneNumber } });
     if (!user) {
@@ -178,6 +200,7 @@ export async function verifySigninCode(req: Request, res: Response) {
       message: 'User signed in successfully',
       data: { user }
     });
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'An error occurred while verifying the code' });

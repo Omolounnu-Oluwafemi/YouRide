@@ -1,5 +1,6 @@
 import express from 'express';
-import { initialSignUp, verifySignupCode, verifySigninCode, finalSignUp, signInUser } from '../controllers/usersController'; 
+import passport from 'passport';
+import { initialSignUp, verifySignupCode, verifySigninCode, finalSignUp, signInUser, googleSignInUser } from '../controllers/usersController'; 
 import { validateInitialSignUp, validateFinalSignUp, validateVerificationCode } from '../utils/middleware';
 
 const router = express.Router();
@@ -115,6 +116,32 @@ router.post('/signin', validateInitialSignUp, signInUser)
  */
 router.post('/verifysignin', validateVerificationCode, verifySigninCode)
 
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }))
+
+// router.get('/google/redirect', function(req, res, next) {
+//   passport.authenticate('google', function(err, user, info) {
+//     if (err) { 
+//       console.error('Error in passport.authenticate:', err);
+//       return next(err); 
+//     }
+//     if (!user) { 
+//       console.log('No user returned from Google:', info);
+//       return res.redirect('/login'); 
+//     }
+//       req.logIn(user, function (err) {
+//         console.log('Logging in user:', user);
+//         if (err) { 
+//         console.error('Error logging in user:', err);
+//         return next(err); 
+//       }
+//       return res.redirect('/user/' + user.username);
+//     });
+//   })(req, res, next);
+// }, googleSignInUser);
+router.get('/google/redirect',
+  passport.authenticate('google', { failureRedirect: '/' }),
+  googleSignInUser
+);
 
 /**
  * @swagger

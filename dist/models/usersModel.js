@@ -14,7 +14,7 @@ const initUser = (sequelize) => {
         },
         phoneNumber: {
             type: sequelize_1.DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
             unique: true,
         },
         email: {
@@ -30,9 +30,17 @@ const initUser = (sequelize) => {
             type: sequelize_1.DataTypes.STRING,
             allowNull: false,
         },
+        ssoProvider: {
+            type: sequelize_1.DataTypes.STRING,
+            allowNull: true,
+        },
+        googleId: {
+            type: sequelize_1.DataTypes.STRING,
+            allowNull: true,
+        },
     }, {
         sequelize,
-        tableName: 'users',
+        tableName: 'Users',
     });
 };
 exports.initUser = initUser;
