@@ -7,9 +7,6 @@ interface UserAttributes {
   firstName: string;
   lastName: string;
   ssoProvider: string;
-  googleId: string;
-  appleId: string;
-  facebookId: string;
 }
 
 interface UserCreationAttributes extends Optional<UserAttributes, 'userId'> {}
@@ -21,15 +18,11 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   public firstName!: string;
   public lastName!: string;
   public ssoProvider!: string;
-  public googleId!: string;
-  public appleId!: string;
-  public facebookId!: string;
 
   // timestamps!
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
-
 const initUser = (sequelize: Sequelize) => {
   User.init(
     {
@@ -57,18 +50,6 @@ const initUser = (sequelize: Sequelize) => {
         allowNull: false,
       },
       ssoProvider: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      googleId: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-        facebookId: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      appleId: {
         type: DataTypes.STRING,
         allowNull: true,
       },

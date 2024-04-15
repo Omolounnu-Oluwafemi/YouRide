@@ -8,9 +8,6 @@ import { Sequelize } from "sequelize";
 
 config();
 
-interface DoneFunction {
-  (error: any, user?: any): void;
-}
 
 export default function authSetup(sequelize: Sequelize) {
   
@@ -23,19 +20,17 @@ export default function authSetup(sequelize: Sequelize) {
       },
     async (_accessToken, _refreshToken, profile, done) => {
         try {
-            let user = await User.findOne({ where: { googleId: profile.id } });
+            let user = await User.findOne({ where: { userId: profile.id } });
 
             if (!user) {
                 // If user not found, create a new user
                 user = await User.create({
-                    googleId: profile.id,
+                    userId: profile.id,
                     phoneNumber: '',
                     email: profile.emails?.[0]?.value ?? '',
                     firstName: profile.name?.givenName ?? '',
                     lastName: profile.name?.familyName ?? '',
                     ssoProvider: 'Google',
-                    appleId: '',
-                    facebookId: '',
                 });
             }
 
@@ -59,18 +54,16 @@ export default function authSetup(sequelize: Sequelize) {
       },
     async (_accessToken, _refreshToken, profile, done) => {
         try {
-            let user = await User.findOne({ where: { facebookId: profile.id } });
+            let user = await User.findOne({ where: { userId: profile.id } });
 
             if (!user) {
                 user = await User.create({
-                    facebookId: profile.id,
+                    userId: profile.id,
                     email: profile.emails?.[0]?.value ?? '',
                     firstName: profile.name?.givenName ?? '',
                     lastName: profile.name?.familyName ?? '',
                     ssoProvider: 'Facebook',
-                    googleId: '',
                     phoneNumber: '',
-                    appleId: '',
                 });
             }
 
@@ -92,25 +85,24 @@ export default function authSetup(sequelize: Sequelize) {
         callbackURL: process.env.APPLE_REDIRECT_URL as string,
         keyID: process.env.APPLE_KEY_ID as string,
         privateKeyLocation: process.env.APPLE_PRIVATE_KEY_LOCATION as string,
+        passReqToCallback: true,
       },
-    async (_accessToken, _refreshToken, profile, done) => {
+    async (req, _accessToken, _refreshToken, _idToken, profile, done: (error: any, user?: any) => void) => {
         try {
-            let user = await User.findOne({ where: { appleId: profile.id } });
+            let user = await User.findOne({ where: { userId: (profile as any).id } });
 
             if (!user) {
-                user = await User.create({
-                    appleId: profile.id,
-                    email: profile.emails?.[0]?.value ?? '',
-                    firstName: profile.name?.firstName ?? '',
-                    lastName: profile.name?.lastName ?? '',
-                    ssoProvider: 'Apple',
-                    facebookId: '',
-                    phoneNumber: '',
-                    googleId: '',
-                });
+              user = await User.create({
+                userId: (profile as any).id,
+                email: (profile as any).emails?.[0]?.value ?? '',
+                firstName: (profile as any).name?.givenName ?? '',
+                lastName: (profile as any).lastName ?? '',
+                ssoProvider: 'Apple',
+                phoneNumber: '',
+              });
             }
 
-            return done(null, user);
+            return done(null, user as any);
         } catch (error) {
             console.error('Error authenticating with Apple:', error);
             return done(error as Error);
@@ -119,11 +111,11 @@ export default function authSetup(sequelize: Sequelize) {
     )
   );
         // Serialize and deserialize user for session management
-        passport.serializeUser((user, done) => {
-          done(null, user.userId); 
+        passport.serializeUser((user: any, done) => {
+          done(null, user.userId as string); 
         });
 
-        passport.deserializeUser(async (userId, done) => {
+        passport.deserializeUser(async (userId: number | string, done) => {
         try {
           const user = await User.findByPk(userId);
           done(null, user);

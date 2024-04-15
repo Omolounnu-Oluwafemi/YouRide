@@ -34,18 +34,6 @@ const initUser = (sequelize) => {
             type: sequelize_1.DataTypes.STRING,
             allowNull: true,
         },
-        googleId: {
-            type: sequelize_1.DataTypes.STRING,
-            allowNull: true,
-        },
-        facebookId: {
-            type: sequelize_1.DataTypes.STRING,
-            allowNull: true,
-        },
-        appleId: {
-            type: sequelize_1.DataTypes.STRING,
-            allowNull: true,
-        },
     }, {
         sequelize,
         tableName: 'Users',

@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifySigninCode = exports.socialSignInUser = exports.signInUser = exports.finalSignUp = exports.verifySignupCode = exports.initialSignUp = void 0;
+exports.socialSignInUser = exports.verifySigninCode = exports.signInUser = exports.finalSignUp = exports.verifySignupCode = exports.initialSignUp = void 0;
 const uuid_1 = require("uuid");
 const email_1 = require("../utils/email");
 const token_1 = require("../utils/token");
@@ -85,15 +85,18 @@ function finalSignUp(req, res) {
         try {
             const userId = (0, uuid_1.v4)();
             const { firstName, lastName } = req.body;
+            const phoneNumber = req.session.phoneNumber;
+            const email = req.session.email;
             // Generate a JWT token for the user
             const token = (0, token_1.signToken)(userId);
             // Create a new user in the database
             const newUser = yield usersModel_1.User.create({
-                phoneNumber: req.session.phoneNumber,
-                email: req.session.email,
+                phoneNumber: phoneNumber,
+                email: email,
                 firstName,
                 lastName,
                 userId,
+                ssoProvider: "DatRide"
             });
             yield newUser.save();
             return res.status(201).json({
@@ -140,31 +143,6 @@ const signInUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.signInUser = signInUser;
-const socialSignInUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { email } = req.user;
-        // Check if the email and the phone number already exists in the database
-        const user = yield usersModel_1.User.findOne({ where: { email } });
-        if (!user) {
-            return res.status(400).json({
-                message: "User not found"
-            });
-        }
-        const token = (0, token_1.signToken)(user.userId);
-        // Set the token in a cookie
-        res.cookie('token', token, { httpOnly: true });
-        return res.status(200).json({
-            status: 'success',
-            message: 'User signed in successfully',
-            data: { user }
-        });
-    }
-    catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'An error occurred while sending code' });
-    }
-});
-exports.socialSignInUser = socialSignInUser;
 function verifySigninCode(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -200,3 +178,28 @@ function verifySigninCode(req, res) {
 }
 exports.verifySigninCode = verifySigninCode;
 ;
+const socialSignInUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { email } = req.user;
+        // Check if the email and the phone number already exists in the database
+        const user = yield usersModel_1.User.findOne({ where: { email } });
+        if (!user) {
+            return res.status(400).json({
+                message: "User not found"
+            });
+        }
+        const token = (0, token_1.signToken)(user.userId);
+        // Set the token in a cookie
+        res.cookie('token', token, { httpOnly: true });
+        return res.status(200).json({
+            status: 'success',
+            message: 'User signed in successfully',
+            data: { user }
+        });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'An error occurred while sending code' });
+    }
+});
+exports.socialSignInUser = socialSignInUser;

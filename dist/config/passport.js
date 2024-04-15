@@ -27,18 +27,16 @@ function authSetup(sequelize) {
     }, (_accessToken, _refreshToken, profile, done) => __awaiter(this, void 0, void 0, function* () {
         var _a, _b, _c, _d, _e, _f, _g;
         try {
-            let user = yield usersModel_1.User.findOne({ where: { googleId: profile.id } });
+            let user = yield usersModel_1.User.findOne({ where: { userId: profile.id } });
             if (!user) {
                 // If user not found, create a new user
                 user = yield usersModel_1.User.create({
-                    googleId: profile.id,
+                    userId: profile.id,
                     phoneNumber: '',
                     email: (_c = (_b = (_a = profile.emails) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.value) !== null && _c !== void 0 ? _c : '',
                     firstName: (_e = (_d = profile.name) === null || _d === void 0 ? void 0 : _d.givenName) !== null && _e !== void 0 ? _e : '',
                     lastName: (_g = (_f = profile.name) === null || _f === void 0 ? void 0 : _f.familyName) !== null && _g !== void 0 ? _g : '',
                     ssoProvider: 'Google',
-                    appleId: '',
-                    facebookId: '',
                 });
             }
             return done(null, user);
@@ -57,17 +55,15 @@ function authSetup(sequelize) {
     }, (_accessToken, _refreshToken, profile, done) => __awaiter(this, void 0, void 0, function* () {
         var _h, _j, _k, _l, _m, _o, _p;
         try {
-            let user = yield usersModel_1.User.findOne({ where: { facebookId: profile.id } });
+            let user = yield usersModel_1.User.findOne({ where: { userId: profile.id } });
             if (!user) {
                 user = yield usersModel_1.User.create({
-                    facebookId: profile.id,
+                    userId: profile.id,
                     email: (_k = (_j = (_h = profile.emails) === null || _h === void 0 ? void 0 : _h[0]) === null || _j === void 0 ? void 0 : _j.value) !== null && _k !== void 0 ? _k : '',
                     firstName: (_m = (_l = profile.name) === null || _l === void 0 ? void 0 : _l.givenName) !== null && _m !== void 0 ? _m : '',
                     lastName: (_p = (_o = profile.name) === null || _o === void 0 ? void 0 : _o.familyName) !== null && _p !== void 0 ? _p : '',
                     ssoProvider: 'Facebook',
-                    googleId: '',
                     phoneNumber: '',
-                    appleId: '',
                 });
             }
             return done(null, user);
@@ -84,20 +80,19 @@ function authSetup(sequelize) {
         callbackURL: process.env.APPLE_REDIRECT_URL,
         keyID: process.env.APPLE_KEY_ID,
         privateKeyLocation: process.env.APPLE_PRIVATE_KEY_LOCATION,
-    }, (_accessToken, _refreshToken, profile, done) => __awaiter(this, void 0, void 0, function* () {
-        var _q, _r, _s, _t, _u, _v, _w;
+        passReqToCallback: true,
+    }, (req, _accessToken, _refreshToken, _idToken, profile, done) => __awaiter(this, void 0, void 0, function* () {
+        var _q, _r, _s, _t, _u, _v;
         try {
-            let user = yield usersModel_1.User.findOne({ where: { appleId: profile.id } });
+            let user = yield usersModel_1.User.findOne({ where: { userId: profile.id } });
             if (!user) {
                 user = yield usersModel_1.User.create({
-                    appleId: profile.id,
+                    userId: profile.id,
                     email: (_s = (_r = (_q = profile.emails) === null || _q === void 0 ? void 0 : _q[0]) === null || _r === void 0 ? void 0 : _r.value) !== null && _s !== void 0 ? _s : '',
-                    firstName: (_u = (_t = profile.name) === null || _t === void 0 ? void 0 : _t.firstName) !== null && _u !== void 0 ? _u : '',
-                    lastName: (_w = (_v = profile.name) === null || _v === void 0 ? void 0 : _v.lastName) !== null && _w !== void 0 ? _w : '',
+                    firstName: (_u = (_t = profile.name) === null || _t === void 0 ? void 0 : _t.givenName) !== null && _u !== void 0 ? _u : '',
+                    lastName: (_v = profile.lastName) !== null && _v !== void 0 ? _v : '',
                     ssoProvider: 'Apple',
-                    facebookId: '',
                     phoneNumber: '',
-                    googleId: '',
                 });
             }
             return done(null, user);

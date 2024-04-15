@@ -2,10 +2,10 @@ import { Request, Response } from 'express';
 import { Admin } from '../models/admin';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from "uuid";
-import cloudinary from '../utils/cloudinary';
 import { sendTemporaryPassword } from '../utils/email';
 import { signAdminToken, verifyAdminToken } from '../utils/token';
 import { generateTempPassword } from '../utils/middleware'
+import cloudinary  from '../utils/cloudinary';
 
 const uploadToCloudinary = async (file: Express.Multer.File) => {
   const result = await cloudinary.uploader.upload(file.path);
@@ -185,7 +185,6 @@ export const updateProfilePicture = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Error updating profile picture' });
   }
 };
-
 export const toggleStaffActiveStatus = async (req: Request, res: Response) => {
   try {
     const token = req.cookies.token;

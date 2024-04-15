@@ -16,10 +16,10 @@ exports.toggleStaffActiveStatus = exports.updateProfilePicture = exports.changeT
 const admin_1 = require("../models/admin");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const uuid_1 = require("uuid");
-const cloudinary_1 = __importDefault(require("../utils/cloudinary"));
 const email_1 = require("../utils/email");
 const token_1 = require("../utils/token");
 const middleware_1 = require("../utils/middleware");
+const cloudinary_1 = __importDefault(require("../utils/cloudinary"));
 const uploadToCloudinary = (file) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield cloudinary_1.default.uploader.upload(file.path);
     return result.secure_url;

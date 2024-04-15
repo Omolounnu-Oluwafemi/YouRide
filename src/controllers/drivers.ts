@@ -59,20 +59,20 @@ export const DriverSignup = async (req: Request, res: Response) => {
       return res.status(400).json({ message });
     }
 
-    // Check if all required files are present
-    const requiredFiles = ['driverLicense', 'vehicleLogBook', 'privateHireLicenseBadge', 'insuranceCertificate', 'motTestCertificate'];
-    for (const file of requiredFiles) {
-      if (!req.files || !req.files[file] || req.files[file].length === 0) {
-        return res.status(400).json({ error: `${file} file is missing` });
+      // Check if all required files are present
+      const requiredFiles = ['driverLicense', 'vehicleLogBook', 'privateHireLicenseBadge', 'insuranceCertificate', 'motTestCertificate'];
+      for (const file of requiredFiles) {
+        if (!req.files || !(req.files as { [fieldname: string]: Express.Multer.File[] })[file] || (req.files as { [fieldname: string]: Express.Multer.File[] })[file].length === 0) {
+          return res.status(400).json({ error: `${file} file is missing` });
+        }
       }
-    }
 
-    // Upload files to Cloudinary and obtain URLs
-    const driverLicenseUrl = await uploadToCloudinary(req.files['driverLicense'][0] as File);
-    const vehicleLogBookUrl = await uploadToCloudinary(req.files['vehicleLogBook'][0] as File);
-    const privateHireLicenseBadgeUrl = await uploadToCloudinary(req.files['privateHireLicenseBadge'][0] as File);
-    const insuranceCertificateUrl = await uploadToCloudinary(req.files['insuranceCertificate'][0] as File);
-    const motTestCertificateUrl = await uploadToCloudinary(req.files['motTestCertificate'][0]);
+      // Upload files to Cloudinary and obtain URLs
+      const driverLicenseUrl = await uploadToCloudinary((req.files as { [fieldname: string]: Express.Multer.File[] })['driverLicense'][0]);
+      const vehicleLogBookUrl = await uploadToCloudinary((req.files as { [fieldname: string]: Express.Multer.File[] })['vehicleLogBook'][0]);
+      const privateHireLicenseBadgeUrl = await uploadToCloudinary((req.files as { [fieldname: string]: Express.Multer.File[] })['privateHireLicenseBadge'][0]);
+      const insuranceCertificateUrl = await uploadToCloudinary((req.files as { [fieldname: string]: Express.Multer.File[] })['insuranceCertificate'][0]);
+      const motTestCertificateUrl = await uploadToCloudinary((req.files as { [fieldname: string]: Express.Multer.File[] })['motTestCertificate'][0]);
 
      // Generate a JWT token for the user
     const token = signToken(driverId);
@@ -117,7 +117,6 @@ export const DriverSignup = async (req: Request, res: Response) => {
 
 export const DriverSignIn = async (req: Request, res: Response) => {
   try {
-
     const { phoneNumber, email } = req.body;
 
       // Check if the email and the phone number already exists in the database
@@ -149,10 +148,8 @@ export const DriverSignIn = async (req: Request, res: Response) => {
   }
 };
 
-
 export async function verifyDriverSignIn(req: Request, res: Response) {
   try {
-
     const { verificationCode } = req.body;
 
     // Check if the verification code matches the one in the session
@@ -186,8 +183,4 @@ export async function verifyDriverSignIn(req: Request, res: Response) {
   }
 };
 
-   
-
-  
-    
    

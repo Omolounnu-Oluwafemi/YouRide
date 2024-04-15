@@ -1,6 +1,5 @@
 import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
 
-
 interface AdminAttributes {
   adminId: string;
   firstName: string;
