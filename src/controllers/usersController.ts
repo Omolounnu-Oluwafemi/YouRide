@@ -1,4 +1,4 @@
-import { Response, Request } from "express";
+import { Response, Request, RequestHandler } from "express";
 import { v4 as uuidv4 } from "uuid";
 import  { sendVerificationCode } from '../utils/email';
 import { signToken, generateVerificationCode} from "../utils/token";
@@ -147,7 +147,8 @@ export const signInUser = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'An error occurred while sending code' });
   }
 };
-export const googleSignInUser = async (req: Request, res: Response) => {
+
+export const socialSignInUser: RequestHandler = async (req, res) => {
   try {
     const { email } = req.user as Express.User & { email: string };
 

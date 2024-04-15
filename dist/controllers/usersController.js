@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifySigninCode = exports.googleSignInUser = exports.signInUser = exports.finalSignUp = exports.verifySignupCode = exports.initialSignUp = void 0;
+exports.verifySigninCode = exports.socialSignInUser = exports.signInUser = exports.finalSignUp = exports.verifySignupCode = exports.initialSignUp = void 0;
 const uuid_1 = require("uuid");
 const email_1 = require("../utils/email");
 const token_1 = require("../utils/token");
@@ -140,7 +140,7 @@ const signInUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.signInUser = signInUser;
-const googleSignInUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const socialSignInUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email } = req.user;
         // Check if the email and the phone number already exists in the database
@@ -164,7 +164,7 @@ const googleSignInUser = (req, res) => __awaiter(void 0, void 0, void 0, functio
         res.status(500).json({ message: 'An error occurred while sending code' });
     }
 });
-exports.googleSignInUser = googleSignInUser;
+exports.socialSignInUser = socialSignInUser;
 function verifySigninCode(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
