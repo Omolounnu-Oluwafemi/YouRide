@@ -20,6 +20,7 @@ interface DriversAttributes {
   privateHireLicenseBadge: string;
   insuranceCertificate: string;
   motTestCertificate: string;
+  isAvailable: boolean;
 }
 
 interface DriverCreationAttributes extends Optional<DriversAttributes, 'driverId'> {}
@@ -44,6 +45,7 @@ class Driver extends Model<DriversAttributes, DriverCreationAttributes> implemen
   public privateHireLicenseBadge!: string;
   public insuranceCertificate!: string;
   public motTestCertificate!: string;
+  public isAvailable!: boolean;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
@@ -90,6 +92,11 @@ const initDriver = (sequelize: Sequelize) => {
       },
       referralCode: {
         type: DataTypes.STRING,
+        allowNull: true, 
+      },
+      isAvailable: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: 'Yes',
         allowNull: true, 
       },
       vehicleYear: {

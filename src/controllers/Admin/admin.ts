@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
-import { Admin } from '../models/admin';
+import { Admin } from '../../models/admin';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from "uuid";
-import { sendTemporaryPassword } from '../utils/email';
-import { signAdminToken, verifyAdminToken } from '../utils/token';
-import { generateTempPassword } from '../utils/middleware'
-import cloudinary  from '../utils/cloudinary';
+import { sendTemporaryPassword } from '../../utils/email';
+import { signAdminToken, verifyAdminToken } from '../../utils/token';
+import { generateTempPassword } from '../../utils/middleware'
+import cloudinary  from '../../utils/cloudinary';
 
 const uploadToCloudinary = async (file: Express.Multer.File) => {
   const result = await cloudinary.uploader.upload(file.path);

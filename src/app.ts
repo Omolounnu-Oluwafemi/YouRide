@@ -11,9 +11,9 @@ import session from 'express-session';
 import passport from 'passport';
 import authSetup from './config/passport'; 
 
-import driverRouter from './routes/drivers';
-import usersRouter from './routes/usersRoute';
-import adminRouter from './routes/admin';
+import driverRouter from './routes/Driver/drivers';
+import usersRouter from './routes/User/usersRoute';
+import adminRouter from './routes/Admin/admin';
 
 const app = express();
 

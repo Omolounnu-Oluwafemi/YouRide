@@ -1,7 +1,7 @@
 import express from 'express';
 import multer from 'multer';
-import { DriverSignup, DriverSignIn, verifyDriverSignIn } from '../controllers/drivers'
-import { ValidateDriverSignup, validateInitialSignUp, validateVerificationCode, verifySignInLimiter } from '../utils/middleware';
+import { DriverSignup, DriverSignIn, verifyDriverSignIn } from '../../controllers/Driver/driversAuth'
+import { ValidateDriverSignup, validateInitialSignUp, validateVerificationCode, verifySignInLimiter } from '../../utils/middleware';
 
 const router = express.Router();
 const upload = multer({ dest: 'uploads/' });

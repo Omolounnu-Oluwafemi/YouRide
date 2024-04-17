@@ -1,8 +1,8 @@
 import { Response, Request, RequestHandler } from "express";
 import { v4 as uuidv4 } from "uuid";
-import  { sendVerificationCode } from '../utils/email';
-import { signToken, generateVerificationCode} from "../utils/token";
-import { User } from '../models/usersModel';
+import  { sendVerificationCode } from '../../utils/email';
+import { signToken, generateVerificationCode} from "../../utils/token";
+import { User } from '../../models/usersModel';
 import { Op } from 'sequelize';
 
 

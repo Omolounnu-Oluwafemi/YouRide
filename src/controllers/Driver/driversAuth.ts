@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import { Op } from 'sequelize';
 import { v4 as uuidv4 } from "uuid";
-import { Driver } from '../models/drivers';
-import cloudinary from '../utils/cloudinary';
-import  { sendVerificationCode } from '../utils/email';
-import { signToken, generateVerificationCode} from "../utils/token";
+import { Driver } from '../../models/drivers';
+import cloudinary from '../../utils/cloudinary';
+import  { sendVerificationCode } from '../../utils/email';
+import { signToken, generateVerificationCode} from "../../utils/token";
 
 const uploadToCloudinary = async (file: Express.Multer.File) => {
   const result = await cloudinary.uploader.upload(file.path);
@@ -93,6 +93,7 @@ export const DriverSignup = async (req: Request, res: Response) => {
       vehicleColor,
       licensePlate,
       vehicleNumber,
+      isAvailable: true, 
       driverLicense: driverLicenseUrl,
       vehicleLogBook: vehicleLogBookUrl,
       privateHireLicenseBadge: privateHireLicenseBadgeUrl,

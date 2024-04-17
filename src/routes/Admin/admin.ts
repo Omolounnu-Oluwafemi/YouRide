@@ -1,7 +1,7 @@
 import express from 'express';
 import multer from 'multer';
-import { CreateAdmin, AdminLogin, changeTempPassword, updateProfilePicture, toggleStaffActiveStatus} from '../controllers/admin'
-import { ValidateAdminSignup, ValidateAdminSignIn, ValidateAdminPAsswordUpdate, isAdmin, isSuperAdmin } from '../utils/middleware';
+import { CreateAdmin, AdminLogin, changeTempPassword, updateProfilePicture, toggleStaffActiveStatus} from '../../controllers/Admin/admin'
+import { ValidateAdminSignup, ValidateAdminSignIn, ValidateAdminPAsswordUpdate, isAdmin, isSuperAdmin } from '../../utils/middleware';
 
 const router = express.Router();
 const upload = multer({ dest: 'uploads/' });

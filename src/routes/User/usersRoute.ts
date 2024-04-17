@@ -1,7 +1,7 @@
 import express from 'express';
 import passport from 'passport';
-import { initialSignUp, verifySignupCode, verifySigninCode, finalSignUp, signInUser, socialSignInUser } from '../controllers/usersController'; 
-import { validateInitialSignUp, validateFinalSignUp, validateVerificationCode } from '../utils/middleware';
+import { initialSignUp, verifySignupCode, verifySigninCode, finalSignUp, signInUser, socialSignInUser } from '../../controllers/User/usersController'; 
+import { validateInitialSignUp, validateFinalSignUp, validateVerificationCode } from '../../utils/middleware';
 
 const router = express.Router();
 
