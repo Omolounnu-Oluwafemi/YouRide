@@ -1,12 +1,15 @@
 import { Request, Response } from 'express';
 import { Driver } from '../../models/drivers';
 import  cloudinary  from '../../utils/cloudinary'; 
-
+// import jwt from 'jsonwebtoken';
+import { decodeDriverIdFromToken } from '../../utils/token';
 
 export const getVehicleDetails = async (req: Request, res: Response) => {
-  const driverId = req.params.driverId;
 
   try {
+    const driverId = decodeDriverIdFromToken(req)
+    console.log(req)
+
     const driver = await Driver.findOne({ where: { driverId } });
 
     if (!driver) {
@@ -29,6 +32,7 @@ export const getVehicleDetails = async (req: Request, res: Response) => {
 
     return res.status(200).json(vehicleDetails);
   } catch (error) {
+    console.error(error)
     return res.status(500).json({ error: 'An error occurred while retrieving vehicle details' });
   }
 };
@@ -52,7 +56,6 @@ export const updateVehicleDetails = async (req: Request, res: Response) => {
         return res.status(500).json({ error: 'An error occurred while updating vehicle details' });
     }
 };
-
 
 export const updateDocuments = async (req: Request, res: Response) => {
   const driverId = req.params.driverId;
@@ -80,5 +83,23 @@ export const updateDocuments = async (req: Request, res: Response) => {
     return res.status(200).json({ message: 'Documents updated successfully' });
   } catch (error) {
     return res.status(500).json({ error: 'An error occurred while updating documents' });
+  }
+};
+
+export const updateAvailability = async (req: Request, res: Response) => {
+  const driverId = req.params.driverId;
+
+  try {
+    const driver = await Driver.findOne({ where: { driverId } });
+
+    if (!driver) {
+      return res.status(404).json({ error: 'Driver not found' });
+    }
+
+    await Driver.update({ isAvailable: !driver.isAvailable }, { where: { driverId } });
+
+    return res.status(200).json({ message: 'Availability updated successfully' });
+  } catch (error) {
+    return res.status(500).json({ error: 'An error occurred while updating availability' });
   }
 };

@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
+import { Request } from 'express';
  
-// Generates a JSON Web Token (JWT) for a user.
 export const signToken = (id: string): string => {
   const secret = process.env.JWT_SECRET;
   const expiresIn = process.env.JWT_EXPIRES_IN;
@@ -39,6 +39,34 @@ export const verifyAdminToken = (token: string): any => {
     console.error(error);
     throw new Error('Invalid token');
   }
+};
+
+export const decodeDriverIdFromToken = (req: Request) => {
+  try {
+    const secret = process.env.JWT_SECRET;
+    const token = req.cookies.token;
+    console.log(token)
+
+  if (!token) {
+    throw new Error('No token provided in cookies');
+  }
+
+  if (!secret) {
+    throw new Error('JWT secret not provided');
+  }
+
+    const decoded = jwt.verify(token, secret) as { id: string };
+    console.log(decoded)
+    const driverId = decoded.id;
+    console.log(driverId)
+
+  return driverId;
+  }
+  catch (error) {
+    console.error(error);
+    throw new Error('Invalid token');
+  }
+
 };
 
  export const generateVerificationCode = (): number  => {

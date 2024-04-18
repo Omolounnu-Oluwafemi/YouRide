@@ -11,9 +11,10 @@ import session from 'express-session';
 import passport from 'passport';
 import authSetup from './config/passport'; 
 
-import driverRouter from './routes/Driver/drivers';
-import usersRouter from './routes/User/usersRoute';
-import adminRouter from './routes/Admin/admin';
+import driverAuth from './routes/Driver/drivers';
+import driverDashboard from './routes/Driver/dashboard';
+import usersAuth from './routes/User/usersRoute';
+import adminAuth from './routes/Admin/admin';
 
 const app = express();
 
@@ -53,9 +54,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../public')));
 
-app.use('/user', usersRouter);
-app.use('/driver', driverRouter);
-app.use('/admin', adminRouter);
+app.use('/user', usersAuth);
+app.use('/driver', driverAuth);
+app.use('/driver/dashboard', driverDashboard);
+app.use('/admin', adminAuth);
 
 // SWAGGER
 app.use("/docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
