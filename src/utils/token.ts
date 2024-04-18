@@ -45,7 +45,6 @@ export const decodeDriverIdFromToken = (req: Request) => {
   try {
     const secret = process.env.JWT_SECRET;
     const token = req.cookies.token;
-    console.log(token)
 
   if (!token) {
     throw new Error('No token provided in cookies');
@@ -56,9 +55,7 @@ export const decodeDriverIdFromToken = (req: Request) => {
   }
 
     const decoded = jwt.verify(token, secret) as { id: string };
-    console.log(decoded)
     const driverId = decoded.id;
-    console.log(driverId)
 
   return driverId;
   }
