@@ -1,4 +1,5 @@
 import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
+import { Ride } from '../models/ride';
 
 interface DriversAttributes {
   driverId: string;
@@ -48,6 +49,10 @@ class Driver extends Model<DriversAttributes, DriverCreationAttributes> implemen
   public isAvailable!: boolean;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
+
+   public static associate(models: { [key: string]: any }) {
+    Driver.hasMany(models.Ride, { foreignKey: 'driverId', as: 'rides' });
+  }
 }
 
 const initDriver = (sequelize: Sequelize) => {
@@ -96,7 +101,7 @@ const initDriver = (sequelize: Sequelize) => {
       },
       isAvailable: {
         type: DataTypes.BOOLEAN,
-        defaultValue: 'Yes',
+        defaultValue: true,
         allowNull: true, 
       },
       vehicleYear: {
@@ -145,7 +150,7 @@ const initDriver = (sequelize: Sequelize) => {
     },
     {
       sequelize,
-      tableName: 'Drivers',
+      tableName: 'Driver',
     }
   );
 };

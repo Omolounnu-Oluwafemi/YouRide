@@ -65,6 +65,30 @@ export const decodeDriverIdFromToken = (req: Request) => {
   }
 
 };
+export const decodeUserIdFromToken = (req: Request) => {
+  try {
+    const secret = process.env.JWT_SECRET;
+    const token = req.cookies.token;
+
+  if (!token) {
+    throw new Error('No token provided in cookies');
+  }
+
+  if (!secret) {
+    throw new Error('JWT secret not provided');
+  }
+
+    const decoded = jwt.verify(token, secret) as { id: string };
+    const userId = decoded.id;
+
+  return userId;
+  }
+  catch (error) {
+    console.error(error);
+    throw new Error('Invalid token');
+  }
+
+};
 
  export const generateVerificationCode = (): number  => {
       return Math.floor(1000 + Math.random() * 9000);

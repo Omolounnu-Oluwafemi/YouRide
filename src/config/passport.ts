@@ -8,9 +8,7 @@ import { Sequelize } from "sequelize";
 
 config();
 
-
 export default function authSetup(sequelize: Sequelize) {
-  
   passport.use(
     new GoogleStrategy(
       {

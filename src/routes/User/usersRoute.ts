@@ -1,7 +1,8 @@
-import express from 'express';
+import express from 'express'; 
 import passport from 'passport';
+import { BookRide } from '../../controllers/Ride/ride';
 import { initialSignUp, verifySignupCode, verifySigninCode, finalSignUp, signInUser, socialSignInUser } from '../../controllers/User/usersController'; 
-import { validateInitialSignUp, validateFinalSignUp, validateVerificationCode } from '../../utils/middleware';
+import { validateInitialSignUp, validateFinalSignUp, validateVerificationCode, validateBookRide} from '../../utils/middleware';
 
 const router = express.Router();
 
@@ -325,6 +326,8 @@ router.get('/apple/redirect',
   passport.authenticate('apple', { failureRedirect: '/' }),
   socialSignInUser
 );
+router.post('/bookride', validateBookRide, BookRide)
+
 /**
  * @swagger
  * components:

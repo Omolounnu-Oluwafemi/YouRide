@@ -130,6 +130,17 @@ export const AdminPasswordUpdate = Joi.object().keys({
       'string.email': 'email must be a valid email'}),
 })
 
+export const BookRide = Joi.object({
+  rideId: Joi.string(),
+  userId: Joi.string(),
+  driverId: Joi.string().allow(null),
+  pickupLocation: Joi.string().required(),
+  dropoffLocation: Joi.string().required(),
+  pickupTime: Joi.date().allow(null),
+  dropoffTime: Joi.date().allow(null),
+  status: Joi.string().valid('pending', 'accepted', 'in-progress', 'completed', 'cancelled'),
+});
+
 export const options = {
     abortEarly: false,
     errors: {

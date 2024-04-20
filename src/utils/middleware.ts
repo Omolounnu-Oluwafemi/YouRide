@@ -1,5 +1,5 @@
 import { NextFunction, Response, Request } from "express";
-import { initiialSignUpValidator, finalSignUpValidator, verificationCodeValidator, AdminSignupValidator, AdminSignInValidator, AdminPasswordUpdate, options } from "../utils/validate";
+import { initiialSignUpValidator, finalSignUpValidator, verificationCodeValidator, AdminSignupValidator, AdminSignInValidator, AdminPasswordUpdate, options, BookRide } from "../utils/validate";
 import { DriverSignupValidator } from '../utils/validate';
 import rateLimit from 'express-rate-limit';
 import { verifyAdminToken } from "./token";
@@ -149,4 +149,14 @@ export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
     return res.status(401).json({ message: 'Invalid token' });
   }
 };
+export const validateBookRide = (req: Request, res: Response, next: NextFunction) => { 
+  const { error } = BookRide.validate(req.body, options);
+  if (error) {
+    const errors = error.details.map((err: { message: any; }) => err.message);
+    return res.status(400).json({
+      errors
+    });
+  }
+next();
+}
 
