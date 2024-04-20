@@ -1,6 +1,4 @@
 import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
-import { Ride } from '../models/ride';
-
 interface UserAttributes {
   userId: string;
   phoneNumber: string;

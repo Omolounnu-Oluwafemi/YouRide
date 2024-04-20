@@ -165,7 +165,7 @@ router.patch('/uploadpicture', isAdmin, upload.single('profilePicture'), updateP
 
 /**
  * @swagger
- * /admin/statusupdate:
+ * /api/v1/admin/statusupdate:
  *   post:
  *     summary: Toggle staff active status
  *     security: 

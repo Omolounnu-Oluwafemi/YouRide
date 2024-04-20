@@ -57,34 +57,34 @@ export const updateVehicleDetails = async (req: Request, res: Response) => {
     }
 };
 
-export const updateDocuments = async (req: Request, res: Response) => {
-  const driverId = req.params.driverId;
-  const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+// export const updateDocuments = async (req: Request, res: Response) => {
+//   const driverId = req.params.driverId;
+//   const files = req.files as { [fieldname: string]: Express.Multer.File[] };
 
-  try {
-    const driver = await Driver.findOne({ where: { driverId } });
+//   try {
+//     const driver = await Driver.findOne({ where: { driverId } });
 
-    if (!driver) {
-      return res.status(404).json({ error: 'Driver not found' });
-    }
+//     if (!driver) {
+//       return res.status(404).json({ error: 'Driver not found' });
+//     }
 
-    const updatedDocuments = {};
+//     const updatedDocuments = {};
 
-    for (const [key, fileArray] of Object.entries(files)) {
-      if (fileArray.length > 0) {
-        const file = fileArray[0];
-        const result = await uploadToCloudinary(file);
-        updatedDocuments[key] = { name: file.originalname, url: result.secure_url };
-      }
-    }
+//     for (const [key, fileArray] of Object.entries(files)) {
+//       if (fileArray.length > 0) {
+//         const file = fileArray[0];
+//         const result = await uploadToCloudinary(file);
+//         updatedDocuments[key] = { name: file.originalname, url: result.secure_url };
+//       }
+//     }
 
-    await Driver.update(updatedDocuments, { where: { driverId } });
+//     await Driver.update(updatedDocuments, { where: { driverId } });
 
-    return res.status(200).json({ message: 'Documents updated successfully' });
-  } catch (error) {
-    return res.status(500).json({ error: 'An error occurred while updating documents' });
-  }
-};
+//     return res.status(200).json({ message: 'Documents updated successfully' });
+//   } catch (error) {
+//     return res.status(500).json({ error: 'An error occurred while updating documents' });
+//   }
+// };
 
 export const updateAvailability = async (req: Request, res: Response) => {
 

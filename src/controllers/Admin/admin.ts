@@ -71,7 +71,6 @@ export const CreateAdmin = async (req: Request, res: Response) => {
 export const AdminLogin = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
-
     const admin = await Admin.findOne({ where: { email: email} });
 
     if (!admin) {
@@ -87,8 +86,6 @@ export const AdminLogin = async (req: Request, res: Response) => {
 
       // Generate a JWT
       const token = signAdminToken(admin.adminId, admin.role)
-      console.log("ID from LOGIN",admin.adminId)
-      console.log('token from LOGIN', token)
     
       // Save the token in a cookie
       res.cookie('token', token, { httpOnly: true });

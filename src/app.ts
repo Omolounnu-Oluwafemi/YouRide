@@ -47,8 +47,6 @@ app.use(passport.session());
 
 config();
 authSetup(sequelize);
-// passportSetup();
-
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

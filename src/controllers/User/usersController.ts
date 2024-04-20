@@ -90,10 +90,8 @@ export async function finalSignUp(req: Request, res: Response) {
     const phoneNumber = (req.session as SessionData).phoneNumber;
     const email = (req.session as SessionData).email;
 
-    // Generate a JWT token for the user
     const token = signToken(userId);
 
-    // Create a new user in the database
     const newUser = await User.create({
       phoneNumber: phoneNumber as string,
       email: email as string,
@@ -111,7 +109,6 @@ export async function finalSignUp(req: Request, res: Response) {
       data: { newUser }
     });
   } catch (error) {
-    console.error(error);
     return res.status(500).json({
       error: "Internal server error"
     });

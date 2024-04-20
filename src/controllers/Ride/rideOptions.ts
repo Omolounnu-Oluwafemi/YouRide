@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { RideOption } from "../../models/rideOptions";
-// import { decodeAdminIdFromToken } from "../../utils/token";
 
 export const GetRideOptions = async (req: Request, res: Response) => {
     try {

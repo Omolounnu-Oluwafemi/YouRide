@@ -7,7 +7,7 @@ const { PORT } = process.env;
 const swaggerDefinition = {
   openapi: "3.0.0", 
   info: {
-    title: "YouRide API",
+    title: "Datride API",
     version: "1.0.0",
     description: "API documentation for Our Amazing Ride"
   },
