@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import { Ride } from "../../models/ride";
 import { v4 as uuidv4 } from "uuid";
 import { decodeUserIdFromToken } from "../../utils/token";

@@ -8,7 +8,7 @@ const upload = multer({ dest: 'uploads/' });
 
 /**
  * @swagger
- * /admin/create:
+ * /api/v1/admin/create:
  *   post:
  *     summary: Create a new admin
  *     security: 
@@ -51,7 +51,7 @@ router.post('/create', isSuperAdmin, ValidateAdminSignup, CreateAdmin);
 
 /**
  * @swagger
- * /admin/signin:
+ * /api/v1/admin/signin:
  *   post:
  *     summary: Login an admin
  *     tags: [Admin]
@@ -92,7 +92,7 @@ router.post('/signin', ValidateAdminSignIn, AdminLogin);
 
 /**
  * @swagger
- * /admin/updatepassword:
+ * /api/v1/admin/updatepassword:
  *   patch:
  *     summary: Change temporary password
  *     security: 
@@ -131,7 +131,7 @@ router.patch('/updatepassword', isAdmin, ValidateAdminPAsswordUpdate, changeTemp
 
 /**
  * @swagger
- * /admin/uploadpicture:
+ * /api/v1/admin/uploadpicture:
  *   patch:
  *     summary: Update admin profile picture
  *     security: 

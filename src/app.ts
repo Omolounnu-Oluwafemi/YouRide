@@ -54,10 +54,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../public')));
 
-app.use('/user', usersAuth);
-app.use('/driver', driverAuth);
-app.use('/driver/dashboard', driverDashboard);
-app.use('/admin', adminAuth);
+app.use('/api/v1/user', usersAuth);
+app.use('/api/v1/driver', driverAuth);
+app.use('/api/v1/driver/dashboard', driverDashboard);
+app.use('/api/v1/admin', adminAuth);
+app.use('/api/v1/rides', adminAuth);
 
 // SWAGGER
 app.use("/docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));

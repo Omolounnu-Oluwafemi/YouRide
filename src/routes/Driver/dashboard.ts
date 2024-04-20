@@ -5,7 +5,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /driver/dashboard/vehicle:
+ * /api/v1/driver/dashboard/vehicle:
  *   get:
  *     summary: Retrieve vehicle details
  *     tags: [Drivers]
@@ -49,7 +49,7 @@ router.get('/vehicle', getVehicleDetails);
 
 /**
  * @swagger
- * /driver/dashboard/vehicle-updates:
+ * /api/v1/driver/dashboard/vehicle-updates:
  *   patch:
  *     summary: Update vehicle details
  *     tags: [Drivers]
@@ -87,7 +87,7 @@ router.patch('/vehicle-updates', updateVehicleDetails)
 
 /**
  * @swagger
- * /driver/dashboard/availability:
+ * /api/v1/driver/dashboard/availability:
  *   patch:
  *     summary: Update driver availability
  *     tags: [Drivers]

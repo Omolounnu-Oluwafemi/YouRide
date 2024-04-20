@@ -8,7 +8,7 @@ const upload = multer({ dest: 'uploads/' });
 
 /**
  * @swagger
- * /driver/signup:
+ * /api/v1/driver/signup:
  *   post:
  *     summary: Register a new driver
  *     tags: [Drivers]
@@ -119,7 +119,7 @@ router.post('/signup',  upload.fields([
 
 /**
  * @swagger
- * /driver/signin:
+ * /api/v1/driver/signin:
  *   post:
  *     summary: Sign in a driver
  *     tags: [Drivers]
@@ -173,7 +173,7 @@ router.post('/signin', validateInitialSignUp, DriverSignIn)
 
 /**
  * @swagger
- * /driver/verify:
+ * /api/v1/driver/verify:
  *   post:
  *     summary: Verify a driver's sign in
  *     tags: [Drivers]
