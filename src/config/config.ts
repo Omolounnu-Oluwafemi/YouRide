@@ -4,6 +4,7 @@ import { Driver, initDriver } from '../models/drivers';
 import { Admin, initAdmin } from '../models/admin';
 import { Ride, initRide } from '../models/ride';
 import { RideOption, initRideOption } from '../models/rideOptions';
+import { Voucher, initVoucher } from '../models/voucher';
 
 const database = process.env.DB_NAME || 'postgres';
 const username = process.env.DB_USER || 'postgres';
@@ -21,6 +22,7 @@ initDriver(sequelize);
 initAdmin(sequelize);
 initRide(sequelize);
 initRideOption(sequelize);
+initVoucher(sequelize);
 
 // Then set up associations
 User.associate(sequelize.models);

@@ -16,7 +16,6 @@ interface RideAttributes {
 
 interface RideCreationAttributes extends Optional<RideAttributes, 'rideId'> {}
 class Ride extends Model<RideAttributes, RideCreationAttributes> implements RideAttributes {
-
     public rideId!: string;
     public driverId!: string | null;
     public userId!: string;
