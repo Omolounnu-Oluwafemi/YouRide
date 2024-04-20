@@ -151,6 +151,19 @@ export const updateRideOptionSchema = Joi.object({
   serviceType: Joi.string().valid('Datride Vehicle', 'Datride Share', 'Datride Delivery').required(),
 });
 
+export const createRideSchema = Joi.object({
+    country: Joi.string(),
+    couponCode: Joi.string().required(),
+    description: Joi.string(),
+    usageLimit: Joi.number().integer().min(1).required(),
+    perUserLimit: Joi.number().integer().min(1).required(),
+    discount: Joi.number().min(0).max(100).required(),
+    activationDate: Joi.date().iso().required(),
+    expiryDate: Joi.date().iso().greater(Joi.ref('activationDate')).required(),
+    validity: Joi.string().valid('DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY').required(),
+    status: Joi.string().valid('ACTIVE', 'INACTIVE', 'EXPIRED').required()
+})
+
 export const options = {
     abortEarly: false,
     errors: {

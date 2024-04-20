@@ -58,7 +58,7 @@ const initUser = (sequelize: Sequelize) => {
     },
     {
       sequelize,
-      tableName: 'User',
+      tableName: 'Users',
     }
   );
 };

@@ -47,7 +47,7 @@ const initRideOption = (sequelize: Sequelize) => {
         },
     }, {
         sequelize,
-        modelName: 'RideOption',
+        modelName: 'RideOptions',
     })
 }
 

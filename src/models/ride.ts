@@ -31,8 +31,8 @@ class Ride extends Model<RideAttributes, RideCreationAttributes> implements Ride
     public getUser!: BelongsToGetAssociationMixin<User>;
 
     public static associate(models: { [key: string]: any }) {
-    Ride.belongsTo(models.User, { foreignKey: 'userId', as: 'user' });
-    Ride.belongsTo(models.Driver, { foreignKey: 'driverId', as: 'driver' });
+    Ride.belongsTo(models.User, { foreignKey: 'userId', as: 'users' });
+    Ride.belongsTo(models.Driver, { foreignKey: 'driverId', as: 'drivers' });
   }
 }
 

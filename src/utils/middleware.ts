@@ -1,5 +1,5 @@
 import { NextFunction, Response, Request } from "express";
-import { initiialSignUpValidator, finalSignUpValidator, verificationCodeValidator, AdminSignupValidator, AdminSignInValidator, AdminPasswordUpdate, options, BookRide, createRideOptionSchema, updateRideOptionSchema } from "../utils/validate";
+import { initiialSignUpValidator, finalSignUpValidator, verificationCodeValidator, AdminSignupValidator, AdminSignInValidator, AdminPasswordUpdate, options, BookRide, createRideOptionSchema, updateRideOptionSchema, createRideSchema } from "../utils/validate";
 import { DriverSignupValidator } from '../utils/validate';
 import rateLimit from 'express-rate-limit';
 import { verifyAdminToken } from "./token";
@@ -174,3 +174,12 @@ export const validateUpdateRideOption = (req: Request, res: Response, next: Next
     next();
 };
 
+export const validateVoucherCreation = (req: Request, res: Response, next: NextFunction) => { 
+  const { error } = createRideSchema.validate(req.body, options);
+  if (error) {
+    const errors = error.details.map((err: { message: any; }) => err.message);
+    return res.status(400).json({
+      errors
+    });
+  }
+}

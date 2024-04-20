@@ -68,7 +68,7 @@ const initAdmin = (sequelize: Sequelize) => {
     },
    {
       sequelize,
-      tableName: 'Admin',
+      tableName: 'Admins',
     },
   )
 }

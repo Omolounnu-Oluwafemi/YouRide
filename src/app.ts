@@ -18,6 +18,7 @@ import driverDashboard from './routes/Driver/dashboard';
 import usersAuth from './routes/User/usersRoute';
 import adminAuth from './routes/Admin/admin';
 import rideRoutes from './routes/Ride/rides';
+import voucherRoutes from './routes/Admin/voucher';
 
 const app = express();
 
@@ -63,6 +64,7 @@ app.use('/api/v1/driver', driverAuth);
 app.use('/api/v1/driver/dashboard', driverDashboard);
 app.use('/api/v1/admin', adminAuth);
 app.use('/api/v1/rides', rideRoutes);
+app.use('/api/v1/admin', voucherRoutes);
 
 // SWAGGER
 app.use("/docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));

@@ -150,7 +150,7 @@ const initDriver = (sequelize: Sequelize) => {
     },
     {
       sequelize,
-      tableName: 'Driver',
+      tableName: 'Drivers',
     }
   );
 };

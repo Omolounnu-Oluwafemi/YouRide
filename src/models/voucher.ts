@@ -106,7 +106,7 @@ const initVoucher = (sequelize: Sequelize) => {
         },
         {
         sequelize,
-        tableName: 'vouchers',
+        tableName: 'Vouchers',
         },
     );
 }
