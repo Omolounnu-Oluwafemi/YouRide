@@ -86,7 +86,9 @@ export const AdminLogin = async (req: Request, res: Response) => {
     }
 
       // Generate a JWT
-    const token = signAdminToken(admin.adminId, admin.role)
+      const token = signAdminToken(admin.adminId, admin.role)
+      console.log("ID from LOGIN",admin.adminId)
+      console.log('token from LOGIN', token)
     
       // Save the token in a cookie
       res.cookie('token', token, { httpOnly: true });

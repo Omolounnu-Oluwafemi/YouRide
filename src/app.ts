@@ -1,7 +1,9 @@
-import {config} from "dotenv"
+import { config } from "dotenv"
+import nocache from 'nocache';
 import createError from 'http-errors';
 import express, { Request, Response, NextFunction } from "express";
 import path from 'path';
+import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import { sequelize } from './config/config';
@@ -15,8 +17,12 @@ import driverAuth from './routes/Driver/drivers';
 import driverDashboard from './routes/Driver/dashboard';
 import usersAuth from './routes/User/usersRoute';
 import adminAuth from './routes/Admin/admin';
+import rideRoutes from './routes/Ride/rides';
 
 const app = express();
+
+app.use(nocache());
+app.use(cors());
 
 app.use(
   session({
@@ -58,7 +64,7 @@ app.use('/api/v1/user', usersAuth);
 app.use('/api/v1/driver', driverAuth);
 app.use('/api/v1/driver/dashboard', driverDashboard);
 app.use('/api/v1/admin', adminAuth);
-app.use('/api/v1/rides', adminAuth);
+app.use('/api/v1/rides', rideRoutes);
 
 // SWAGGER
 app.use("/docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));

@@ -1,14 +1,13 @@
 import express from 'express'; 
 import passport from 'passport';
-import { BookRide } from '../../controllers/Ride/ride';
 import { initialSignUp, verifySignupCode, verifySigninCode, finalSignUp, signInUser, socialSignInUser } from '../../controllers/User/usersController'; 
-import { validateInitialSignUp, validateFinalSignUp, validateVerificationCode, validateBookRide} from '../../utils/middleware';
+import { validateInitialSignUp, validateFinalSignUp, validateVerificationCode} from '../../utils/middleware';
 
 const router = express.Router();
 
 /**
  * @swagger
- * /user/initialsignup:
+ * /api/v1/user/initialsignup:
  *   post:
  *     summary: To signup as a Customer, you need to be verified.
  *     tags: [User]
@@ -31,7 +30,7 @@ router.post('/initialsignup', validateInitialSignUp, initialSignUp)
 
 /**
  * @swagger
- * /user/verifysignup:
+ * /api/v1/user/verifysignup:
  *   post:
  *     summary: Verify the code sent to your email address
  *     tags: [User]
@@ -52,7 +51,7 @@ router.post('/verifysignup', validateVerificationCode, verifySignupCode)
 
 /**
  * @swagger
- * /user/finalsignup:
+ * /api/v1/user/finalsignup:
  *   post:
  *     summary: Enter your Firstname and Lastname to create a user.
  *     tags: [User]
@@ -75,7 +74,7 @@ router.post('/finalsignup', validateFinalSignUp, finalSignUp)
 
 /**
  * @swagger
- * /user/signin:
+ * /api/v1/user/signin:
  *   post:
  *     summary: To signin as a Customer, you need to be verified again.
  *     tags: [User]
@@ -98,7 +97,7 @@ router.post('/signin', validateInitialSignUp, signInUser)
 
 /**
  * @swagger
- * /verifySigninCode:
+ * /api/v1/user/verifysignin:
  *   post:
  *     summary: Verify the sign-in code
  *     tags: [User]
@@ -326,7 +325,7 @@ router.get('/apple/redirect',
   passport.authenticate('apple', { failureRedirect: '/' }),
   socialSignInUser
 );
-router.post('/bookride', validateBookRide, BookRide)
+
 
 /**
  * @swagger

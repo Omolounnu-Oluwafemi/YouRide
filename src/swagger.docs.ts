@@ -1,4 +1,5 @@
 require("dotenv").config();
+
 import swaggerJsdoc from "swagger-jsdoc";
 
 const { PORT } = process.env;
@@ -14,6 +15,20 @@ const swaggerDefinition = {
     {
       url: `http://localhost:${PORT}`,
       description: "Development server"
+    }
+  ],
+  components: {
+    securitySchemes: {
+      BearerAuth: {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      }
+    }
+  },
+  security: [
+    {
+      BearerAuth: []
     }
   ]
 };

@@ -141,6 +141,16 @@ export const BookRide = Joi.object({
   status: Joi.string().valid('pending', 'accepted', 'in-progress', 'completed', 'cancelled'),
 });
 
+export const createRideOptionSchema = Joi.object({
+  pricing: Joi.number().precision(2).positive().required(),
+  serviceType: Joi.string().valid('Datride Vehicle', 'Datride Share', 'Datride Delivery').required(),
+});
+export const updateRideOptionSchema = Joi.object({
+  rideOptionid: Joi.string().required( ),
+  pricing: Joi.number().precision(2).positive().required(),
+  serviceType: Joi.string().valid('Datride Vehicle', 'Datride Share', 'Datride Delivery').required(),
+});
+
 export const options = {
     abortEarly: false,
     errors: {

@@ -1,5 +1,5 @@
 import { NextFunction, Response, Request } from "express";
-import { initiialSignUpValidator, finalSignUpValidator, verificationCodeValidator, AdminSignupValidator, AdminSignInValidator, AdminPasswordUpdate, options, BookRide } from "../utils/validate";
+import { initiialSignUpValidator, finalSignUpValidator, verificationCodeValidator, AdminSignupValidator, AdminSignInValidator, AdminPasswordUpdate, options, BookRide, createRideOptionSchema, updateRideOptionSchema } from "../utils/validate";
 import { DriverSignupValidator } from '../utils/validate';
 import rateLimit from 'express-rate-limit';
 import { verifyAdminToken } from "./token";
@@ -90,10 +90,10 @@ export const verifySignInLimiter = rateLimit({
 });
 
 export const isSuperAdmin = (req: Request, res: Response, next: NextFunction) => {
-
   try {
-      // Get the JWT token from the cookie
-    const token = req.cookies.token;
+        // Get the JWT token from the Authorization header or cookie
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1] || req.cookies.token;
 
     if (!token) {
       return res.status(401).json({ message: 'No token provided' });
@@ -106,8 +106,6 @@ export const isSuperAdmin = (req: Request, res: Response, next: NextFunction) =>
       return res.status(403).json({ error: 'Invalid or expired token' });
     }
     const role = decoded.role;
-    console.log(role)
-
     // Check if the role is superadmin or admin
     if (role !== 'Super Admin') {
       return res.status(403).json({ message: 'You are not authorized to access this route' });
@@ -122,8 +120,10 @@ export const isSuperAdmin = (req: Request, res: Response, next: NextFunction) =>
 export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
 
   try {
-      // Get the JWT token from the cookie
-    const token = req.cookies.token;
+       // Get the JWT token from the Authorization header
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1] || req.cookies.token;
+  
 
     if (!token) {
       return res.status(401).json({ message: 'No token provided' });
@@ -132,11 +132,11 @@ export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
      let decoded;
     try {
       decoded = verifyAdminToken(token);
+  
     } catch (error) {
       return res.status(403).json({ error: 'Invalid or expired token' });
     }
     const role = decoded.role;
-    console.log(role)
 
     // Check if the role is superadmin or admin
     if (role !== 'Super Admin' && role !== 'Admin') {
@@ -159,4 +159,18 @@ export const validateBookRide = (req: Request, res: Response, next: NextFunction
   }
 next();
 }
+export const validateCreateRideOption = (req: Request, res: Response, next: NextFunction) => {
+    const { error } = createRideOptionSchema.validate(req.body, options);
+  if (error) {
+        return res.status(400).json({ error: error.details[0].message });
+    }
+    next();
+};
+export const validateUpdateRideOption = (req: Request, res: Response, next: NextFunction) => {
+    const { error } = updateRideOptionSchema.validate(req.body, options);
+  if (error) {
+        return res.status(400).json({ error: error.details[0].message });
+    }
+    next();
+};
 
