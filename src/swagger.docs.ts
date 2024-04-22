@@ -26,11 +26,6 @@ const swaggerDefinition = {
       }
     }
   },
-  security: [
-    {
-      BearerAuth: []
-    }
-  ]
 };
 
 const options = {

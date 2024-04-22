@@ -42,6 +42,10 @@ class Voucher extends Model<VoucherAttributes, VoucherCreationAttributes> implem
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
+
+    public static associate(models: { [key: string]: any }) {
+    Voucher.hasMany(models.Ride, { foreignKey: 'voucherId', as: 'rides' });
+}
 }
 
 const initVoucher = (sequelize: Sequelize) => {

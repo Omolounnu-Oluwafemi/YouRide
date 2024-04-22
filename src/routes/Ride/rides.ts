@@ -1,89 +1,9 @@
 import express from 'express'; 
-const router = express.Router();
-import { CreateRideOption, GetRideOptions, UpdateRideOption } from '../../controllers/Ride/rideOptions';
-import { isAdmin, validateBookRide, validateCreateRideOption, validateUpdateRideOption } from '../../utils/middleware';
+
+import { validateBookRide } from '../../utils/middleware';
 import { BookRide } from '../../controllers/Ride/ride';
 
-/**
- * @swagger
- * /api/v1/rides/options:
- *   get:
- *     summary: Retrieve a list of ride options
- *     tags: [Rides]
- *     description: Retrieve a list of ride options. This can be used to populate a list of available ride options for a user to choose from.
- *     responses:
- *       200:
- *         description: A list of ride options.
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   vehicleType:
- *                     type: string
- *                     description: The type of vehicle for the ride option.
- *                   capacity:
- *                     type: integer
- *                     description: The capacity of the vehicle for the ride option.
- *                   pricing:
- *                     type: number
- *                     description: The pricing for the ride option.
- *                   serviceType:
- *                     type: string
- *                     description: The service type of the ride option.
- *       404:
- *         description: No ride options found.
- *       500:
- *         description: An error occurred while fetching ride options.
- */
-router.get('/options', GetRideOptions);
-
-/**
- * @swagger
- * /api/v1/rides/options:
- *   post:
- *     summary: Create a ride option
- *     security: 
- *       - BearerAuth: {}
- *     tags: [Rides]
- *     description: Create a new ride option. Only accessible by admins.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               pricing:
- *                 type: number
- *                 format: float
- *                 description: The pricing for the ride option.
- *               serviceType:
- *                 type: string
- *                 enum: ['Datride Vehicle', 'Datride Share', 'Datride Delivery']
- *                 description: The service type for the ride option.
- *             example:
- *               pricing: 15.99
- *               serviceType: "Datride Vehicle"
- *     responses:
- *       200:
- *         description: The ride option was successfully created.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Ride option created successfully"
- *                 rideOption:
- *                   $ref: '#/components/schemas/RideOption'
- *       500:
- *         description: An error occurred while creating the ride option.
- */
-router.post('/options', isAdmin, validateCreateRideOption, CreateRideOption);
+const router = express.Router();
 
 /**
  * @swagger
@@ -104,9 +24,9 @@ router.post('/options', isAdmin, validateCreateRideOption, CreateRideOption);
  *               pickupLocation:
  *                 type: string
  *                 description: The pickup location for the ride.
- *               dropoffLocation:
+ *               destination:
  *                 type: string
- *                 description: The dropoff location for the ride.
+ *                 description: The destination for the ride.
  *             example:
  *               pickupLocation: "123 Main St"
  *               dropoffLocation: "456 Elm St"
@@ -128,89 +48,6 @@ router.post('/options', isAdmin, validateCreateRideOption, CreateRideOption);
  */
 router.post('/bookride', validateBookRide, BookRide);
 
-/**
- * @swagger
- * /api/v1/rides/update-options:
- *   put:
- *     summary: Update a ride options
- *     tags: [Rides]
- *     description: Only an admin user can update the ride options
- *     requestBody:
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               rideOptionid:
- *                 type: string
- *                 description: The ID of the ride option to update
- *               pricing:
- *                 type: number
- *                 description: The pricing for the ride option.
- *               serviceType:
- *                 type: string
- *                 description: The service type of the ride option.
- *           required: true
- *     responses:
- *       200:
- *         description: Ride options updated successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                 rideOption:
- *                   type: object
- *                   properties:
- *                     rideOptionId:
- *                       type: string
- *                     capacity:
- *                       type: integer
- *                     pricing:
- *                       type: number
- *                     serviceType:
- *                       type: string
- *       400:
- *         description: Invalid input
- *       404:
- *         description: No ride options found.
- *       500:
- *         description: An error occurred while updating ride options.
- */
-router.put('/update-options', isAdmin, validateUpdateRideOption, UpdateRideOption);
-
-/**
- * @swagger
- * components:
- *   schemas:
- *     RideOption:
- *       type: object
- *       required:
- *         - vehicleType
- *         - capacity
- *         - pricing
- *         - serviceType
- *       properties:
- *         vehicleType:
- *           type: string
- *           description: The type of vehicle for the ride option.
- *         capacity:
- *           type: integer
- *           description: The capacity of the vehicle for the ride option.
- *         pricing:
- *           type: number
- *           description: The pricing for the ride option.
- *         serviceType:
- *           type: string
- *           description: The service type of the ride option.
- *       example:
- *         vehicleType: "Car"
- *         capacity: 4
- *         pricing: 10.5
- *         serviceType: "Standard"
- */
 
 /**
  * @swagger
@@ -240,7 +77,7 @@ router.put('/update-options', isAdmin, validateUpdateRideOption, UpdateRideOptio
  *         pickupLocation:
  *           type: string
  *           description: The pickup location for the ride.
- *         dropoffLocation:
+ *         destination:
  *           type: string
  *           description: The dropoff location for the ride.
  *         pickupTime:

@@ -47,7 +47,6 @@ export const finalSignUpValidator = Joi.object().keys({
       'any.required': 'Last name is required'
     }),
 })
-
 export const verificationCodeValidator = Joi.object().keys({
   verificationCode: Joi.number().integer().min(1000).max(9999).required().messages({
     'number.base': 'Verification code must be a number',
@@ -57,7 +56,6 @@ export const verificationCodeValidator = Joi.object().keys({
     'any.required': 'Verification code is required'
   }),
 });
-
 export const DriverSignupValidator = Joi.object({
     phoneNumber: Joi.string().pattern(/^[0-9]{11}$/).message('Invalid phone number format').required(),
     email: Joi.string().email({ minDomainSegments: 2 }).lowercase().required().messages({
@@ -100,7 +98,6 @@ export const DriverSignupValidator = Joi.object({
       'any.required': 'Vehicle number is required'
     }),
 });
-
 export const AdminSignupValidator = Joi.object({
     email: Joi.string().email({ minDomainSegments: 2 }).lowercase().required().messages({
       'string.email': 'email must be a valid email'
@@ -116,41 +113,43 @@ export const AdminSignupValidator = Joi.object({
       'any.only': 'Invalid role'
     }),
 });
-
 export const AdminSignInValidator = Joi.object().keys({
     password: Joi.string().regex(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,30}$/).message('Password must contain at least one uppercase letter, one lowercase letter, one of these symbols (@$!%*?&#) , one digit, and be between 8 and 30 characters in length.').required(),
     email: Joi.string().email({ minDomainSegments: 2 }).lowercase().required().messages({
       'string.email': 'email must be a valid email'}),
 })
-
 export const AdminPasswordUpdate = Joi.object().keys({
    tempPassword: Joi.string().regex(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,30}$/).message('Password must contain at least one uppercase letter, one lowercase letter, one of these symbols (@$!%*?&#) , one digit, and be between 8 and 30 characters in length.').required(),
    newPassword: Joi.string().regex(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,30}$/).message('Password must contain at least one uppercase letter, one lowercase letter, one of these symbols (@$!%*?&#) , one digit, and be between 8 and 30 characters in length.').required(),
    email: Joi.string().email({ minDomainSegments: 2 }).lowercase().required().messages({
       'string.email': 'email must be a valid email'}),
 })
-
 export const BookRide = Joi.object({
   rideId: Joi.string(),
   userId: Joi.string(),
   driverId: Joi.string().allow(null),
   pickupLocation: Joi.string().required(),
-  dropoffLocation: Joi.string().required(),
+  destination: Joi.string().required(),
   pickupTime: Joi.date().allow(null),
   dropoffTime: Joi.date().allow(null),
   status: Joi.string().valid('pending', 'accepted', 'in-progress', 'completed', 'cancelled'),
 });
-
-export const createRideOptionSchema = Joi.object({
-  pricing: Joi.number().precision(2).positive().required(),
-  serviceType: Joi.string().valid('Datride Vehicle', 'Datride Share', 'Datride Delivery').required(),
+export const createVehicleSchema = Joi.object({
+    country: Joi.string().required(),
+    baseFare: Joi.number().required(),
+    pricePerKMorMI: Joi.number().required(),
+    pricePerMIN: Joi.number().required(),
+    adminCommission: Joi.number().required(),
+    status: Joi.string().valid('Active', 'Inactive').required(),
+    vehicleCategory: Joi.string().valid('Taxi', 'Bus', 'Delivery').required(),
+    isSurge: Joi.boolean().required(),
+    surgeStartTime: Joi.string().pattern(/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/),
+    surgeEndTime: Joi.string().pattern(/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/),
+    surgeType: Joi.string().valid('Percentage', 'Fixed'),
+    carImage: Joi.string(),
+    documentImage: Joi.string(),
+    isDocVerified: Joi.boolean(),
 });
-export const updateRideOptionSchema = Joi.object({
-  rideOptionid: Joi.string().required( ),
-  pricing: Joi.number().precision(2).positive().required(),
-  serviceType: Joi.string().valid('Datride Vehicle', 'Datride Share', 'Datride Delivery').required(),
-});
-
 export const createRideSchema = Joi.object({
     country: Joi.string(),
     couponCode: Joi.string().required(),
@@ -163,7 +162,6 @@ export const createRideSchema = Joi.object({
     validity: Joi.string().valid('DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY').required(),
     status: Joi.string().valid('ACTIVE', 'INACTIVE', 'EXPIRED').required()
 })
-
 export const options = {
     abortEarly: false,
     errors: {

@@ -13,12 +13,13 @@ import session from 'express-session';
 import passport from 'passport';
 import authSetup from './config/passport'; 
 
-import driverAuth from './routes/Driver/drivers';
+import driverAuth from './routes/Driver/driversAuth';
 import driverDashboard from './routes/Driver/dashboard';
 import usersAuth from './routes/User/usersRoute';
 import adminAuth from './routes/Admin/admin';
 import rideRoutes from './routes/Ride/rides';
 import voucherRoutes from './routes/Admin/voucher';
+import vehicleRoutes from './routes/Vehicle/vehicle';
 
 const app = express();
 
@@ -65,6 +66,7 @@ app.use('/api/v1/driver/dashboard', driverDashboard);
 app.use('/api/v1/admin', adminAuth);
 app.use('/api/v1/rides', rideRoutes);
 app.use('/api/v1/admin', voucherRoutes);
+app.use('/api/v1/vehicles', vehicleRoutes);
 
 // SWAGGER
 app.use("/docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));

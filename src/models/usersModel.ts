@@ -1,4 +1,5 @@
 import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
+
 interface UserAttributes {
   userId: string;
   phoneNumber: string;
@@ -6,22 +7,28 @@ interface UserAttributes {
   firstName: string;
   lastName: string;
   ssoProvider: string;
+  googleId: string;
+  facebookId: string;
+  appleId: string;
 }
 
 interface UserCreationAttributes extends Optional<UserAttributes, 'userId'> {}
 
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
- 
   public userId!: string;
   public phoneNumber!: string;
   public email!: string;
   public firstName!: string;
   public lastName!: string;
   public ssoProvider!: string;
+  public googleId!: string;
+  public facebookId!: string;
+  public appleId!: string;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
-   public static associate(models: { [key: string]: any }) {
+
+  public static associate(models: { [key: string]: any }) {
     User.hasMany(models.Ride, { foreignKey: 'userId', as: 'rides' });
   }
 }
@@ -50,6 +57,18 @@ const initUser = (sequelize: Sequelize) => {
       lastName: {
         type: DataTypes.STRING,
         allowNull: false,
+      },
+      googleId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      },
+      facebookId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      },
+      appleId: {
+      type: DataTypes.STRING,
+      allowNull: true,
       },
       ssoProvider: {
         type: DataTypes.STRING,

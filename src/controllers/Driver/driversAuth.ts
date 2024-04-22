@@ -115,7 +115,6 @@ export const DriverSignup = async (req: Request, res: Response) => {
     }
   }
 }
-
 export const DriverSignIn = async (req: Request, res: Response) => {
   try {
     const { phoneNumber, email } = req.body;
@@ -148,7 +147,6 @@ export const DriverSignIn = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'An error occurred while sending code' });
   }
 };
-
 export async function verifyDriverSignIn(req: Request, res: Response) {
   try {
     const { verificationCode } = req.body;

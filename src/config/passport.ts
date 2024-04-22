@@ -5,10 +5,12 @@ import AppleStrategy from "passport-apple";
 import { User } from "../models/usersModel";
 import { config } from "dotenv";
 import { Sequelize } from "sequelize";
+import { v4 as uuidv4 } from "uuid";
 
 config();
 
 export default function authSetup(sequelize: Sequelize) {
+  
   passport.use(
     new GoogleStrategy(
       {
@@ -17,21 +19,25 @@ export default function authSetup(sequelize: Sequelize) {
         callbackURL: process.env.GOOGLE_REDIRECT_URL as string,
       },
     async (_accessToken, _refreshToken, profile, done) => {
-        try {
-            let user = await User.findOne({ where: { userId: profile.id } });
+      try {
+         const userId = uuidv4();
+        
+            let user = await User.findOne({ where: { userId: userId} });
 
             if (!user) {
                 // If user not found, create a new user
-                user = await User.create({
-                    userId: profile.id,
+              user = await User.create({
+                    userId,
+                    googleId: profile.id,
                     phoneNumber: '',
                     email: profile.emails?.[0]?.value ?? '',
                     firstName: profile.name?.givenName ?? '',
                     lastName: profile.name?.familyName ?? '',
                     ssoProvider: 'Google',
+                    facebookId: '',
+                    appleId: ''
                 });
             }
-
             return done(null, user);
         } catch (error) {
             console.error('Error authenticating with Google:', error);
@@ -56,12 +62,14 @@ export default function authSetup(sequelize: Sequelize) {
 
             if (!user) {
                 user = await User.create({
-                    userId: profile.id,
+                    facebookId: profile.id,
                     email: profile.emails?.[0]?.value ?? '',
                     firstName: profile.name?.givenName ?? '',
                     lastName: profile.name?.familyName ?? '',
                     ssoProvider: 'Facebook',
                     phoneNumber: '',
+                    googleId: '',
+                    appleId: ''
                 });
             }
 
@@ -91,12 +99,14 @@ export default function authSetup(sequelize: Sequelize) {
 
             if (!user) {
               user = await User.create({
-                userId: (profile as any).id,
+                appleId: (profile as any).id,
                 email: (profile as any).emails?.[0]?.value ?? '',
                 firstName: (profile as any).name?.givenName ?? '',
                 lastName: (profile as any).lastName ?? '',
                 ssoProvider: 'Apple',
                 phoneNumber: '',
+                facebookId: '',
+                googleId: ''
               });
             }
 

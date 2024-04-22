@@ -1,5 +1,5 @@
 import { NextFunction, Response, Request } from "express";
-import { initiialSignUpValidator, finalSignUpValidator, verificationCodeValidator, AdminSignupValidator, AdminSignInValidator, AdminPasswordUpdate, options, BookRide, createRideOptionSchema, updateRideOptionSchema, createRideSchema } from "../utils/validate";
+import { initiialSignUpValidator, finalSignUpValidator, verificationCodeValidator, AdminSignupValidator, AdminSignInValidator, AdminPasswordUpdate, options, BookRide, createVehicleSchema, createRideSchema } from "../utils/validate";
 import { DriverSignupValidator } from '../utils/validate';
 import rateLimit from 'express-rate-limit';
 import { verifyAdminToken } from "./token";
@@ -71,7 +71,6 @@ export function ValidateAdminPAsswordUpdate(req: Request, res: Response, next: N
   }
   next();
 }
-
 export function generateTempPassword():string {
     const length = 10; // choose the length of the password
     const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@$!%*?&#";
@@ -82,13 +81,11 @@ export function generateTempPassword():string {
   retVal = retVal.slice(0, length - 4) + 'A' + 'a' + '1' + '@';
   return retVal;
 }
-
 export const verifySignInLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 10, // limit each IP to 10 requests per windowMs
   message: 'Too many attempts from this IP, please try again after 15 minutes'
 });
-
 export const isSuperAdmin = (req: Request, res: Response, next: NextFunction) => {
   try {
         // Get the JWT token from the Authorization header or cookie
@@ -159,21 +156,13 @@ export const validateBookRide = (req: Request, res: Response, next: NextFunction
   }
 next();
 }
-export const validateCreateRideOption = (req: Request, res: Response, next: NextFunction) => {
-    const { error } = createRideOptionSchema.validate(req.body, options);
+export const validateVehicle = (req: Request, res: Response, next: NextFunction) => {
+    const { error } = createVehicleSchema.validate(req.body, options);
   if (error) {
         return res.status(400).json({ error: error.details[0].message });
     }
     next();
 };
-export const validateUpdateRideOption = (req: Request, res: Response, next: NextFunction) => {
-    const { error } = updateRideOptionSchema.validate(req.body, options);
-  if (error) {
-        return res.status(400).json({ error: error.details[0].message });
-    }
-    next();
-};
-
 export const validateVoucherCreation = (req: Request, res: Response, next: NextFunction) => { 
   const { error } = createRideSchema.validate(req.body, options);
   if (error) {
