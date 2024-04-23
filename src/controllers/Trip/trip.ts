@@ -6,6 +6,7 @@ import { Vehicle } from "../../models/vehicle";
 import { v4 as uuidv4 } from "uuid";
 import { decodeUserIdFromToken } from "../../utils/token";
 import { Voucher } from "../../models/voucher";
+import { tripAmountschema } from '../../utils/validate'
 
 interface Location {
   address: string;
@@ -19,13 +20,45 @@ interface TripCreation {
     tripAmount: number;
     voucher: string | null;
     driverName: string | null;
-    pickupLocation: Location;
-    destination: Location;
+    pickupLocation: string;
+    destination: string;
     pickupTime: Date | null;
     dropoffTime: Date | null;
-    status: 'pending' | 'accepted' | 'in-progress' | 'completed' | 'cancelled';
-    rating: number | null;
+    status: 'current' | 'scheduled' | 'completed' | 'cancelled';
 }
+
+export const calculateTripAmount = async (req: Request, res: Response) => {
+    try {
+        const { vehicleName, distance, time } = req.body;
+
+        const { error } = tripAmountschema.validate(req.body);
+
+        if (error) {
+            return res.status(400).json({ message: 'Invalid input', error: error.details[0].message });
+        }
+        // Get the vehicle details
+        const vehicle = await Vehicle.findOne({ where: { vehicleName } });
+
+        if (!vehicle) {
+            return res.status(404).json({ message: 'Vehicle not found' });
+        }
+
+        // Calculate the trip amount
+        const baseTripAmount = vehicle.baseFare + vehicle.pricePerMIN * time + vehicle.pricePerKMorMI * distance + vehicle.adminCommission;
+
+        // Calculate the trip amounts for all vehicle types
+        const tripAmounts = {
+            'Datride Vehicle': baseTripAmount,
+            'Datride Share': baseTripAmount / 4,
+            'Datride Delivery': baseTripAmount,
+        };
+
+        // Send the response
+        res.status(200).json({ message: 'Trip amounts calculated successfully', tripAmounts });
+    } catch (error: any) {
+        res.status(500).json({ message: 'An error occurred while calculating the trip amounts', error: error.message });
+    }
+};
 
 export const BookTrip = async (req: Request, res: Response) => {
     try {
@@ -38,6 +71,8 @@ export const BookTrip = async (req: Request, res: Response) => {
         const trip: TripCreation = {
             tripId,
             userName,
+            tripAmount,
+            paymentMethod,
             driverName: null,
             pickupLocation,
             destination,

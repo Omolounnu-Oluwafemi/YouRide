@@ -154,6 +154,10 @@ router.get('/get/:vehicleId', isAdmin, GetOneVehicle);
  *                 type: string
  *                 enum: ['Taxi', 'Bus', 'Delivery']
  *                 description: The category of the vehicle.
+ *               vehicleName:
+ *                 type: string
+ *                 enum: ['Datride Vehicle', 'Datride Share', 'Datride Delivery']
+ *                 description: The name of the vehicle.
  *               isSurge:
  *                 type: boolean
  *                 description: Whether the vehicle is in surge pricing.
@@ -176,16 +180,17 @@ router.get('/get/:vehicleId', isAdmin, GetOneVehicle);
  *                 type: string
  *                 description: The image of the document.
  *             example:
- *               country: "USA"
- *               baseFare: 10.00
- *               pricePerKMorMI: 1.50
- *               pricePerMIN: 0.20
- *               adminCommission: 2.00
+ *               country: "Nigeria"
+ *               baseFare: 100
+ *               pricePerKMorMI: 10
+ *               pricePerMIN: 10
+ *               adminCommission: 50
  *               status: "Active"
  *               vehicleCategory: "Taxi"
+ *               vehicleName: "Datride Share"
  *               isSurge: false
- *               surgeStartTime: "08:00:00"
- *               surgeEndTime: "10:00:00"
+ *               surgeStartTime: "08:00"
+ *               surgeEndTime: "10:00"
  *               surgeType: "Percentage"
  *               carImage: "https://example.com/car.jpg"
  *               documentImage: "https://example.com/document.jpg"
@@ -305,6 +310,10 @@ router.put('/update/:vehicleId', isAdmin, validateVehicle, EditVehicle);
  *           type: string
  *           enum: [Taxi, Bus, Delivery]
  *           description: The category of the vehicle.
+ *         vehicleName:
+ *           type: string
+ *           enum: [Datride Vehicle, Datride Share, Datride Delivery]
+ *           description: The name of the vehicle.
  *         carImage:
  *           type: string
  *           format: uri

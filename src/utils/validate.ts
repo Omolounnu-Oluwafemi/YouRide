@@ -142,6 +142,7 @@ export const createVehicleSchema = Joi.object({
     adminCommission: Joi.number().required(),
     status: Joi.string().valid('Active', 'Inactive').required(),
     vehicleCategory: Joi.string().valid('Taxi', 'Bus', 'Delivery').required(),
+    vehicleName: Joi.string().valid('Datride Share', 'Datride Vehicle', 'Datride Delivery').required(),
     isSurge: Joi.boolean().required(),
     surgeStartTime: Joi.string().pattern(/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/),
     surgeEndTime: Joi.string().pattern(/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/),
@@ -162,6 +163,12 @@ export const createTripSchema = Joi.object({
     validity: Joi.string().valid('DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY').required(),
     status: Joi.string().valid('ACTIVE', 'INACTIVE', 'EXPIRED').required()
 })
+
+export const tripAmountschema = Joi.object({
+    vehicleName: Joi.string().required(),
+    distance: Joi.number().positive().required(),
+    time: Joi.number().positive().required(),
+});
 export const options = {
     abortEarly: false,
     errors: {

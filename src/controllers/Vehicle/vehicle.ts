@@ -45,8 +45,7 @@ export const CreateVehicle = async (req: Request, res: Response) => {
 
         const vehicleId = uuidv4();
         
-        const { country, baseFare, pricePerKMorMI, pricePerMIN, adminCommission, status, vehicleCategory, carImage, documentImage, isSurge, surgeStartTime, surgeEndTime, surgeType, isDocVerified } = req.body;
-
+        const { country, baseFare, pricePerKMorMI, pricePerMIN, adminCommission, status, vehicleCategory, vehicleName, carImage, documentImage, isSurge, surgeStartTime, surgeEndTime, surgeType, isDocVerified } = req.body;
 
         // Create a new vehicle record
         const vehicle = {
@@ -62,6 +61,7 @@ export const CreateVehicle = async (req: Request, res: Response) => {
             surgeType,
             status,
             vehicleCategory,
+            vehicleName,
             carImage,
             documentImage,
             isDocVerified
@@ -79,7 +79,7 @@ export const CreateVehicle = async (req: Request, res: Response) => {
 
 export const EditVehicle = async (req: Request, res: Response) => {
   const { vehicleId } = req.params;
-    const { country, baseFare, pricePerKMorMI, pricePerMIN, adminCommission, status, vehicleCategory, carImage, documentImage, isSurge, surgeStartTime, surgeEndTime, surgeType, isDocVerified } = req.body;
+    const { country, baseFare, pricePerKMorMI, pricePerMIN, adminCommission, status, vehicleCategory, vehicleName, carImage, documentImage, isSurge, surgeStartTime, surgeEndTime, surgeType, isDocVerified } = req.body;
 
   try {
     const vehicle = await Vehicle.findOne({ where: { vehicleId } });
@@ -99,6 +99,7 @@ export const EditVehicle = async (req: Request, res: Response) => {
     vehicle.surgeType = surgeType;
     vehicle.status = status;
     vehicle.vehicleCategory = vehicleCategory;
+    vehicle.vehicleName = vehicleName;
     vehicle.carImage = carImage;
     vehicle.documentImage = documentImage;
     vehicle.isDocVerified = isDocVerified;

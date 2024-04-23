@@ -1,9 +1,91 @@
 import express from 'express'; 
-
 import { validateBookTrip } from '../../utils/middleware';
-import { BookTrip } from '../../controllers/Trip/trip';
+import { BookTrip, calculateTripAmount } from '../../controllers/Trip/trip';
 
 const router = express.Router();
+
+/**
+ * @swagger
+ * /api/v1/trips/trip-price:
+ *   post:
+ *     tags:
+ *       - Trip
+ *     summary: Calculate trip amount
+ *     description: This endpoint calculates the trip amount for different vehicle types based on the provided distance and time.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               vehicleName:
+ *                 type: string
+ *                 enum: [Datride Share, Datride Vehicle, Datride Delivery]
+ *                 description: The category of the vehicle.
+ *               distance:
+ *                 type: number
+ *                 format: float
+ *                 description: The distance of the trip in kilometers or miles.
+ *               time:
+ *                 type: number
+ *                 format: float
+ *                 description: The time of the trip in minutes.
+ *     responses:
+ *       '200':
+ *         description: Trip amounts calculated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Trip amounts calculated successfully
+ *                 tripAmounts:
+ *                   type: object
+ *                   properties:
+ *                     Datride Vehicle:
+ *                       type: number
+ *                       format: float
+ *                     Datride Share:
+ *                       type: number
+ *                       format: float
+ *                     Datride Delivery:
+ *                       type: number
+ *                       format: float
+ *       '400':
+ *         description: Invalid input
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Invalid input
+ *       '404':
+ *         description: Vehicle not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Vehicle not found
+ *       '500':
+ *         description: An error occurred while calculating the trip amounts
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: An error occurred while calculating the trip amounts
+ */
+router.post('/trip-price', calculateTripAmount)
 
 /**
  * @swagger
@@ -12,7 +94,7 @@ const router = express.Router();
  *     summary: Book a ride for trip
  *     security: 
  *       - BearerAuth: {}
- *     tags: [Trips]
+ *     tags: [Trip]
  *     description: Book a trip by providing necessary details.
  *     requestBody:
  *       required: true

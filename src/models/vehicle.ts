@@ -9,6 +9,7 @@ interface VehicleAttributes {
     adminCommission: number;
     status: string;
     vehicleCategory: string;
+    vehicleName: string;
     carImage: string;
     documentImage: string;
     isSurge: boolean;
@@ -29,6 +30,7 @@ class Vehicle extends Model<VehicleAttributes, VehicleCreationAttributes> implem
     public adminCommission!: number;
     public status!: string;
     public vehicleCategory!: string;
+    public vehicleName!: string;
     public carImage!: string;
     public documentImage!: string;
     public isSurge!: boolean;
@@ -81,6 +83,11 @@ const initVehicle = (sequelize: Sequelize) => {
         vehicleCategory: {
             type: DataTypes.ENUM,
             values: ['Taxi', 'Bus', 'Delivery'],
+            allowNull: false,
+        },
+        vehicleName: {
+            type: DataTypes.ENUM,
+            values: ['Datride Vehicle', 'Datride Share', 'Datride Delivery'],
             allowNull: false,
         },
         isSurge: {

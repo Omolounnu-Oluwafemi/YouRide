@@ -11,16 +11,17 @@ interface TripAttributes {
     userId: string;
     userName: string;
     driverName: string | null;
+    country: string;
     vehicleId: string;
     paymentMethod: string;
     tripAmount: number;
     voucherId: string | null;
     pickupLocation: string;
     destination: string;
+    totalDistance: string;
     pickupTime: Date | null;
     dropoffTime: Date | null;
     status: string;
-    rating: number | null;
 }
 
 interface TripCreationAttributes extends Optional<TripAttributes, 'tripId'> {}
@@ -31,16 +32,17 @@ class Trip extends Model<TripAttributes, TripCreationAttributes> implements Trip
     public driverId!: string;
     public userName!: string;
     public driverName!: string | null;
+    public country!: string;
     public vehicleId!: string;
     public paymentMethod!: string;
     public tripAmount!: number;
     public voucherId!: string | null;
     public pickupLocation!:  string;
     public destination!: string;
+    public totalDistance!: string;
     public pickupTime!: Date | null;
     public dropoffTime!: Date | null;
     public status!: string;
-    public rating!: number | null;
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
         
@@ -97,11 +99,19 @@ const initTrip = (sequelize: Sequelize) => {
                     key: 'userId'
                 }
             },
+            country: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
             pickupLocation: {
                 type: DataTypes.STRING,
                 allowNull: false,
             },
             destination: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
+            totalDistance: {
                 type: DataTypes.STRING,
                 allowNull: false,
             },
@@ -124,13 +134,8 @@ const initTrip = (sequelize: Sequelize) => {
             },
             status: {
                 type: DataTypes.ENUM,
-                values: ['pending', 'accepted', 'in-progress', 'completed', 'cancelled'],
+                values: ['current', 'scheduled', 'completed' , 'cancelled'],
                 allowNull: false,
-            },
-            rating: {
-                type: DataTypes.ENUM,
-                values: ['1', '2', '3', '4', '5'],
-                allowNull: true,
             },
             voucherId: {
                 type: DataTypes.UUID,
