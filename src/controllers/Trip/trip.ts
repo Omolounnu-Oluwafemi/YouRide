@@ -8,10 +8,6 @@ import { decodeUserIdFromToken } from "../../utils/token";
 import { Voucher } from "../../models/voucher";
 import { tripAmountschema } from '../../utils/validate'
 
-interface Location {
-  address: string;
-  coordinates: { lat: number, lng: number };
-}
 interface TripCreation {
     tripId: string;
     userName: string;
@@ -29,7 +25,7 @@ interface TripCreation {
 
 export const calculateTripAmount = async (req: Request, res: Response) => {
     try {
-        const { vehicleName, distance, time } = req.body;
+        const { vehicleName, distance, time, voucher } = req.body;
 
         const { error } = tripAmountschema.validate(req.body);
 
@@ -43,85 +39,63 @@ export const calculateTripAmount = async (req: Request, res: Response) => {
             return res.status(404).json({ message: 'Vehicle not found' });
         }
 
+        // Check if voucher is valid and active
+        let voucherData;
+        let discount = 0;
+        if (voucher) {
+            voucherData = await Voucher.findOne({ where: { couponCode: voucher } });
+            if (!voucherData || voucherData.status !== 'active') {
+                return res.status(400).json({ error: "Invalid or inactive voucher" });
+            }
+            // Apply the discount
+            discount = voucherData.discount;
+        }
+
         // Calculate the trip amount
         const baseTripAmount = vehicle.baseFare + vehicle.pricePerMIN * time + vehicle.pricePerKMorMI * distance + vehicle.adminCommission;
 
+        // Apply the discount to the base trip amount
+        const discountedTripAmount = baseTripAmount - (baseTripAmount * discount / 100);
+
         // Calculate the trip amounts for all vehicle types
         const tripAmounts = {
-            'Datride Vehicle': baseTripAmount,
-            'Datride Share': baseTripAmount / 4,
-            'Datride Delivery': baseTripAmount,
+            'Datride Vehicle': discountedTripAmount,
+            'Datride Share': discountedTripAmount / 4,
+            'Datride Delivery': discountedTripAmount,
         };
-
+        
+          if (voucherData) {
+            // Decrease the usageLimit of the voucher by 1
+            voucherData.usageLimit -= 1;
+            // If usageLimit is now 0, set status to 'inactive'
+            if (voucherData.usageLimit === 0) {
+                voucherData.status = 'inactive';
+            }
+            // Save the updated voucher
+            await voucherData.save();
+        }
         // Send the response
-        res.status(200).json({ message: 'Trip amounts calculated successfully', tripAmounts });
+        res.status(200).json({
+            message: 'Trip amounts calculated successfully',
+            tripAmounts
+        });
     } catch (error: any) {
         res.status(500).json({ message: 'An error occurred while calculating the trip amounts', error: error.message });
     }
 };
-
-export const BookTrip = async (req: Request, res: Response) => {
-    try {
-        const tripId = uuidv4();
-        const userId = decodeUserIdFromToken(req)
-
-        const { pickupLocation, destination } = req.body;
-
-        // Create a new Trip record
-        const trip: TripCreation = {
-            tripId,
-            userName,
-            tripAmount,
-            paymentMethod,
-            driverName: null,
-            pickupLocation,
-            destination,
-            pickupTime: null,
-            dropoffTime: null,
-            status: 'pending',
-        };
-         // Save the Trip to the database
-        const newTrip = await trip.create(Trip);
-        return res.status(200).json({ message: 'Trip booked successfully', trip: newTrip });
-        
-    } catch (error) {
-        // console.log(error)
-        return res.status(500).json({ error: 'An error occurred while booking the Trip' }); 
-    }
-}
 
 export const confirmTripRequest = async (req: Request, res: Response) => {
 
     const tripId = uuidv4();
     const userId = decodeUserIdFromToken(req)
     
-    const { pickupLocation, destination, vehicleId, paymentMethod, voucher } = req.body;
-
-    // pickupLocation and destination should be objects with 'address' and 'coordinates' properties
-    const { address: pickupAddress, coordinates: pickupCoordinates } = pickupLocation;
-    const { address: destinationAddress, coordinates: destinationCoordinates } = destination;
+    const { pickupLocation, destination, vehicleName, paymentMethod, tripAmount, voucher } = req.body;
 
     try {
-        const vehicleData = await Vehicle.findOne({ where: { vehicleId: vehicleId } });
+        const vehicleData = await Vehicle.findOne({ where: { vehicleName: vehicleName } });
         if (!vehicleData) {
             return res.status(400).json({ error: "Invalid Trip option" });
         }
-
-        let voucherData;
-        let discount = 0;
-        if (voucher) {
-            // Check if voucher is valid and active
-            voucherData = await Voucher.findOne({ where: { couponCode: voucher } });
-            if (!voucherData || voucherData.status !== 'active') {
-                return res.status(400).json({ error: "Invalid or inactive voucher" });
-            }
-
-            // Apply the discount
-            discount = voucherData.discount;
-        }
-
-        // Calculate the price after discount
-        const priceAfterDiscount = vehicleData.pricing - (vehicleData.pricing * discount / 100);
 
         // Fetch user and driver details
         const userData = await User.findOne({ where: { userId: userId } });
@@ -133,35 +107,19 @@ export const confirmTripRequest = async (req: Request, res: Response) => {
             userName: userData?.firstName + ' ' + userData?.lastName,
             vehicleId,
             paymentMethod,
+            tripAmount,
             voucher,
             driverName: null,
-            pickupLocation: {
-                address: pickupAddress,
-                coordinates: pickupCoordinates
-            },
-            destination: {
-                address: destinationAddress,
-                coordinates: destinationCoordinates
-            },
+            pickupLocation,
+            destination,
             pickupTime: null,
             dropoffTime: null,
             status: 'pending',
             rating: null,
-            tripAmount: priceAfterDiscount,
         };
 
         const newTrip = await trip.create(trip);
 
-        if (voucherData) {
-            // Decrease the usageLimit of the voucher by 1
-            voucherData.usageLimit -= 1;
-            // If usageLimit is now 0, set status to 'inactive'
-            if (voucherData.usageLimit === 0) {
-                voucherData.status = 'inactive';
-            }
-            // Save the updated voucher
-            await voucherData.save();
-        }
         res.status(201).json({
             Success: "Trip order created successfully",
             data: newTrip

@@ -1,6 +1,6 @@
 import express from 'express'; 
 import { validateBookTrip } from '../../utils/middleware';
-import { BookTrip, calculateTripAmount } from '../../controllers/Trip/trip';
+import { calculateTripAmount } from '../../controllers/Trip/trip';
 
 const router = express.Router();
 
@@ -11,7 +11,7 @@ const router = express.Router();
  *     tags:
  *       - Trip
  *     summary: Calculate trip amount
- *     description: This endpoint calculates the trip amount for different vehicle types based on the provided distance and time.
+ *     description: This endpoint calculates the trip amount for different vehicle types based on the provided distance, time, and optional voucher.
  *     requestBody:
  *       required: true
  *       content:
@@ -31,6 +31,9 @@ const router = express.Router();
  *                 type: number
  *                 format: float
  *                 description: The time of the trip in minutes.
+ *               voucher:
+ *                 type: string
+ *                 description: The voucher code for the trip. This is optional.
  *     responses:
  *       '200':
  *         description: Trip amounts calculated successfully
@@ -55,7 +58,7 @@ const router = express.Router();
  *                       type: number
  *                       format: float
  *       '400':
- *         description: Invalid input
+ *         description: Invalid input or Invalid or inactive voucher
  *         content:
  *           application/json:
  *             schema:
@@ -86,50 +89,6 @@ const router = express.Router();
  *                   example: An error occurred while calculating the trip amounts
  */
 router.post('/trip-price', calculateTripAmount)
-
-/**
- * @swagger
- * /api/v1/trips/booktrip:
- *   post:
- *     summary: Book a ride for trip
- *     security: 
- *       - BearerAuth: {}
- *     tags: [Trip]
- *     description: Book a trip by providing necessary details.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               pickupLocation:
- *                 type: string
- *                 description: The pickup location for the trip.
- *               destination:
- *                 type: string
- *                 description: The destination for the trip.
- *             example:
- *               pickupLocation: "123 Main St"
- *               dropoffLocation: "456 Elm St"
- *     responses:
- *       200:
- *         description: The trip was successfully booked.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Trip booked successfully"
- *                 trip:
- *                   $ref: '#/components/schemas/Trip'
- *       500:
- *         description: An error occurred while booking the trip.
- */
-router.post('/booktrip', validateBookTrip, BookTrip);
-
 
 /**
  * @swagger

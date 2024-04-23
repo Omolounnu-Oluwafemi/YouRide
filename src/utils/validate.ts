@@ -163,11 +163,11 @@ export const createTripSchema = Joi.object({
     validity: Joi.string().valid('DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY').required(),
     status: Joi.string().valid('ACTIVE', 'INACTIVE', 'EXPIRED').required()
 })
-
 export const tripAmountschema = Joi.object({
-    vehicleName: Joi.string().required(),
-    distance: Joi.number().positive().required(),
-    time: Joi.number().positive().required(),
+  vehicleName: Joi.string().required(),
+  distance: Joi.number().required(),
+  time: Joi.number().required(),
+  voucher: Joi.string().optional().allow(''),
 });
 export const options = {
     abortEarly: false,
