@@ -41,7 +41,7 @@ class Vehicle extends Model<VehicleAttributes, VehicleCreationAttributes> implem
     public readonly updatedAt!: Date;
 
     public static associate(models: { [key: string]: any }) {
-    Vehicle.hasMany(models.Ride, { foreignKey: 'vehicleId', as: 'rides' });
+    Vehicle.hasMany(models.Trip, { foreignKey: 'vehicleId', as: 'trips' });
   }
 }
 

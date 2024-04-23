@@ -29,7 +29,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   public readonly updatedAt!: Date;
 
   public static associate(models: { [key: string]: any }) {
-    User.hasMany(models.Ride, { foreignKey: 'userId', as: 'rides' });
+    User.hasMany(models.Trip, { foreignKey: 'userId', as: 'trips' });
   }
 }
 const initUser = (sequelize: Sequelize) => {

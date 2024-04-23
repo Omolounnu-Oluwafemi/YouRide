@@ -169,7 +169,7 @@ router.post('/verifysignin', validateVerificationCode, verifySigninCode)
 
 /**
  * @swagger
- * /user/google:
+ * /api/v1/user/google:
  *   get:
  *     tags:
  *       - Authentication

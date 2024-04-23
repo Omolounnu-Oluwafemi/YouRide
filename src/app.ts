@@ -17,7 +17,7 @@ import driverAuth from './routes/Driver/driversAuth';
 import driverDashboard from './routes/Driver/dashboard';
 import usersAuth from './routes/User/usersRoute';
 import adminAuth from './routes/Admin/admin';
-import rideRoutes from './routes/Ride/rides';
+import tripRoutes from './routes/Trip/trip';
 import voucherRoutes from './routes/Admin/voucher';
 import vehicleRoutes from './routes/Vehicle/vehicle';
 
@@ -40,7 +40,7 @@ sequelize
   console.log("database synced sucessfully");
 })
 .catch((err)=>{
-  console.log(err)
+  console.log(err.message)
 })
 
 // Initialize Passport.js
@@ -64,7 +64,7 @@ app.use('/api/v1/user', usersAuth);
 app.use('/api/v1/driver', driverAuth);
 app.use('/api/v1/driver/dashboard', driverDashboard);
 app.use('/api/v1/admin', adminAuth);
-app.use('/api/v1/rides', rideRoutes);
+app.use('/api/v1/trips', tripRoutes);
 app.use('/api/v1/admin', voucherRoutes);
 app.use('/api/v1/vehicles', vehicleRoutes);
 

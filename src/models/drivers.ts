@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
-import { Ride } from '../models/ride';
+// import { Trip } from './trip';
 
 interface DriversAttributes {
   driverId: string;
@@ -51,7 +51,7 @@ class Driver extends Model<DriversAttributes, DriverCreationAttributes> implemen
   public readonly updatedAt!: Date;
 
    public static associate(models: { [key: string]: any }) {
-    Driver.hasMany(models.Ride, { foreignKey: 'driverId', as: 'rides' });
+    Driver.hasMany(models.Trip, { foreignKey: 'driverId', as: 'trips' });
   }
 }
 

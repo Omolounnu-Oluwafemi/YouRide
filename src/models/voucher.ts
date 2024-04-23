@@ -44,7 +44,7 @@ class Voucher extends Model<VoucherAttributes, VoucherCreationAttributes> implem
     public readonly updatedAt!: Date;
 
     public static associate(models: { [key: string]: any }) {
-    Voucher.hasMany(models.Ride, { foreignKey: 'voucherId', as: 'rides' });
+    Voucher.hasMany(models.Trip, { foreignKey: 'voucherId', as: 'trips' });
 }
 }
 

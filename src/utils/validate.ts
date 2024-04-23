@@ -124,8 +124,8 @@ export const AdminPasswordUpdate = Joi.object().keys({
    email: Joi.string().email({ minDomainSegments: 2 }).lowercase().required().messages({
       'string.email': 'email must be a valid email'}),
 })
-export const BookRide = Joi.object({
-  rideId: Joi.string(),
+export const BookTrip = Joi.object({
+  tripId: Joi.string(),
   userId: Joi.string(),
   driverId: Joi.string().allow(null),
   pickupLocation: Joi.string().required(),
@@ -150,7 +150,7 @@ export const createVehicleSchema = Joi.object({
     documentImage: Joi.string(),
     isDocVerified: Joi.boolean(),
 });
-export const createRideSchema = Joi.object({
+export const createTripSchema = Joi.object({
     country: Joi.string(),
     couponCode: Joi.string().required(),
     description: Joi.string(),

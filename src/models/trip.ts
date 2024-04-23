@@ -4,39 +4,39 @@ import { Driver } from './drivers'
 import { Vehicle } from './vehicle';
 import { Voucher } from './voucher';
 
-interface Location {
-  address: string;
-  coordinates: { lat: number, lng: number };
-}
     
-interface RideAttributes {
-    rideId: string;
+interface TripAttributes {
+    tripId: string;
+    driverId: string;
+    userId: string;
     userName: string;
     driverName: string | null;
     vehicleId: string;
     paymentMethod: string;
-    rideAmount: number;
+    tripAmount: number;
     voucherId: string | null;
-    pickupLocation: Location;
-    destination: Location;
+    pickupLocation: string;
+    destination: string;
     pickupTime: Date | null;
     dropoffTime: Date | null;
     status: string;
     rating: number | null;
 }
 
-interface RideCreationAttributes extends Optional<RideAttributes, 'rideId'> {}
+interface TripCreationAttributes extends Optional<TripAttributes, 'tripId'> {}
 
-class Ride extends Model<RideAttributes, RideCreationAttributes> implements RideAttributes {
-    public rideId!: string;
+class Trip extends Model<TripAttributes, TripCreationAttributes> implements TripAttributes {
+    public tripId!: string;
+    public userId!: string;
+    public driverId!: string;
     public userName!: string;
     public driverName!: string | null;
     public vehicleId!: string;
     public paymentMethod!: string;
-    public rideAmount!: number;
+    public tripAmount!: number;
     public voucherId!: string | null;
-    public pickupLocation!: Location;
-    public destination!: Location;
+    public pickupLocation!:  string;
+    public destination!: string;
     public pickupTime!: Date | null;
     public dropoffTime!: Date | null;
     public status!: string;
@@ -50,51 +50,59 @@ class Ride extends Model<RideAttributes, RideCreationAttributes> implements Ride
     public getVoucher!: BelongsToGetAssociationMixin<Voucher>;
 
     public static associate(models: { [key: string]: any }) {
-    Ride.belongsTo(models.User, { foreignKey: 'userId', as: 'users' });
-    Ride.belongsTo(models.Driver, { foreignKey: 'driverId', as: 'drivers' });
-    Ride.belongsTo(models.Vehicle, { foreignKey: 'vehicleId', as: 'vehicles' });
-    Ride.belongsTo(models.Voucher, { foreignKey: 'voucherId', as: 'vouchers' });
+    Trip.belongsTo(models.User, { foreignKey: 'userId', as: 'users' });
+    Trip.belongsTo(models.Driver, { foreignKey: 'driverId', as: 'drivers' });
+    Trip.belongsTo(models.Vehicle, { foreignKey: 'vehicleId', as: 'vehicles' });
+    Trip.belongsTo(models.Voucher, { foreignKey: 'voucherId', as: 'vouchers' });
   }
 }
 
-const initRide = (sequelize: Sequelize) => {
-    Ride.init(
+const initTrip = (sequelize: Sequelize) => {
+    Trip.init(
         {
-            rideId: {
+            tripId: {
                 type: DataTypes.UUID,
                 defaultValue: DataTypes.UUIDV4,
                 primaryKey: true,
             },
-            driverName: {
-                type: DataTypes.STRING,
+            driverId: {
+                type: DataTypes.UUID,
                 allowNull: true,
                 references: {
-                    model: 'Driver',
+                    model: 'Drivers',
                     key: 'driverId'
                 }
+            },
+            driverName: {
+                type: DataTypes.STRING,
+                allowNull: true
+            },
+            userName: {
+                type: DataTypes.STRING,
+                allowNull: true
             },
             vehicleId: {
                 type: DataTypes.UUID,
                 allowNull: false,
                 references: {
-                    model: 'Vehicle',
+                    model: 'Vehicles',
                     key: 'vehicleId'
                 }
             },
-            userName: {
-                type: DataTypes.STRING,
+            userId: {
+                type: DataTypes.UUID,
                 allowNull: false,
                 references: {
-                    model: 'User',
+                    model: 'Users',
                     key: 'userId'
                 }
             },
             pickupLocation: {
-                type: DataTypes.JSON,
+                type: DataTypes.STRING,
                 allowNull: false,
             },
             destination: {
-                type: DataTypes.JSON,
+                type: DataTypes.STRING,
                 allowNull: false,
             },
             pickupTime: {
@@ -105,8 +113,8 @@ const initRide = (sequelize: Sequelize) => {
                 type: DataTypes.DATE,
                 allowNull: true,
             },
-            rideAmount: {
-                type: DataTypes.NUMBER,
+            tripAmount: {
+                type: DataTypes.INTEGER,
                 allowNull: false,
             },
              paymentMethod: {
@@ -125,15 +133,15 @@ const initRide = (sequelize: Sequelize) => {
                 allowNull: true,
             },
             voucherId: {
-                type: DataTypes.STRING,
+                type: DataTypes.UUID,
                 allowNull: true,
             },
         },
         {
             sequelize,
-            tableName: 'Rides',
+            tableName: 'Trips',
         },
     );
 }
 
-export { Ride, initRide };
+export { Trip, initTrip };

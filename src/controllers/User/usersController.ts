@@ -93,11 +93,14 @@ export async function finalSignUp(req: Request, res: Response) {
     const token = signToken(userId);
 
     const newUser = await User.create({
-      phoneNumber: phoneNumber as string,
+        phoneNumber: phoneNumber as string,
       email: email as string,
       firstName,
       lastName,
       userId,
+      googleId: "",
+      facebookId: "",
+      appleId: "",
       ssoProvider: "DatRide"
     });
 

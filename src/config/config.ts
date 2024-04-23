@@ -3,7 +3,7 @@ import { User, initUser } from '../models/usersModel';
 import { Driver, initDriver } from '../models/drivers';
 import { Admin, initAdmin } from '../models/admin';
 import { Vehicle, initVehicle } from '../models/vehicle';
-import { Ride, initRide } from '../models/ride';
+import { Trip, initTrip } from '../models/trip';
 import { Voucher, initVoucher } from '../models/voucher';
 
 const database = process.env.DB_NAME || 'postgres';
@@ -22,8 +22,8 @@ initDriver(sequelize);
 initVehicle(sequelize);
 initAdmin(sequelize);
 initVoucher(sequelize);
-initRide(sequelize);
+initTrip(sequelize);
 
 // Define associations
-Ride.associate({ User, Driver, Vehicle, Voucher });
+Trip.associate({ User, Driver, Vehicle, Voucher });
 

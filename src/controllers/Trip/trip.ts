@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Ride } from "../../models/ride";
+import { Trip } from "../../models/trip";
 import { User } from "../../models/usersModel";
 import { Driver } from "../../models/drivers";
 import { Vehicle } from "../../models/vehicle";
@@ -11,12 +11,12 @@ interface Location {
   address: string;
   coordinates: { lat: number, lng: number };
 }
-interface RideCreation {
-    rideId: string;
+interface TripCreation {
+    tripId: string;
     userName: string;
     vehicleId: string;
     paymentMethod: string;
-    rideAmount: number;
+    tripAmount: number;
     voucher: string | null;
     driverName: string | null;
     pickupLocation: Location;
@@ -27,37 +27,37 @@ interface RideCreation {
     rating: number | null;
 }
 
-export const BookRide = async (req: Request, res: Response) => {
+export const BookTrip = async (req: Request, res: Response) => {
     try {
-        const rideId = uuidv4();
+        const tripId = uuidv4();
         const userId = decodeUserIdFromToken(req)
 
         const { pickupLocation, destination } = req.body;
 
-        // Create a new ride record
-        const ride: RideCreation = {
-            rideId,
-            userId,
-            driverId: null,
+        // Create a new Trip record
+        const trip: TripCreation = {
+            tripId,
+            userName,
+            driverName: null,
             pickupLocation,
             destination,
             pickupTime: null,
             dropoffTime: null,
             status: 'pending',
         };
-         // Save the ride to the database
-        const newRide = await Ride.create(ride);
-        return res.status(200).json({ message: 'Ride booked successfully', ride: newRide });
+         // Save the Trip to the database
+        const newTrip = await trip.create(Trip);
+        return res.status(200).json({ message: 'Trip booked successfully', trip: newTrip });
         
     } catch (error) {
         // console.log(error)
-        return res.status(500).json({ error: 'An error occurred while booking the ride' }); 
+        return res.status(500).json({ error: 'An error occurred while booking the Trip' }); 
     }
 }
 
-export const confirmRideRequest = async (req: Request, res: Response) => {
+export const confirmTripRequest = async (req: Request, res: Response) => {
 
-    const rideId = uuidv4();
+    const tripId = uuidv4();
     const userId = decodeUserIdFromToken(req)
     
     const { pickupLocation, destination, vehicleId, paymentMethod, voucher } = req.body;
@@ -69,7 +69,7 @@ export const confirmRideRequest = async (req: Request, res: Response) => {
     try {
         const vehicleData = await Vehicle.findOne({ where: { vehicleId: vehicleId } });
         if (!vehicleData) {
-            return res.status(400).json({ error: "Invalid ride option" });
+            return res.status(400).json({ error: "Invalid Trip option" });
         }
 
         let voucherData;
@@ -92,9 +92,9 @@ export const confirmRideRequest = async (req: Request, res: Response) => {
         const userData = await User.findOne({ where: { userId: userId } });
         // const driverData = await Driver.findOne({ where: { driverId: driverId } });
 
-        // Create a new ride record
-        const ride: RideCreation = {
-            rideId,
+        // Create a new Trip record
+        const trip: TripCreation = {
+            tripId,
             userName: userData?.firstName + ' ' + userData?.lastName,
             vehicleId,
             paymentMethod,
@@ -112,10 +112,10 @@ export const confirmRideRequest = async (req: Request, res: Response) => {
             dropoffTime: null,
             status: 'pending',
             rating: null,
-            rideAmount: priceAfterDiscount,
+            tripAmount: priceAfterDiscount,
         };
 
-        const newRide = await Ride.create(ride);
+        const newTrip = await trip.create(trip);
 
         if (voucherData) {
             // Decrease the usageLimit of the voucher by 1
@@ -128,8 +128,8 @@ export const confirmRideRequest = async (req: Request, res: Response) => {
             await voucherData.save();
         }
         res.status(201).json({
-            Success: "Ride order created successfully",
-            data: newRide
+            Success: "Trip order created successfully",
+            data: newTrip
         });
     } catch (error: any) {
         res.status(500).json({

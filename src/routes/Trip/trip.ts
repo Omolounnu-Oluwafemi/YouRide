@@ -1,19 +1,19 @@
 import express from 'express'; 
 
-import { validateBookRide } from '../../utils/middleware';
-import { BookRide } from '../../controllers/Ride/ride';
+import { validateBookTrip } from '../../utils/middleware';
+import { BookTrip } from '../../controllers/Trip/trip';
 
 const router = express.Router();
 
 /**
  * @swagger
- * /api/v1/rides/bookride:
+ * /api/v1/trips/booktrip:
  *   post:
- *     summary: Book a ride
+ *     summary: Book a ride for trip
  *     security: 
  *       - BearerAuth: {}
- *     tags: [Rides]
- *     description: Book a ride by providing necessary details.
+ *     tags: [Trips]
+ *     description: Book a trip by providing necessary details.
  *     requestBody:
  *       required: true
  *       content:
@@ -23,16 +23,16 @@ const router = express.Router();
  *             properties:
  *               pickupLocation:
  *                 type: string
- *                 description: The pickup location for the ride.
+ *                 description: The pickup location for the trip.
  *               destination:
  *                 type: string
- *                 description: The destination for the ride.
+ *                 description: The destination for the trip.
  *             example:
  *               pickupLocation: "123 Main St"
  *               dropoffLocation: "456 Elm St"
  *     responses:
  *       200:
- *         description: The ride was successfully booked.
+ *         description: The trip was successfully booked.
  *         content:
  *           application/json:
  *             schema:
@@ -40,60 +40,60 @@ const router = express.Router();
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Ride booked successfully"
- *                 ride:
- *                   $ref: '#/components/schemas/Ride'
+ *                   example: "Trip booked successfully"
+ *                 trip:
+ *                   $ref: '#/components/schemas/Trip'
  *       500:
- *         description: An error occurred while booking the ride.
+ *         description: An error occurred while booking the trip.
  */
-router.post('/bookride', validateBookRide, BookRide);
+router.post('/booktrip', validateBookTrip, BookTrip);
 
 
 /**
  * @swagger
  * components:
  *   schemas:
- *     Ride:
+ *     Trip:
  *       type: object
  *       required:
- *         - rideId
+ *         - tripId
  *         - userId
  *         - pickupLocation
  *         - dropoffLocation
  *         - status
  *       properties:
- *         rideId:
+ *         tripId:
  *           type: string
  *           format: uuid
- *           description: The ID of the ride.
+ *           description: The ID of the trip.
  *         driverId:
  *           type: string
  *           format: uuid
- *           description: The ID of the driver for the ride.
+ *           description: The ID of the driver for the trip.
  *         userId:
  *           type: string
  *           format: uuid
- *           description: The ID of the user who booked the ride.
+ *           description: The ID of the user who booked the trip.
  *         pickupLocation:
  *           type: string
- *           description: The pickup location for the ride.
+ *           description: The pickup location for the trip.
  *         destination:
  *           type: string
- *           description: The dropoff location for the ride.
+ *           description: The dropoff location for the trip.
  *         pickupTime:
  *           type: string
  *           format: date-time
- *           description: The pickup time for the ride.
+ *           description: The pickup time for the trip.
  *         dropoffTime:
  *           type: string
  *           format: date-time
- *           description: The dropoff time for the ride.
+ *           description: The dropoff time for the trip.
  *         status:
  *           type: string
  *           enum: ['pending', 'accepted', 'in-progress', 'completed', 'cancelled']
- *           description: The status of the ride.
+ *           description: The status of the trip.
  *       example:
- *         rideId: "123e4567-e89b-12d3-a456-426614174000"
+ *         tripId: "123e4567-e89b-12d3-a456-426614174000"
  *         driverId: "123e4567-e89b-12d3-a456-426614174000"
  *         userId: "123e4567-e89b-12d3-a456-426614174000"
  *         pickupLocation: "123 Main St"
