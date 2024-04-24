@@ -178,9 +178,22 @@ export const createTripSchema = Joi.object({
 export const tripAmountschema = Joi.object({
   vehicleName: Joi.string().required(),
   distance: Joi.number().required(),
-  time: Joi.number().required(),
+  estimatedtime: Joi.number().required(),
   country: Joi.string().required(),
   voucher: Joi.string().optional().allow(''),
+});
+export const tripRequestSchema = Joi.object({
+    country: Joi.string().required(),
+    pickupLocation: Joi.string().required(),
+    destination: Joi.string().required(),
+    vehicleName: Joi.string().required(),
+    paymentMethod: Joi.string().required(),
+    tripAmount: Joi.number().required(),
+    totalDistance: Joi.number().required(),
+    pickupLatitude: Joi.number().required(),
+    pickupLongitude: Joi.number().required(),
+    destinationLatitude: Joi.number().required(),
+    destinationLongitude: Joi.number().required(),
 });
 export const options = {
     abortEarly: false,

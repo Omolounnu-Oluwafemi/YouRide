@@ -54,7 +54,8 @@ class Driver extends Model<DriversAttributes, DriverCreationAttributes> implemen
   public readonly updatedAt!: Date;
 
    public static associate(models: { [key: string]: any }) {
-    Driver.hasMany(models.Trip, { foreignKey: 'driverId', as: 'trips' });
+     Driver.hasMany(models.Trip, { foreignKey: 'driverId', as: 'trips' });
+     Driver.belongsTo(models.Vehicle, { foreignKey: 'vehicleId', as: 'vehicles' });
   }
 }
 

@@ -1,5 +1,5 @@
 import { NextFunction, Response, Request } from "express";
-import { initiialSignUpValidator, finalSignUpValidator, verificationCodeValidator, AdminSignupValidator, AdminSignInValidator, AdminPasswordUpdate, options, BookTrip, createVehicleSchema, createTripSchema } from "../utils/validate";
+import { initiialSignUpValidator, finalSignUpValidator, verificationCodeValidator, AdminSignupValidator, AdminSignInValidator, AdminPasswordUpdate, options, BookTrip, createVehicleSchema, createTripSchema, tripRequestSchema } from "../utils/validate";
 import { DriverSignupValidator } from '../utils/validate';
 import rateLimit from 'express-rate-limit';
 import { verifyAdminToken } from "./token";
@@ -146,8 +146,8 @@ export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
     return res.status(401).json({ message: 'Invalid token' });
   }
 };
-export const validateBookTrip = (req: Request, res: Response, next: NextFunction) => { 
-  const { error } = BookTrip.validate(req.body, options);
+export const validatetripRequest = (req: Request, res: Response, next: NextFunction) => { 
+  const { error } = tripRequestSchema.validate(req.body, options);
   if (error) {
     const errors = error.details.map((err: { message: any; }) => err.message);
     return res.status(400).json({

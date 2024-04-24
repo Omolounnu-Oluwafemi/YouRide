@@ -44,6 +44,7 @@ class Vehicle extends Model<VehicleAttributes, VehicleCreationAttributes> implem
 
     public static associate(models: { [key: string]: any }) {
     Vehicle.hasMany(models.Trip, { foreignKey: 'vehicleId', as: 'trips' });
+    Vehicle.hasMany(models.Driver, { foreignKey: 'driverId', as: 'drivers' });
   }
 }
 

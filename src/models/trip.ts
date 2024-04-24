@@ -17,6 +17,10 @@ interface TripAttributes {
     tripAmount: number;
     pickupLocation: string;
     destination: string;
+    pickupLatitude: number;
+    pickupLongitude: number;
+    destinationLatitude: number;
+    destinationLongitude: number;
     totalDistance: number;
     pickupTime: Date | null;
     dropoffTime: Date | null;
@@ -38,6 +42,10 @@ class Trip extends Model<TripAttributes, TripCreationAttributes> implements Trip
     public voucherId!: string | null;
     public pickupLocation!:  string;
     public destination!: string;
+    public pickupLatitude!: number;
+    public pickupLongitude!: number;
+    public destinationLatitude!: number;
+    public destinationLongitude!: number;
     public totalDistance!: number;
     public pickupTime!: Date | null;
     public dropoffTime!: Date | null;
@@ -108,6 +116,22 @@ const initTrip = (sequelize: Sequelize) => {
             },
             destination: {
                 type: DataTypes.STRING,
+                allowNull: false,
+            },
+            pickupLatitude: {
+                type: DataTypes.FLOAT,
+                allowNull: false,
+            },
+            pickupLongitude: {
+                type: DataTypes.FLOAT,
+                allowNull: false,
+            },
+            destinationLatitude: {
+                type: DataTypes.FLOAT,
+                allowNull: false,
+            },
+            destinationLongitude: {
+                type: DataTypes.FLOAT,
                 allowNull: false,
             },
             totalDistance: {

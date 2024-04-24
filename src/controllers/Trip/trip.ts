@@ -1,3 +1,4 @@
+import { Sequelize } from 'sequelize';
 import { Request, Response } from "express";
 import { Trip } from "../../models/trip";
 import { User } from "../../models/usersModel";
@@ -21,14 +22,48 @@ interface TripCreation {
     driverName: string | null;
     pickupLocation: string;
     destination: string;
+    pickupLatitude: number;
+    pickupLongitude: number;
+    destinationLatitude: number;
+    destinationLongitude: number;
     pickupTime: Date | null;
     dropoffTime: Date | null;
     status: 'current' | 'scheduled' | 'completed' | 'cancelled';
 }
 
+async function findClosestDriver(latitude: number, longitude: number, vehicleName: string) {
+    const userLocation = Sequelize.literal(`ST_MakePoint(${longitude}, ${latitude})`);
+    const driverLocation = Sequelize.literal(`ST_MakePoint(longitude, latitude)`);
+    const distance = Sequelize.fn('ST_Distance', driverLocation, userLocation);
+
+    // Find the vehicle with the given name
+    const vehicle = await Vehicle.findOne({ where: { vehicleName } });
+
+    if (!vehicle) {
+        throw new Error('Vehicle not found');
+    }
+
+    // Find the closest driver who is driving the specified vehicle and is available
+    const driverData = await Driver.findOne({
+        where: {
+            isAvailable: true,
+        },
+          include: [{
+            model: Vehicle,
+            where: {
+                name: vehicleName
+            }
+        }],
+        order: Sequelize.literal(`${distance} ASC`),
+        limit: 1
+    });
+
+    return driverData;
+}
+
 export const calculateTripAmount = async (req: Request, res: Response) => {
     try {
-        const { vehicleName, totalDistance, time, voucher, country } = req.body;
+        const { vehicleName, totalDistance, estimatedtime, voucher, country } = req.body;
 
         const { error } = tripAmountschema.validate(req.body);
 
@@ -55,7 +90,7 @@ export const calculateTripAmount = async (req: Request, res: Response) => {
         }
 
         // Calculate the trip amount
-        const baseTripAmount = vehicle.baseFare + vehicle.pricePerMIN * time + vehicle.pricePerKMorMI * totalDistance + vehicle.adminCommission;
+        const baseTripAmount = vehicle.baseFare + vehicle.pricePerMIN * estimatedtime + vehicle.pricePerKMorMI * totalDistance + vehicle.adminCommission;
 
         // Apply the discount to the base trip amount
         const discountedTripAmount = baseTripAmount - (baseTripAmount * discount / 100);
@@ -88,11 +123,10 @@ export const calculateTripAmount = async (req: Request, res: Response) => {
 };
 
 export const TripRequest = async (req: Request, res: Response) => {
-
     const tripId = uuidv4();
     const userId = decodeUserIdFromToken(req)
     
-    const { country, pickupLocation, destination, vehicleName, paymentMethod, tripAmount, totalDistance } = req.body;
+    const { country, pickupLocation, destination, vehicleName, paymentMethod, tripAmount, totalDistance, pickupLatitude, pickupLongitude, destinationLatitude, destinationLongitude } = req.body;
 
     try {
         const vehicleData = await Vehicle.findOne({ where: { vehicleName: vehicleName } });
@@ -121,12 +155,23 @@ export const TripRequest = async (req: Request, res: Response) => {
             driverName: null,
             pickupLocation,
             destination,
+            pickupLatitude,
+            pickupLongitude,
+            destinationLatitude,
+            destinationLongitude,
             pickupTime: null,
             dropoffTime: null,
             status: 'scheduled',
         };
 
         const newTrip = await userData.createTrip(trip);
+
+        // Find the closest driver
+        const driverData = await findClosestDriver(pickupLocation.latitude, pickupLocation.longitude, vehicleName);
+
+        if (!driverData) {
+            return res.status(404).json({ error: "No available drivers found" });
+        }
 
         res.status(201).json({
             Success: "Trip order created successfully",
