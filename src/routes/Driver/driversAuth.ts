@@ -30,6 +30,12 @@ const upload = multer({ dest: 'uploads/' });
  *                 type: string
  *               country:
  *                 type: string
+ *               latitude:
+ *                 type: number
+ *                 format: float
+ *               longitude:
+ *                 type: number
+ *                 format: float
  *               gender:
  *                 type: string
  *                 enum: [Male, Female, Other]
@@ -275,6 +281,12 @@ router.post('/verify', validateVerificationCode, verifySignInLimiter, verifyDriv
  *         gender:
  *           type: string
  *           enum: [Male, Female, Other]
+ *         latitude:
+ *           type: number
+ *           format: float
+ *         longitude:
+ *           type: number
+ *           format: float
  *         category:
  *           type: string
  *           enum: [Private Driver, Taxi Driver, Delivery Driver]

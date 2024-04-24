@@ -78,7 +78,7 @@ export const DriverSignupValidator = Joi.object({
       'any.required': 'Category is required',
       'any.only': 'Invalid category'
     }),
-    referralCode: Joi.string(),
+    referralCode: Joi.string().optional().allow(''),
     vehicleYear: Joi.string().pattern(/^(19|20)\d{2}$/).valid(...Object.values(vehicleYear)).required().messages({
       'any.required': 'Vehicle year is required',
       'string.pattern.base': 'Invalid vehicle year',
@@ -96,6 +96,18 @@ export const DriverSignupValidator = Joi.object({
     }),
     vehicleNumber: Joi.string().required().messages({
       'any.required': 'Vehicle number is required'
+    }),
+    latitude: Joi.number().min(-90).max(90).messages({
+    'number.base': 'Latitude must be a number',
+    'number.min': 'Latitude must be between -90 and 90',
+    'number.max': 'Latitude must be between -90 and 90',
+    'any.required': 'Latitude is required'
+    }),
+    longitude: Joi.number().min(-180).max(180).messages({
+    'number.base': 'Longitude must be a number',
+    'number.min': 'Longitude must be between -180 and 180',
+    'number.max': 'Longitude must be between -180 and 180',
+    'any.required': 'Longitude is required'
     }),
 });
 export const AdminSignupValidator = Joi.object({
@@ -167,6 +179,7 @@ export const tripAmountschema = Joi.object({
   vehicleName: Joi.string().required(),
   distance: Joi.number().required(),
   time: Joi.number().required(),
+  country: Joi.string().required(),
   voucher: Joi.string().optional().allow(''),
 });
 export const options = {

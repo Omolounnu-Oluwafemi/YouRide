@@ -7,39 +7,38 @@ import { Voucher } from './voucher';
     
 interface TripAttributes {
     tripId: string;
-    driverId: string;
+    driverId: string | null;
     userId: string;
     userName: string;
     driverName: string | null;
     country: string;
-    vehicleId: string;
+    vehicleId: string | null;
     paymentMethod: string;
     tripAmount: number;
-    voucherId: string | null;
     pickupLocation: string;
     destination: string;
-    totalDistance: string;
+    totalDistance: number;
     pickupTime: Date | null;
     dropoffTime: Date | null;
     status: string;
 }
 
-interface TripCreationAttributes extends Optional<TripAttributes, 'tripId'> {}
+export interface TripCreationAttributes extends Optional<TripAttributes, 'tripId'> {}
 
 class Trip extends Model<TripAttributes, TripCreationAttributes> implements TripAttributes {
     public tripId!: string;
     public userId!: string;
-    public driverId!: string;
+    public driverId!: string | null;
     public userName!: string;
     public driverName!: string | null;
     public country!: string;
-    public vehicleId!: string;
+    public vehicleId!: string | null;
     public paymentMethod!: string;
     public tripAmount!: number;
     public voucherId!: string | null;
     public pickupLocation!:  string;
     public destination!: string;
-    public totalDistance!: string;
+    public totalDistance!: number;
     public pickupTime!: Date | null;
     public dropoffTime!: Date | null;
     public status!: string;
@@ -85,7 +84,7 @@ const initTrip = (sequelize: Sequelize) => {
             },
             vehicleId: {
                 type: DataTypes.UUID,
-                allowNull: false,
+                allowNull: true,
                 references: {
                     model: 'Vehicles',
                     key: 'vehicleId'
@@ -112,7 +111,7 @@ const initTrip = (sequelize: Sequelize) => {
                 allowNull: false,
             },
             totalDistance: {
-                type: DataTypes.STRING,
+                type: DataTypes.INTEGER,
                 allowNull: false,
             },
             pickupTime: {
@@ -136,10 +135,6 @@ const initTrip = (sequelize: Sequelize) => {
                 type: DataTypes.ENUM,
                 values: ['current', 'scheduled', 'completed' , 'cancelled'],
                 allowNull: false,
-            },
-            voucherId: {
-                type: DataTypes.UUID,
-                allowNull: true,
             },
         },
         {

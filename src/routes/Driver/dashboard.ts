@@ -89,16 +89,29 @@ router.patch('/vehicle-updates', updateVehicleDetails)
  * @swagger
  * /api/v1/driver/dashboard/availability:
  *   patch:
- *     summary: Update driver availability
+ *     summary: Update driver availability and location
  *     tags: [Drivers]
- *     description: Update the availability of a driver by the driver's ID from the JWT token stored in a cookie.
+ *     description: Update the availability and location of a driver by the driver's ID from the JWT token stored in a cookie.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               latitude:
+ *                 type: number
+ *                 format: float
+ *               longitude:
+ *                 type: number
+ *                 format: float
  *     responses:
  *       200:
- *         description: Availability updated successfully
+ *         description: Availability and location updated successfully
  *       404:
  *         description: Driver not found
  *       500:
- *         description: An error occurred while updating availability
+ *         description: An error occurred while updating availability and location
  */
 router.patch('/availability', updateAvailability)
 

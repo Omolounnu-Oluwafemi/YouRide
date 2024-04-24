@@ -98,7 +98,9 @@ export const DriverSignup = async (req: Request, res: Response) => {
       vehicleLogBook: vehicleLogBookUrl,
       privateHireLicenseBadge: privateHireLicenseBadgeUrl,
       insuranceCertificate: insuranceCertificateUrl,
-      motTestCertificate: motTestCertificateUrl
+      motTestCertificate: motTestCertificateUrl,
+      latitude: '0',
+      longitude: '0'
     });
 
     // Send response

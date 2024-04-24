@@ -1,5 +1,4 @@
 import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
-// import { Trip } from './trip';
 
 interface DriversAttributes {
   driverId: string;
@@ -22,6 +21,8 @@ interface DriversAttributes {
   insuranceCertificate: string;
   motTestCertificate: string;
   isAvailable: boolean;
+  latitude: string; 
+  longitude: string; 
 }
 
 interface DriverCreationAttributes extends Optional<DriversAttributes, 'driverId'> {}
@@ -47,6 +48,8 @@ class Driver extends Model<DriversAttributes, DriverCreationAttributes> implemen
   public insuranceCertificate!: string;
   public motTestCertificate!: string;
   public isAvailable!: boolean;
+  public latitude!: string; 
+  public longitude!: string; 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
@@ -103,6 +106,14 @@ const initDriver = (sequelize: Sequelize) => {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
         allowNull: true, 
+      },
+      latitude: {
+        type: DataTypes.FLOAT,
+        allowNull: true,
+      },
+      longitude: {
+        type: DataTypes.FLOAT,
+        allowNull: true,
       },
       vehicleYear: {
         type: DataTypes.ENUM,

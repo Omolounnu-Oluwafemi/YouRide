@@ -10,11 +10,14 @@ import { tripAmountschema } from '../../utils/validate'
 
 interface TripCreation {
     tripId: string;
+    userId: string;
+    driverId: string | null;
     userName: string;
-    vehicleId: string;
+    vehicleId: string | null;
     paymentMethod: string;
+    country: string;
     tripAmount: number;
-    voucher: string | null;
+    totalDistance: number;
     driverName: string | null;
     pickupLocation: string;
     destination: string;
@@ -25,7 +28,7 @@ interface TripCreation {
 
 export const calculateTripAmount = async (req: Request, res: Response) => {
     try {
-        const { vehicleName, distance, time, voucher } = req.body;
+        const { vehicleName, totalDistance, time, voucher, country } = req.body;
 
         const { error } = tripAmountschema.validate(req.body);
 
@@ -33,7 +36,7 @@ export const calculateTripAmount = async (req: Request, res: Response) => {
             return res.status(400).json({ message: 'Invalid input', error: error.details[0].message });
         }
         // Get the vehicle details
-        const vehicle = await Vehicle.findOne({ where: { vehicleName } });
+        const vehicle = await Vehicle.findOne({ where: { vehicleName, country } });
 
         if (!vehicle) {
             return res.status(404).json({ message: 'Vehicle not found' });
@@ -52,7 +55,7 @@ export const calculateTripAmount = async (req: Request, res: Response) => {
         }
 
         // Calculate the trip amount
-        const baseTripAmount = vehicle.baseFare + vehicle.pricePerMIN * time + vehicle.pricePerKMorMI * distance + vehicle.adminCommission;
+        const baseTripAmount = vehicle.baseFare + vehicle.pricePerMIN * time + vehicle.pricePerKMorMI * totalDistance + vehicle.adminCommission;
 
         // Apply the discount to the base trip amount
         const discountedTripAmount = baseTripAmount - (baseTripAmount * discount / 100);
@@ -84,12 +87,12 @@ export const calculateTripAmount = async (req: Request, res: Response) => {
     }
 };
 
-export const confirmTripRequest = async (req: Request, res: Response) => {
+export const TripRequest = async (req: Request, res: Response) => {
 
     const tripId = uuidv4();
     const userId = decodeUserIdFromToken(req)
     
-    const { pickupLocation, destination, vehicleName, paymentMethod, tripAmount, voucher } = req.body;
+    const { country, pickupLocation, destination, vehicleName, paymentMethod, tripAmount, totalDistance } = req.body;
 
     try {
         const vehicleData = await Vehicle.findOne({ where: { vehicleName: vehicleName } });
@@ -97,28 +100,33 @@ export const confirmTripRequest = async (req: Request, res: Response) => {
             return res.status(400).json({ error: "Invalid Trip option" });
         }
 
-        // Fetch user and driver details
+        // Fetch user details
         const userData = await User.findOne({ where: { userId: userId } });
-        // const driverData = await Driver.findOne({ where: { driverId: driverId } });
+
+        if (!userData) {
+            return res.status(404).json({ error: "User not found" });
+        }
 
         // Create a new Trip record
         const trip: TripCreation = {
             tripId,
-            userName: userData?.firstName + ' ' + userData?.lastName,
-            vehicleId,
+            userId: userData.userId, 
+            driverId: null, 
+            userName: userData.firstName + ' ' + userData.lastName,
+            vehicleId: null,
             paymentMethod,
+            totalDistance,
             tripAmount,
-            voucher,
+            country,
             driverName: null,
             pickupLocation,
             destination,
             pickupTime: null,
             dropoffTime: null,
-            status: 'pending',
-            rating: null,
+            status: 'scheduled',
         };
 
-        const newTrip = await trip.create(trip);
+        const newTrip = await userData.createTrip(trip);
 
         res.status(201).json({
             Success: "Trip order created successfully",

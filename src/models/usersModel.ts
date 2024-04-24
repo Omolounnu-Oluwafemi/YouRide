@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
-
+import { Trip, TripCreationAttributes } from './trip';
 interface UserAttributes {
   userId: string;
   phoneNumber: string;
@@ -12,9 +12,9 @@ interface UserAttributes {
   appleId: string;
 }
 
-interface UserCreationAttributes extends Optional<UserAttributes, 'userId'> {}
+interface UserCreationAttributes extends Optional<UserAttributes, 'userId'> { }
 
-class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
+class User extends Model<UserAttributes, UserCreationAttributes> {
   public userId!: string;
   public phoneNumber!: string;
   public email!: string;
@@ -27,11 +27,13 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
-
   public static associate(models: { [key: string]: any }) {
     User.hasMany(models.Trip, { foreignKey: 'userId', as: 'trips' });
   }
+  // Add the createTrip method to the User class
+  public createTrip!: (trip: TripCreationAttributes) => Promise<Trip>;
 }
+
 const initUser = (sequelize: Sequelize) => {
   User.init(
     {
