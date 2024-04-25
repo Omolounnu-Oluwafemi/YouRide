@@ -31,7 +31,6 @@ interface TripCreation {
     dropoffTime: Date | null;
     status: 'current' | 'scheduled' | 'completed' | 'cancelled';
 }
-
 async function findClosestDriver(latitude: number, longitude: number, vehicleName: string) {
     const userLocation = Sequelize.literal(`ST_MakePoint(${longitude}, ${latitude})`);
     const driverLocation = Sequelize.literal(`ST_MakePoint(longitude, latitude)`);
@@ -61,7 +60,6 @@ async function findClosestDriver(latitude: number, longitude: number, vehicleNam
 
     return driverData;
 }
-
 export const calculateTripAmount = async (req: Request, res: Response) => {
     try {
         const { vehicleName, totalDistance, estimatedtime, voucher, country } = req.body;
