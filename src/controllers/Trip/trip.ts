@@ -132,6 +132,7 @@ export const TripRequest = async (req: Request, res: Response) => {
             totalDistance,
             tripAmount,
             country,
+            vehicleName,
             driverName: null,
             pickupLocation,
             destination,
@@ -211,22 +212,97 @@ export const acceptTrip = async (req: Request, res: Response) => {
 }
 export const skipTrip = async (req: Request, res: Response) => {
     try {
-        
-    } catch (error) {
-        
-    }
-}
-export const startTrip = async (req: Request, res: Response) => { 
-    try {
-        
-    } catch (error) {
-        
-    }
-}
-export const cancelTrip = async (req: Request, res: Response) => { 
-    try { 
+        const { tripId } = req.params;
 
+        // Find the trip with the given ID
+        const trip = await Trip.findOne({ where: { tripId: tripId } });
+
+        if (!trip) {
+            return res.status(404).json({ error: 'Trip not found' });
+        }
+
+        // Find the next closest driver
+        const nextDriver = await findClosestDriver(trip.pickupLatitude, trip.pickupLongitude, trip.vehicleName);
+
+        // Assign the trip to the next driver
+        trip.driverId = nextDriver.driverId;
+        await trip.save();
+
+        return res.status(200).json({ message: 'Trip skipped successfully', nextDriver });
     } catch (error) {
-        
+        return res.status(500).json({ error: 'An error occurred while processing your request' });
+    }
+}
+export const startTrip = async (req: Request, res: Response) => {
+    try {
+        const { tripId } = req.params;
+        const { driverId, pickupTime } = req.body;
+
+        // Find the trip with the given ID
+        const trip = await Trip.findOne({ where: { tripId: tripId } });
+
+        if (!trip) {
+            return res.status(404).json({ error: 'Trip not found' });
+        }
+
+        // Check if the trip is assigned to the current driver
+        if (trip.driverId !== driverId) {
+            return res.status(403).json({ error: 'This trip is not assigned to you' });
+        }
+
+        // Update the status and pickup time of the trip
+        trip.status = 'current';
+        trip.pickupTime = new Date(pickupTime);
+        await trip.save();
+
+        return res.status(200).json({ message: 'Trip started successfully' });
+    } catch (error) {
+        return res.status(500).json({ error: 'An error occurred while processing your request' });
+    }
+}
+export const cancelTrip = async (req: Request, res: Response) => {
+    try {
+        const { tripId } = req.params;
+
+        // Find the trip with the given ID
+        const trip = await Trip.findOne({ where: { tripId: tripId } });
+
+        if (!trip) {
+            return res.status(404).json({ error: 'Trip not found' });
+        }
+
+        // Update the status of the trip
+        trip.status = 'cancelled';
+        await trip.save();
+
+        return res.status(200).json({ message: 'Trip cancelled successfully' });
+    } catch (error) {
+        return res.status(500).json({ error: 'An error occurred while processing your request' });
+    }
+}
+export const completeTrip = async (req: Request, res: Response) => {
+    try {
+        const { tripId } = req.params;
+        const { driverId } = req.body;
+
+        // Find the trip with the given ID
+        const trip = await Trip.findOne({ where: { tripId: tripId } });
+
+        if (!trip) {
+            return res.status(404).json({ error: 'Trip not found' });
+        }
+
+        // Check if the trip is assigned to the current driver
+        if (trip.driverId !== driverId) {
+            return res.status(403).json({ error: 'This trip is not assigned to you' });
+        }
+
+        // Update the status of the trip
+        trip.status = 'completed';
+        await trip.save();
+
+        return res.status(200).json({ message: 'Trip completed successfully' });
+    } catch (error) {
+        return res.status(500).json({ error: 'An error occurred while processing your request' });
     }
 }

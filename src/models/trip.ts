@@ -11,6 +11,7 @@ interface TripAttributes {
     userId: string;
     userName: string;
     driverName: string | null;
+    vehicleName: string;
     country: string;
     vehicleId: string | null;
     paymentMethod: string;
@@ -35,8 +36,9 @@ class Trip extends Model<TripAttributes, TripCreationAttributes> implements Trip
     public driverId!: string | null;
     public userName!: string;
     public driverName!: string | null;
+    public vehicleName!: string;
     public country!: string;
-    public vehicleId!: string | null;
+    public vehicleId!: string;
     public paymentMethod!: string;
     public tripAmount!: number;
     public voucherId!: string | null;
@@ -85,6 +87,10 @@ const initTrip = (sequelize: Sequelize) => {
             driverName: {
                 type: DataTypes.STRING,
                 allowNull: true
+            },
+            vehicleName: {
+                type: DataTypes.STRING,
+                allowNull: false
             },
             userName: {
                 type: DataTypes.STRING,
