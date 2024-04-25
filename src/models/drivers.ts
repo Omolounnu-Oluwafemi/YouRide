@@ -2,7 +2,7 @@ import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
 
 interface DriversAttributes {
   driverId: string;
-  vehicleId: string;
+  vehicleId: string | null;
   phoneNumber: string;
   country: string;
   email: string;
@@ -30,7 +30,7 @@ interface DriverCreationAttributes extends Optional<DriversAttributes, 'driverId
 
 class Driver extends Model<DriversAttributes, DriverCreationAttributes> implements DriversAttributes {
   public driverId!: string;
-  public vehicleId!: string;
+  public vehicleId!: string | null;
   public phoneNumber!: string;
   public email!: string;
   public country!: string;
@@ -70,12 +70,12 @@ const initDriver = (sequelize: Sequelize) => {
         primaryKey: true,
       },
       vehicleId: {
-                type: DataTypes.UUID,
-                allowNull: true,
-                references: {
-                    model: 'Vehicles',
-                    key: 'vehicleId'
-                }
+          type: DataTypes.UUID,
+          allowNull: true,
+          references: {
+              model: 'Vehicles',
+              key: 'vehicleId'
+          }
       },
       phoneNumber: {
         type: DataTypes.STRING,

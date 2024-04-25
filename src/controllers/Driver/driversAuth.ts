@@ -80,6 +80,7 @@ export const DriverSignup = async (req: Request, res: Response) => {
     // Create new Rider instance in database
     const newDriver = await Driver.create({
       driverId,
+      vehicleId: null,
       phoneNumber,
       email,
       country,
