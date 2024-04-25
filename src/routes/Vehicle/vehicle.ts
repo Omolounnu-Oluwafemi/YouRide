@@ -219,6 +219,7 @@ router.post('/create', isAdmin, validateVehicle, CreateVehicle);
  *         required: true
  *         description: Unique ID of the vehicle to update
  *     requestBody:
+ *       required: true
  *       content:
  *         application/json:
  *           schema:
@@ -254,7 +255,6 @@ router.post('/create', isAdmin, validateVehicle, CreateVehicle);
  *                 type: string
  *               isDocVerified:
  *                 type: boolean
- *           required: true
  *     responses:
  *       200:
  *         description: Vehicle updated successfully

@@ -50,6 +50,7 @@ export const CreateVehicle = async (req: Request, res: Response) => {
         // Create a new vehicle record
         const vehicle = {
             vehicleId,
+            driverId: null,
             country,
             baseFare,
             pricePerKMorMI,

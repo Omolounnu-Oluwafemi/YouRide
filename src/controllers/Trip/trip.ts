@@ -1,4 +1,4 @@
-import { Sequelize } from 'sequelize';
+import { QueryTypes } from 'sequelize';
 import { Request, Response } from "express";
 import { Trip } from "../../models/trip";
 import { User } from "../../models/usersModel";
@@ -9,32 +9,10 @@ import { decodeDriverIdFromToken, decodeUserIdFromToken } from "../../utils/toke
 import { Voucher } from "../../models/voucher";
 import { tripAmountschema } from '../../utils/validate'
 import { io, driverSocketMap } from '../../config/socket';
+import { sequelize } from '../../config/config';
 
-interface TripCreation {
-    tripId: string;
-    userId: string;
-    driverId: string | null;
-    userName: string;
-    vehicleId: string | null;
-    paymentMethod: string;
-    country: string;
-    tripAmount: number;
-    totalDistance: number;
-    driverName: string | null;
-    pickupLocation: string;
-    destination: string;
-    pickupLatitude: number;
-    pickupLongitude: number;
-    destinationLatitude: number;
-    destinationLongitude: number;
-    pickupTime: Date | null;
-    dropoffTime: Date | null;
-    status: 'current' | 'scheduled' | 'completed' | 'cancelled';
-}
 async function findClosestDriver(latitude: number, longitude: number, vehicleName: string) {
-    const userLocation = Sequelize.literal(`ST_MakePoint(${longitude}, ${latitude})`);
-    const driverLocation = Sequelize.literal(`ST_MakePoint(longitude, latitude)`);
-    const distance = Sequelize.fn('ST_Distance', driverLocation, userLocation);
+    const userLocation = `ST_MakePoint(${longitude}, ${latitude})`;
 
     // Find the vehicle with the given name
     const vehicle = await Vehicle.findOne({ where: { vehicleName } });
@@ -43,22 +21,23 @@ async function findClosestDriver(latitude: number, longitude: number, vehicleNam
         throw new Error('Vehicle not found');
     }
 
-    // Find the closest driver who is driving the specified vehicle and is available
-    const driverData = await Driver.findOne({
-        where: {
-            isAvailable: true,
-        },
-          include: [{
-            model: Vehicle, as: 'vehicle',
-            where: {
-                vehicleName: vehicleName
-            }
-        }],
-        order: [[distance, 'ASC']],
-        limit: 1
+    const driverData = await sequelize.query(`
+        SELECT "Drivers".*, "Vehicles"."vehicleName", 
+               ST_Distance(ST_MakePoint("Drivers"."longitude", "Drivers"."latitude"), ${userLocation}) AS distance
+        FROM "Drivers"
+        INNER JOIN "Vehicles" ON "Drivers"."vehicleId" = "Vehicles"."vehicleId"
+        WHERE "Drivers"."isAvailable" = true AND "Vehicles"."vehicleName" = :vehicleName
+        ORDER BY distance ASC
+        LIMIT 1
+    `, {
+        replacements: { vehicleName },
+        type: QueryTypes.SELECT,
+        model: Driver,
+        mapToModel: true,
+        nest: true,
     });
 
-    return driverData;
+    return driverData[0];
 }
 export const calculateTripAmount = async (req: Request, res: Response) => {
     try {
@@ -166,9 +145,12 @@ export const TripRequest = async (req: Request, res: Response) => {
         });
 
         // const newTrip = await userData.createTrip(trip);
+        if (!pickupLocation || pickupLatitude === undefined || pickupLongitude === undefined) {
+            throw new Error('Invalid pickup location');
+        }
 
         // Find the closest driver
-        const driverData = await findClosestDriver(pickupLocation.latitude, pickupLocation.longitude, vehicleName);
+        const driverData = await findClosestDriver(pickupLatitude, pickupLongitude, vehicleName);
 
         if (!driverData) {
             return res.status(404).json({ error: "No available drivers found" });

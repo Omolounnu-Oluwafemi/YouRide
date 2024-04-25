@@ -94,7 +94,7 @@ export const DriverSignup = async (req: Request, res: Response) => {
       vehicleColor,
       licensePlate,
       vehicleNumber,
-      isAvailable: true, 
+      isAvailable: false, 
       driverLicense: driverLicenseUrl,
       vehicleLogBook: vehicleLogBookUrl,
       privateHireLicenseBadge: privateHireLicenseBadgeUrl,
@@ -112,8 +112,10 @@ export const DriverSignup = async (req: Request, res: Response) => {
     });
   } catch (error) {
     if ((error as Error).name === 'ValidationError') {
+      console.log(error)
       res.status(400).json({ error: (error as Error).message });
     } else {
+      console.log(error)
       res.status(500).json({ error: (error as Error).message });
     }
   }

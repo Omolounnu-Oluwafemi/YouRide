@@ -2,6 +2,7 @@ import { Model, DataTypes, Optional, Sequelize } from 'sequelize';
 
 interface VehicleAttributes {
     vehicleId: string;
+    driverId: string | null;
     country: string;
     baseFare: number;
     pricePerKMorMI: number;
@@ -23,6 +24,7 @@ interface VehicleCreationAttributes extends Optional<VehicleAttributes, 'vehicle
 
 class Vehicle extends Model<VehicleAttributes, VehicleCreationAttributes> implements VehicleAttributes {
     public vehicleId!: string;
+    public driverId!: string | null;
     public country!: string;
     public baseFare!: number;
     public pricePerKMorMI!: number;
@@ -54,6 +56,14 @@ const initVehicle = (sequelize: Sequelize) => {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
             primaryKey: true
+        },
+         driverId: {
+            type: DataTypes.UUID,
+            allowNull: true,
+            references: {
+                model: 'Drivers',
+                key: 'driverId'
+            }
         },
         country: {
             type: DataTypes.STRING,
