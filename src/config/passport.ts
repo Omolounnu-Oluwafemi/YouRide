@@ -4,7 +4,7 @@ import { Strategy as FacebookStrategy}  from "passport-facebook";
 import AppleStrategy from "passport-apple";
 import { User } from "../models/usersModel";
 import { config } from "dotenv";
-import { Sequelize } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 import { v4 as uuidv4 } from "uuid";
 
 config();
@@ -22,7 +22,14 @@ export default function authSetup(sequelize: Sequelize) {
       try {
          const userId = uuidv4();
         
-            let user = await User.findOne({ where: { userId: userId} });
+            let user = await User.findOne({ 
+                where: { 
+                    [Op.or]: [
+                        { userId: userId }, 
+                        { email: profile.emails?.[0]?.value }
+                    ] 
+                } 
+            });
 
             if (!user) {
                 // If user not found, create a new user

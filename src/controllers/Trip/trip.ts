@@ -5,9 +5,10 @@ import { User } from "../../models/usersModel";
 import { Driver } from "../../models/drivers";
 import { Vehicle } from "../../models/vehicle";
 import { v4 as uuidv4 } from "uuid";
-import { decodeUserIdFromToken } from "../../utils/token";
+import { decodeDriverIdFromToken, decodeUserIdFromToken } from "../../utils/token";
 import { Voucher } from "../../models/voucher";
 import { tripAmountschema } from '../../utils/validate'
+import { io, driverSocketMap } from '../../config/socket';
 
 interface TripCreation {
     tripId: string;
@@ -49,12 +50,12 @@ async function findClosestDriver(latitude: number, longitude: number, vehicleNam
             isAvailable: true,
         },
           include: [{
-            model: Vehicle,
+            model: Vehicle, as: 'vehicle',
             where: {
-                name: vehicleName
+                vehicleName: vehicleName
             }
         }],
-        order: Sequelize.literal(`${distance} ASC`),
+        order: [[distance, 'ASC']],
         limit: 1
     });
 
@@ -94,8 +95,7 @@ export const calculateTripAmount = async (req: Request, res: Response) => {
 
         // Apply the discount to the base trip amount
         const discountedTripAmount = baseTripAmount - (baseTripAmount * discount / 100);
-
-        // Calculate the trip amounts for all vehicle types
+            
         const tripAmounts = {
             'Datride Vehicle': discountedTripAmount,
             'Datride Share': discountedTripAmount / 4,
@@ -121,7 +121,6 @@ export const calculateTripAmount = async (req: Request, res: Response) => {
         res.status(500).json({ message: 'An error occurred while calculating the trip amounts', error: error.message });
     }
 };
-
 export const TripRequest = async (req: Request, res: Response) => {
     const tripId = uuidv4();
     const userId = decodeUserIdFromToken(req)
@@ -134,6 +133,10 @@ export const TripRequest = async (req: Request, res: Response) => {
             return res.status(400).json({ error: "Invalid Trip option" });
         }
 
+         if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
+
         // Fetch user details
         const userData = await User.findOne({ where: { userId: userId } });
 
@@ -142,7 +145,7 @@ export const TripRequest = async (req: Request, res: Response) => {
         }
 
         // Create a new Trip record
-        const trip: TripCreation = {
+        const newTrip = await Trip.create({
             tripId,
             userId: userData.userId, 
             driverId: null, 
@@ -162,15 +165,21 @@ export const TripRequest = async (req: Request, res: Response) => {
             pickupTime: null,
             dropoffTime: null,
             status: 'scheduled',
-        };
+        });
 
-        const newTrip = await userData.createTrip(trip);
+        // const newTrip = await userData.createTrip(trip);
 
         // Find the closest driver
         const driverData = await findClosestDriver(pickupLocation.latitude, pickupLocation.longitude, vehicleName);
 
         if (!driverData) {
             return res.status(404).json({ error: "No available drivers found" });
+        }
+
+        // Emit the new trip to the closest driver
+        const driverSocketId = driverSocketMap.get(driverData.driverId);
+        if (driverSocketId) {
+            io.to(driverSocketId).emit('newTrip', newTrip);
         }
 
         res.status(201).json({
@@ -183,4 +192,61 @@ export const TripRequest = async (req: Request, res: Response) => {
             message: error.message
         });
     };
+}
+export const acceptTrip = async (req: Request, res: Response) => {
+    const { tripId } = req.body;
+    const driverId = decodeDriverIdFromToken(req);
+
+    try {
+        const driver = await Driver.findOne({ where: { driverId: driverId } });
+
+        if (!driver) {
+            return res.status(404).json({ error: 'Driver not found' });
+        }
+        const driverName = driver.firstName + " " + driver.lastName;
+
+        // Find the trip with the given id
+        const trip = await Trip.findOne({ where: { tripId: tripId } });
+
+        if (!trip) {
+            return res.status(404).json({ error: 'Trip not found' });
+        }
+
+        // Check if the trip is already accepted
+        if (trip.driverId) {
+            return res.status(400).json({ error: 'Trip is already accepted by another driver' });
+        }
+
+        // Update the trip with the driverId and change the status to 'accepted'
+        const updatedTrip = await trip.update({
+            driverId,
+            driverName,
+        });
+
+        return res.status(200).json({ message: 'Trip accepted successfully', trip: updatedTrip });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'An error occurred while accepting the trip' });
+    }
+}
+export const skipTrip = async (req: Request, res: Response) => {
+    try {
+        
+    } catch (error) {
+        
+    }
+}
+export const startTrip = async (req: Request, res: Response) => { 
+    try {
+        
+    } catch (error) {
+        
+    }
+}
+export const cancelTrip = async (req: Request, res: Response) => { 
+    try { 
+
+    } catch (error) {
+        
+    }
 }

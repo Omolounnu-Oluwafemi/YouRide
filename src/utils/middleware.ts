@@ -2,7 +2,7 @@ import { NextFunction, Response, Request } from "express";
 import { initiialSignUpValidator, finalSignUpValidator, verificationCodeValidator, AdminSignupValidator, AdminSignInValidator, AdminPasswordUpdate, options, BookTrip, createVehicleSchema, createTripSchema, tripRequestSchema } from "../utils/validate";
 import { DriverSignupValidator } from '../utils/validate';
 import rateLimit from 'express-rate-limit';
-import { verifyAdminToken } from "./token";
+import { decodeDriverIdFromToken, verifyAdminToken } from "./token";
 
 export function validateFinalSignUp(req: Request, res: Response, next: NextFunction) {
   const { error } = finalSignUpValidator.validate(req.body);
@@ -115,12 +115,9 @@ export const isSuperAdmin = (req: Request, res: Response, next: NextFunction) =>
   }
 };
 export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
-
   try {
-       // Get the JWT token from the Authorization header
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1] || req.cookies.token;
-  
 
     if (!token) {
       return res.status(401).json({ message: 'No token provided' });
@@ -150,6 +147,7 @@ export const validatetripRequest = (req: Request, res: Response, next: NextFunct
   const { error } = tripRequestSchema.validate(req.body, options);
   if (error) {
     const errors = error.details.map((err: { message: any; }) => err.message);
+    console.log(errors);
     return res.status(400).json({
       errors
     });
@@ -163,7 +161,7 @@ export const validateVehicle = (req: Request, res: Response, next: NextFunction)
     }
     next();
 };
-export const validateVoucherCreation = (req: Request, res: Response, next: NextFunction) => { 
+export const validateVoucherCreation = (req: Request, res: Response, next: NextFunction) => {
   const { error } = createTripSchema.validate(req.body, options);
   if (error) {
     const errors = error.details.map((err: { message: any; }) => err.message);
@@ -172,3 +170,6 @@ export const validateVoucherCreation = (req: Request, res: Response, next: NextF
     });
   }
 }
+  
+
+

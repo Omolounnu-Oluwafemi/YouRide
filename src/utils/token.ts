@@ -87,7 +87,7 @@ export const decodeUserIdFromToken = (req: Request) => {
   }
   catch (error) {
     console.error(error);
-    throw new Error('Invalid token');
+    return null;
   }
 
 };

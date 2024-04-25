@@ -177,7 +177,7 @@ export const createTripSchema = Joi.object({
 })
 export const tripAmountschema = Joi.object({
   vehicleName: Joi.string().required(),
-  distance: Joi.number().required(),
+  totalDistance: Joi.number().required(),
   estimatedtime: Joi.number().required(),
   country: Joi.string().required(),
   voucher: Joi.string().optional().allow(''),

@@ -24,6 +24,14 @@ initAdmin(sequelize);
 initVoucher(sequelize);
 initTrip(sequelize);
 
+
 // Define associations
-Trip.associate({ User, Driver, Vehicle, Voucher });
+User.hasMany(Trip, { foreignKey: 'userId' });
+Driver.hasMany(Trip, { foreignKey: 'driverId' });
+Vehicle.hasMany(Trip, { foreignKey: 'vehicleId' });
+Vehicle.hasMany(Driver, { foreignKey: 'vehicleId' });
+Trip.belongsTo(User, { foreignKey: 'userId' });
+Trip.belongsTo(Driver, { foreignKey: 'driverId' });
+Trip.belongsTo(Vehicle, { foreignKey: 'vehicleId' });
+Driver.belongsTo(Vehicle, { foreignKey: 'driverId', as: 'vehicle' });
 

@@ -14,6 +14,7 @@ import passport from 'passport';
 import authSetup from './config/passport'; 
 
 import driverAuth from './routes/Driver/driversAuth';
+import driverTrip from './routes/Driver/driversTrip';
 import driverDashboard from './routes/Driver/dashboard';
 import usersAuth from './routes/User/usersAuth';
 import usersTrip from './routes/User/usersTrip';
@@ -64,6 +65,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 app.use('/api/v1/user', usersAuth);
 app.use('/api/v1/user', usersTrip);
 app.use('/api/v1/driver', driverAuth);
+app.use('/api/v1/driver', driverTrip);
 app.use('/api/v1/driver/dashboard', driverDashboard);
 app.use('/api/v1/admin', adminAuth);
 app.use('/api/v1/trips', tripRoutes);

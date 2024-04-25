@@ -28,11 +28,12 @@ class User extends Model<UserAttributes, UserCreationAttributes> {
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
   public static associate(models: { [key: string]: any }) {
-    User.hasMany(models.Trip, { foreignKey: 'userId', as: 'trips' });
+    User.hasMany(models.Trip, { foreignKey: 'userId', as: 'trips'});
   }
   // Add the createTrip method to the User class
   public createTrip!: (trip: TripCreationAttributes) => Promise<Trip>;
 }
+
 
 const initUser = (sequelize: Sequelize) => {
   User.init(

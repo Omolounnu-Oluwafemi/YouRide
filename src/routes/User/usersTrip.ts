@@ -9,7 +9,7 @@ const router = express.Router();
  * /api/v1/user/trip-price:
  *   post:
  *     tags:
- *       - User
+ *       - User-Trips
  *     summary: Calculate trip amount
  *     description: This endpoint calculates the trip amount for different vehicle types based on the provided distance, time, and optional voucher.
  *     requestBody:
@@ -23,7 +23,9 @@ const router = express.Router();
  *                 type: string
  *                 enum: [Datride Share, Datride Vehicle, Datride Delivery]
  *                 description: The category of the vehicle.
- *               distance:
+ *               country:
+ *                 type: string
+ *               totalDistance:
  *                 type: number
  *                 format: float
  *                 description: The distance of the trip in kilometers or miles.
@@ -95,39 +97,38 @@ router.post('/trip-price', calculateTripAmount)
  * /api/v1/user/trip-request:
  *   post:
  *     tags:
- *       - User
+ *       - User-Trips
  *     summary: Create a new trip
  *     description: This endpoint allows for the creation of a new trip.
- *     parameters:
- *       - in: body
- *         name: body
- *         description: Trip details
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             country:
- *               type: string
- *             pickupLocation:
- *               type: string
- *             destination:
- *               type: string
- *             vehicleName:
- *               type: string
- *             paymentMethod:
- *               type: string
- *             tripAmount:
- *               type: number
- *             totalDistance:
- *               type: number
- *             pickupLatitude:
- *               type: number
- *             pickupLongitude:
- *               type: number
- *             destinationLatitude:
- *               type: number
- *             destinationLongitude:
- *               type: number
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               country:
+ *                 type: string
+ *               pickupLocation:
+ *                 type: string
+ *               destination:
+ *                 type: string
+ *               vehicleName:
+ *                 type: string
+ *               paymentMethod:
+ *                 type: string
+ *               tripAmount:
+ *                 type: number
+ *               totalDistance:
+ *                 type: number
+ *               pickupLatitude:
+ *                 type: number
+ *               pickupLongitude:
+ *                 type: number
+ *               destinationLatitude:
+ *                 type: number
+ *               destinationLongitude:
+ *                 type: number
  *     responses:
  *       '201':
  *         description: Trip order created successfully
