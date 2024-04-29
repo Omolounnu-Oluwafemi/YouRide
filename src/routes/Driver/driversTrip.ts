@@ -120,13 +120,8 @@ router.patch('/accept-trip', acceptTrip)
  *                   description: The HTTP status code
  *                 message:
  *                   type: string
- *                 nextDriver:
+ *                 trip:
  *                   type: object
- *                   properties:
- *                     driverId:
- *                       type: string
- *                     driverName:
- *                       type: string
  *       404:
  *         description: Not found, the trip with the given id was not found
  *         content:
@@ -152,7 +147,7 @@ router.patch('/accept-trip', acceptTrip)
  *                   description: The HTTP status code
  *                 error:
  *                   type: string
- *                   example: An error occurred while skipping the trip
+ *                   example: "An error occurred while processing your request"
  */
 router.patch('/skip-trip/:tripId', skipTrip);
 
@@ -178,15 +173,10 @@ router.patch('/skip-trip/:tripId', skipTrip);
  *             type: object
  *             required:
  *               - driverId
- *               - pickupTime
  *             properties:
  *               driverId:
  *                 type: string
  *                 description: The id of the driver
- *               pickupTime:
- *                 type: string
- *                 format: date-time
- *                 description: The pickup time for the trip
  *     responses:
  *       200:
  *         description: The trip was successfully started

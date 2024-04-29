@@ -1,4 +1,5 @@
-import { QueryTypes } from 'sequelize';
+// import { QueryTypes } from 'sequelize';
+import geolib from 'geolib';
 import { Request, Response } from "express";
 import { Trip } from "../../models/trip";
 import { User } from "../../models/usersModel";
@@ -9,35 +10,66 @@ import { decodeDriverIdFromToken, decodeUserIdFromToken } from "../../utils/toke
 import { Voucher } from "../../models/voucher";
 import { tripAmountschema } from '../../utils/validate'
 import { io, driverSocketMap } from '../../config/socket';
-import { sequelize } from '../../config/config';
+// import { sequelize } from '../../config/config';
 
-async function findClosestDriver(latitude: number, longitude: number, vehicleName: string) {
-    const userLocation = `ST_MakePoint(${longitude}, ${latitude})`;
+// async function findClosestDriver(latitude: number, longitude: number, vehicleName: string) {
+//     const userLocation = `ST_MakePoint(${longitude}, ${latitude})`;
 
-    // Find the vehicle with the given name
-    const vehicle = await Vehicle.findOne({ where: { vehicleName } });
+//     // Find the vehicle with the given name
+//     const vehicle = await Vehicle.findOne({ where: { vehicleName } });
+
+//     if (!vehicle) {
+//         throw new Error('Vehicle not found');
+//     }
+
+//     const driverData = await sequelize.query(`
+//         SELECT "Drivers".*, "Vehicles"."vehicleName", 
+//                ST_Distance(ST_MakePoint("Drivers"."longitude", "Drivers"."latitude"), ${userLocation}) AS distance
+//         FROM "Drivers"
+//         INNER JOIN "Vehicles" ON "Drivers"."vehicleId" = "Vehicles"."vehicleId"
+//         WHERE "Drivers"."isAvailable" = true AND "Vehicles"."vehicleName" = :vehicleName
+//         ORDER BY distance ASC
+//         LIMIT 1
+//     `, {
+//         replacements: { vehicleName },
+//         type: QueryTypes.SELECT,
+//         model: Driver,
+//         mapToModel: true,
+//         nest: true,
+//     });
+
+//     return driverData[0];
+// }
+
+async function findClosestDriver(pickupLatitude: number, pickupLongitude: number, vehicleName: string) {
+    // Fetch all available drivers who are driving the requested vehicle type
+     const vehicle = await Vehicle.findOne({ where: { vehicleName: vehicleName } });
 
     if (!vehicle) {
-        throw new Error('Vehicle not found');
+        return null;
     }
 
-    const driverData = await sequelize.query(`
-        SELECT "Drivers".*, "Vehicles"."vehicleName", 
-               ST_Distance(ST_MakePoint("Drivers"."longitude", "Drivers"."latitude"), ${userLocation}) AS distance
-        FROM "Drivers"
-        INNER JOIN "Vehicles" ON "Drivers"."vehicleId" = "Vehicles"."vehicleId"
-        WHERE "Drivers"."isAvailable" = true AND "Vehicles"."vehicleName" = :vehicleName
-        ORDER BY distance ASC
-        LIMIT 1
-    `, {
-        replacements: { vehicleName },
-        type: QueryTypes.SELECT,
-        model: Driver,
-        mapToModel: true,
-        nest: true,
+    // Fetch all available drivers for this vehicle
+    const drivers = await Driver.findAll({
+        where: { vehicleId: vehicle.vehicleId, isAvailable: true },
     });
 
-    return driverData[0];
+    if (drivers.length === 0) {
+        return null;
+    }
+
+    // Calculate the distance from each driver to the pickup location
+    const distances = drivers.map(driver => ({
+        driver,
+        distance: geolib.getDistance(
+            { latitude: driver.latitude, longitude: driver.longitude },
+            { latitude: pickupLatitude, longitude: pickupLongitude }
+        ),
+    }));
+
+    // Sort the drivers by distance and return the closest one
+    distances.sort((a, b) => a.distance - b.distance);
+    return distances[0].driver;
 }
 export const calculateTripAmount = async (req: Request, res: Response) => {
     try {
@@ -95,7 +127,9 @@ export const calculateTripAmount = async (req: Request, res: Response) => {
             tripAmounts
         });
     } catch (error: any) {
-        res.status(500).json({ message: 'An error occurred while calculating the trip amounts', error: error.message });
+        res.status(500).json({
+            message: 'An error occurred while calculating the trip amounts', error: error.message
+        });
     }
 };
 export const TripRequest = async (req: Request, res: Response) => {
@@ -112,7 +146,7 @@ export const TripRequest = async (req: Request, res: Response) => {
 
          if (!userId) {
         return res.status(401).json({ error: "Unauthorized" });
-    }
+        }
 
         // Fetch user details
         const userData = await User.findOne({ where: { userId: userId } });
@@ -204,10 +238,15 @@ export const acceptTrip = async (req: Request, res: Response) => {
             driverName,
         });
 
-        return res.status(200).json({ message: 'Trip accepted successfully', trip: updatedTrip });
+        return res.status(200).json({
+            message: 'Trip accepted successfully',
+            trip: updatedTrip
+        });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ error: 'An error occurred while accepting the trip' });
+        return res.status(500).json({
+            error: 'An error occurred while accepting the trip'
+        });
     }
 }
 export const skipTrip = async (req: Request, res: Response) => {
@@ -224,19 +263,30 @@ export const skipTrip = async (req: Request, res: Response) => {
         // Find the next closest driver
         const nextDriver = await findClosestDriver(trip.pickupLatitude, trip.pickupLongitude, trip.vehicleName);
 
-        // Assign the trip to the next driver
-        trip.driverId = nextDriver.driverId;
-        await trip.save();
+        if (!nextDriver) {
+            return res.status(404).json({ error: 'No available drivers found' });
+        }
 
-        return res.status(200).json({ message: 'Trip skipped successfully', nextDriver });
+        // Emit the trip to the next driver
+        const driverSocketId = driverSocketMap.get(nextDriver.driverId);
+        if (driverSocketId) {
+            io.to(driverSocketId).emit('newTrip', trip);
+        }
+
+        return res.status(200).json({
+            message: 'Trip skipped successfully',
+            trip
+        });
     } catch (error) {
-        return res.status(500).json({ error: 'An error occurred while processing your request' });
+        return res.status(500).json({
+            error: 'An error occurred while processing your request'
+        });
     }
 }
 export const startTrip = async (req: Request, res: Response) => {
     try {
         const { tripId } = req.params;
-        const { driverId, pickupTime } = req.body;
+        const { driverId } = req.body;
 
         // Find the trip with the given ID
         const trip = await Trip.findOne({ where: { tripId: tripId } });
@@ -252,12 +302,16 @@ export const startTrip = async (req: Request, res: Response) => {
 
         // Update the status and pickup time of the trip
         trip.status = 'current';
-        trip.pickupTime = new Date(pickupTime);
+        trip.pickupTime = new Date();
         await trip.save();
 
-        return res.status(200).json({ message: 'Trip started successfully' });
+        return res.status(200).json({
+            message: 'Trip started successfully'
+        });
     } catch (error) {
-        return res.status(500).json({ error: 'An error occurred while processing your request' });
+        return res.status(500).json({
+            error: 'An error occurred while processing your request'
+        });
     }
 }
 export const cancelTrip = async (req: Request, res: Response) => {
@@ -275,9 +329,13 @@ export const cancelTrip = async (req: Request, res: Response) => {
         trip.status = 'cancelled';
         await trip.save();
 
-        return res.status(200).json({ message: 'Trip cancelled successfully' });
+        return res.status(200).json({
+            message: 'Trip cancelled successfully'
+        });
     } catch (error) {
-        return res.status(500).json({ error: 'An error occurred while processing your request' });
+        return res.status(500).json({
+            error: 'An error occurred while processing your request'
+        });
     }
 }
 export const completeTrip = async (req: Request, res: Response) => {
@@ -291,12 +349,17 @@ export const completeTrip = async (req: Request, res: Response) => {
             return res.status(404).json({ error: 'Trip not found' });
         }
 
-        // Update the status of the trip
+        // Update the status and drop-off time of the trip
         trip.status = 'completed';
+        trip.dropoffTime = new Date(); 
         await trip.save();
 
-        return res.status(200).json({ message: 'Trip completed successfully' });
+        return res.status(200).json({
+            message: 'Trip completed successfully'
+        });
     } catch (error) {
-        return res.status(500).json({ error: 'An error occurred while processing your request' });
+        return res.status(500).json({
+            error: 'An error occurred while processing your request'
+        });
     }
 }

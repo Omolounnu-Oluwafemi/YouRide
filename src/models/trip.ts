@@ -141,7 +141,7 @@ const initTrip = (sequelize: Sequelize) => {
                 allowNull: false,
             },
             totalDistance: {
-                type: DataTypes.INTEGER,
+                type: DataTypes.FLOAT,
                 allowNull: false,
             },
             pickupTime: {
