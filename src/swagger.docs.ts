@@ -1,22 +1,21 @@
 require("dotenv").config();
-
 import swaggerJsdoc from "swagger-jsdoc";
+const { PORT, NODE_ENV, PROD_URL } = process.env;
 
-const { PORT } = process.env;
-
+const servers = [
+  {
+    url: NODE_ENV === 'production' ? PROD_URL : `http://localhost:${PORT}`,
+    description: NODE_ENV === 'production' ? "Production server" : "Development server",
+  },
+];
 const swaggerDefinition = {
   openapi: "3.0.0", 
   info: {
-    title: "Datride API",
+    title: "DatRide API",
     version: "1.0.0",
     description: "API documentation for Our Amazing Ride"
   },
-  servers: [
-    {
-      url: `http://localhost:${PORT}`,
-      description: "Development server"
-    }
-  ],
+  servers,
   components: {
     securitySchemes: {
       BearerAuth: {
@@ -26,6 +25,11 @@ const swaggerDefinition = {
       }
     }
   },
+  security: [
+    {
+      BearerAuth: []
+    }
+  ]
 };
 
 const options = {

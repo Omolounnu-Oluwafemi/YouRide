@@ -1,6 +1,6 @@
 import express from 'express'; 
 import passport from 'passport';
-import { initialSignUp, verifySignupCode, verifySigninCode, finalSignUp, signInUser, socialSignInUser } from '../../controllers/User/usersController'; 
+import { initialSignUp, verifySignupCode, verifySigninCode, finalSignUp, signInUser, socialSignInUser, refreshToken, getUserById } from '../../controllers/User/usersController'; 
 import { validateInitialSignUp, validateFinalSignUp, validateVerificationCode} from '../../utils/middleware';
 
 const router = express.Router();
@@ -222,7 +222,7 @@ router.get('/google/redirect',
 
 /**
  * @swagger
- * /user/facebook:
+ * /api/v1/user/facebook:
  *   get:
  *     tags:
  *       - Authentication
@@ -272,10 +272,9 @@ router.get('/facebook/redirect',
   passport.authenticate('facebook', { failureRedirect: '/' }),
   socialSignInUser
 );
-
 /**
  * @swagger
- * /user/apple:
+ * /api/v1/user/apple:
  *   get:
  *     tags:
  *       - Authentication
@@ -325,6 +324,100 @@ router.get('/apple/redirect',
   passport.authenticate('apple', { failureRedirect: '/' }),
   socialSignInUser
 );
+
+/**
+ * @openapi
+ * /api/v1/user/refresh-token:
+ *   post:
+ *     summary: Refresh the authentication token
+ *     description: This endpoint is used to refresh the authentication token when it expires.
+ *     operationId: refreshToken
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *                 description: The refresh token received during login or previous token refresh.
+ *     responses:
+ *       '200':
+ *         description: Token refreshed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       '403':
+ *         description: Invalid or expired refresh token, or User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
+router.post('/refresh-token', refreshToken);
+
+/**
+ * @swagger
+ * /api/v1/user/{userId}:
+ *   get:
+ *     summary: Retrieve a user by their unique userId
+ *     tags: [User]
+ *     description: This endpoint retrieves a user's details using their unique identifier (userId).
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The unique identifier of the user
+ *     responses:
+ *       200:
+ *         description: User retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: User ID is required
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: User ID is required
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: User not found
+ *       500:
+ *         description: An error occurred while retrieving user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: An error occurred while retrieving user
+ */
+// Route to get user by userId
+router.get('/user/:userId', getUserById);
 
 
 /**

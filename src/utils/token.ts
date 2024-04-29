@@ -12,6 +12,17 @@ export const signToken = (id: string): string => {
 
   return token;
 };
+export const signRefreshToken = (id: string): string => {
+  const secret = process.env.JWT_SECRET;
+  const expiresIn = process.env.JWT_REFRESH_EXPIRES_IN;
+
+  if (!secret || !expiresIn) {
+    throw new Error('JWT secret or expiration time not provided');
+  }
+  const token = jwt.sign({ id }, secret, { expiresIn });
+
+  return token;
+};
 
 export const signAdminToken = (adminId: string, role: string): string => {
   const secret = process.env.JWT_SECRET;
@@ -37,6 +48,7 @@ export const verifyAdminToken = (token: string): any => {
     const decoded = jwt.verify(token, secret);
   
     return decoded;
+    
   } catch (error) {
     console.error(error);
     throw new Error('Invalid token');
@@ -117,4 +129,5 @@ export const decodeAdminIdFromToken = (req: Request) => {
 
  export const generateVerificationCode = (): number  => {
       return Math.floor(1000 + Math.random() * 9000);
-}
+ }
+

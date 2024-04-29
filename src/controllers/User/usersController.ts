@@ -1,9 +1,10 @@
 import { Response, Request, RequestHandler } from "express";
 import { v4 as uuidv4 } from "uuid";
 import  { sendVerificationCode } from '../../utils/email';
-import { signToken, generateVerificationCode} from "../../utils/token";
+import { signToken, generateVerificationCode, signRefreshToken} from "../../utils/token";
 import { User } from '../../models/usersModel';
 import { Op } from 'sequelize';
+import jwt from 'jsonwebtoken';
 
 
  interface SessionData {
@@ -150,6 +151,29 @@ export const signInUser = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'An error occurred while sending code' });
   }
 };
+export const getUserById = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+    const user = await User.findOne({ where: { userId } });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      message: 'User retrieved successfully',
+      data: { user }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'An error occurred while retrieving user' });
+  }
+};
 
 export async function verifySigninCode(req: Request, res: Response) {
   try {
@@ -173,8 +197,10 @@ export async function verifySigninCode(req: Request, res: Response) {
     }
 
     const token = signToken(user.userId);
+    const refreshToken = signRefreshToken(user.userId); 
     // Set the token in a cookie
     res.cookie('token', token, { httpOnly: true });
+    res.cookie('refreshToken', refreshToken, { httpOnly: true });
 
     return res.status(200).json({
       status: 'success',
@@ -212,3 +238,39 @@ export const socialSignInUser: RequestHandler = async (req, res) => {
     res.status(500).json({ message: 'An error occurred while sending code' });
   }
 };
+
+export const signOut = async (req: Request, res: Response) => {
+  try {
+    res.clearCookie('token');
+    return res.status(200).json({ message: 'User signed out successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'An error occurred while signing out' });
+  }
+};
+
+export const refreshToken = async (req: Request, res: Response) => {
+  const token = req.cookies.refreshToken;
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT secret not provided');
+  }
+  try {
+    const decoded = jwt.verify(token, secret) as { id: string };
+
+    // Check if the user exists
+    const user = await User.findOne({ where: { userId: decoded.id } });
+    if (!user) {
+      return res.status(403).json({ error: 'User not found' });
+    }
+
+    const newRefreshToken = signRefreshToken(decoded.id);
+    // Set the token in a cookie
+    res.cookie('refreshToken', newRefreshToken, { httpOnly: true });
+
+    return res.status(200).json({ message: 'Token refreshed successfully' });
+
+  } catch (error) {
+    return res.status(403).json({ error: 'Invalid or expired refresh token' });
+  }
+}

@@ -6,7 +6,8 @@
     "start": "node ./bin/www",
     "dev": "nodemon ./bin/www",
     "compile": "tsc --watch",
-    "build": "tsc"
+    "build": "NODE_ENV=production tsc",
+    "start:prod": "NODE_ENV=production node ./bin/www"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",

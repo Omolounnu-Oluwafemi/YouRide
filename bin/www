@@ -87,5 +87,10 @@ function onListening() {
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
-  console.log("Server listening on http://localhost:" + port)
+  
+   const baseUrl = process.env.NODE_ENV === 'production' 
+    ? "https://stag.youride.com" 
+    : "http://localhost:" + port;
+
+  console.log("Server listening on " + baseUrl);
 }

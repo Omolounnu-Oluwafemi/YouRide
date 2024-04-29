@@ -283,18 +283,12 @@ export const cancelTrip = async (req: Request, res: Response) => {
 export const completeTrip = async (req: Request, res: Response) => {
     try {
         const { tripId } = req.params;
-        const { driverId } = req.body;
 
         // Find the trip with the given ID
         const trip = await Trip.findOne({ where: { tripId: tripId } });
 
         if (!trip) {
             return res.status(404).json({ error: 'Trip not found' });
-        }
-
-        // Check if the trip is assigned to the current driver
-        if (trip.driverId !== driverId) {
-            return res.status(403).json({ error: 'This trip is not assigned to you' });
         }
 
         // Update the status of the trip

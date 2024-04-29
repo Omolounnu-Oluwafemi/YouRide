@@ -1,5 +1,5 @@
 import express from 'express'; 
-import { acceptTrip } from '../../controllers/Trip/trip';
+import { acceptTrip, cancelTrip, completeTrip, skipTrip, startTrip } from '../../controllers/Trip/trip';
 
 const router = express.Router();
 
@@ -80,5 +80,149 @@ const router = express.Router();
  *                   example: An error occurred while accepting the trip
  */
 router.patch('/accept-trip', acceptTrip)
+
+/**
+ * @swagger
+ * /skip-trip/{tripId}:
+ *   patch:
+ *     summary: Skip a trip
+ *     tags:
+ *       - Driver-Trips
+ *     parameters:
+ *       - in: path
+ *         name: tripId
+ *         required: true
+ *         description: The id of the trip to skip
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: The trip was successfully skipped
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 nextDriver:
+ *                   type: object
+ *       404:
+ *         description: Not found, the trip with the given id was not found
+ *       500:
+ *         description: Internal server error
+ */
+router.patch('/skip-trip/:tripId', skipTrip)
+
+/**
+ * @swagger
+ * /start-trip/{tripId}:
+ *   patch:
+ *     summary: Start a trip
+ *     tags:
+ *       - Driver-Trips
+ *     parameters:
+ *       - in: path
+ *         name: tripId
+ *         required: true
+ *         description: The id of the trip to start
+ *         schema:
+ *           type: string
+ *       - in: body
+ *         name: trip
+ *         description: The driver id and pickup time
+ *         schema:
+ *           type: object
+ *           required:
+ *             - driverId
+ *             - pickupTime
+ *           properties:
+ *             driverId:
+ *               type: string
+ *               description: The id of the driver
+ *             pickupTime:
+ *               type: string
+ *               format: date-time
+ *               description: The pickup time for the trip
+ *     responses:
+ *       200:
+ *         description: The trip was successfully started
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       403:
+ *         description: Forbidden, the trip is not assigned to the current driver
+ *       404:
+ *         description: Not found, the trip with the given id was not found
+ *       500:
+ *         description: Internal server error
+ */
+router.patch('/start-trip/:tripId', startTrip)
+
+/**
+ * @swagger
+ * /cancel-trip/{tripId}:
+ *   patch:
+ *     summary: Cancel a trip
+ *     tags:
+ *       - Driver-Trips
+ *     parameters:
+ *       - in: path
+ *         name: tripId
+ *         required: true
+ *         description: The id of the trip to cancel
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: The trip was successfully cancelled
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: Not found, the trip with the given id was not found
+ *       500:
+ *         description: Internal server error
+ */
+router.patch('/cancel-trip/:tripId', cancelTrip)
+
+/**
+ * @swagger
+ * /complete-trip/{tripId}:
+ *   patch:
+ *     summary: Complete a trip
+ *     tags:
+ *       - Driver-Trips
+ *     parameters:
+ *       - in: path
+ *         name: tripId
+ *         required: true
+ *         description: The id of the trip to complete
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: The trip was successfully completed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: Not found, the trip with the given id was not found
+ *       500:
+ *         description: Internal server error
+ */
+router.patch('/complete-trip/:tripId', completeTrip)
 
 export default router

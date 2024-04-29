@@ -1,6 +1,6 @@
 import express from 'express'; 
 import { validatetripRequest } from '../../utils/middleware';
-import { calculateTripAmount, TripRequest } from '../../controllers/Trip/trip';
+import { calculateTripAmount, TripRequest, cancelTrip } from '../../controllers/Trip/trip';
 
 const router = express.Router();
 
@@ -140,6 +140,37 @@ router.post('/trip-price', calculateTripAmount)
  *         description: An error occurred while processing your request
  */
 router.post('/trip-request', validatetripRequest, TripRequest)
+
+/**
+ * @swagger
+ * /cancel-trip/{tripId}:
+ *   patch:
+ *     summary: Cancel a trip
+ *     tags:
+ *       - User-Trips
+ *     parameters:
+ *       - in: path
+ *         name: tripId
+ *         required: true
+ *         description: The id of the trip to cancel
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: The trip was successfully cancelled
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: Not found, the trip with the given id was not found
+ *       500:
+ *         description: Internal server error
+ */
+router.patch('/cancel-trip', cancelTrip)
 
 /**
  * @swagger
