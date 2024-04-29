@@ -18,32 +18,60 @@ const router = express.Router();
  *             schema:
  *               type: object
  *               properties:
- *                 category:
- *                   type: string
- *                 vehicleYear:
+ *                 status:
  *                   type: integer
- *                 vehicleManufacturer:
- *                   type: string
- *                 vehicleColor:
- *                   type: string
- *                 licensePlate:
- *                   type: string
- *                 vehicleNumber:
- *                   type: string
- *                 driverLicense:
- *                   type: string
- *                 vehicleLogBook:
- *                   type: string
- *                 privateHireLicenseBadge:
- *                   type: string
- *                 insuranceCertificate:
- *                   type: string
- *                 motTestCertificate:
- *                   type: string
+ *                   description: The HTTP status code
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     category:
+ *                       type: string
+ *                     vehicleYear:
+ *                       type: integer
+ *                     vehicleManufacturer:
+ *                       type: string
+ *                     vehicleColor:
+ *                       type: string
+ *                     licensePlate:
+ *                       type: string
+ *                     vehicleNumber:
+ *                       type: string
+ *                     driverLicense:
+ *                       type: string
+ *                     vehicleLogBook:
+ *                       type: string
+ *                     privateHireLicenseBadge:
+ *                       type: string
+ *                     insuranceCertificate:
+ *                       type: string
+ *                     motTestCertificate:
+ *                       type: string
  *       404:
  *         description: Driver not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: Driver not found
  *       500:
  *         description: An error occurred while retrieving vehicle details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: An error occurred while retrieving vehicle details
  */
 router.get('/vehicle', getVehicleDetails);
 
@@ -68,6 +96,7 @@ router.get('/vehicle', getVehicleDetails);
  *                 type: string
  *                 enum: ['2024', '2023', '2022', '2021', '2020', '2019', '2018']
  *               vehicleManufacturer:
+ *                 type: string
  *                 enum: ['ACE', 'Acura', 'AIWAYS', 'AKT', 'BMW', 'BYD', 'Chevrolet']
  *               vehicleColor:
  *                 type: string
@@ -78,12 +107,45 @@ router.get('/vehicle', getVehicleDetails);
  *     responses:
  *       200:
  *         description: Vehicle details updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: Vehicle details updated successfully
  *       404:
  *         description: Driver not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: Driver not found
  *       500:
  *         description: An error occurred while updating vehicle details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: An error occurred while updating vehicle details
  */
-router.patch('/vehicle-updates', updateVehicleDetails)
+router.patch('/vehicle-updates', updateVehicleDetails);
 
 /**
  * @swagger
@@ -108,11 +170,44 @@ router.patch('/vehicle-updates', updateVehicleDetails)
  *     responses:
  *       200:
  *         description: Availability and location updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: Availability and location updated successfully
  *       404:
  *         description: Driver not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: Driver not found
  *       500:
  *         description: An error occurred while updating availability and location
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: An error occurred while updating availability and location
  */
-router.patch('/availability', updateAvailability)
+router.patch('/availability', updateAvailability);
 
 export default router;

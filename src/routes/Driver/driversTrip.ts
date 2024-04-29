@@ -33,6 +33,9 @@ const router = express.Router();
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
  *                   example: Trip accepted successfully
@@ -55,6 +58,9 @@ const router = express.Router();
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 error:
  *                   type: string
  *                   example: Trip is already accepted by another driver
@@ -65,6 +71,9 @@ const router = express.Router();
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 error:
  *                   type: string
  *                   example: Trip not found
@@ -75,6 +84,9 @@ const router = express.Router();
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 error:
  *                   type: string
  *                   example: An error occurred while accepting the trip
@@ -83,7 +95,7 @@ router.patch('/accept-trip', acceptTrip)
 
 /**
  * @swagger
- * /skip-trip/{tripId}:
+ * /api/v1/driver/skip-trip/{tripId}:
  *   patch:
  *     summary: Skip a trip
  *     tags:
@@ -103,20 +115,50 @@ router.patch('/accept-trip', acceptTrip)
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
  *                 nextDriver:
  *                   type: object
+ *                   properties:
+ *                     driverId:
+ *                       type: string
+ *                     driverName:
+ *                       type: string
  *       404:
  *         description: Not found, the trip with the given id was not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 error:
+ *                   type: string
+ *                   example: Trip not found
  *       500:
  *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 error:
+ *                   type: string
+ *                   example: An error occurred while skipping the trip
  */
-router.patch('/skip-trip/:tripId', skipTrip)
+router.patch('/skip-trip/:tripId', skipTrip);
 
 /**
  * @swagger
- * /start-trip/{tripId}:
+ * /api/v1/driver/start-trip/{tripId}:
  *   patch:
  *     summary: Start a trip
  *     tags:
@@ -128,22 +170,23 @@ router.patch('/skip-trip/:tripId', skipTrip)
  *         description: The id of the trip to start
  *         schema:
  *           type: string
- *       - in: body
- *         name: trip
- *         description: The driver id and pickup time
- *         schema:
- *           type: object
- *           required:
- *             - driverId
- *             - pickupTime
- *           properties:
- *             driverId:
- *               type: string
- *               description: The id of the driver
- *             pickupTime:
- *               type: string
- *               format: date-time
- *               description: The pickup time for the trip
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - driverId
+ *               - pickupTime
+ *             properties:
+ *               driverId:
+ *                 type: string
+ *                 description: The id of the driver
+ *               pickupTime:
+ *                 type: string
+ *                 format: date-time
+ *                 description: The pickup time for the trip
  *     responses:
  *       200:
  *         description: The trip was successfully started
@@ -152,20 +195,56 @@ router.patch('/skip-trip/:tripId', skipTrip)
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
  *       403:
  *         description: Forbidden, the trip is not assigned to the current driver
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 error:
+ *                   type: string
+ *                   example: Forbidden, the trip is not assigned to the current driver
  *       404:
  *         description: Not found, the trip with the given id was not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 error:
+ *                   type: string
+ *                   example: Trip not found
  *       500:
  *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 error:
+ *                   type: string
+ *                   example: An error occurred while starting the trip
  */
-router.patch('/start-trip/:tripId', startTrip)
+router.patch('/start-trip/:tripId', startTrip);
 
 /**
  * @swagger
- * /cancel-trip/{tripId}:
+ * /api/v1/driver/cancel-trip/{tripId}:
  *   patch:
  *     summary: Cancel a trip
  *     tags:
@@ -185,18 +264,43 @@ router.patch('/start-trip/:tripId', startTrip)
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
  *       404:
  *         description: Not found, the trip with the given id was not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 error:
+ *                   type: string
+ *                   example: Trip not found
  *       500:
  *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 error:
+ *                   type: string
+ *                   example: An error occurred while cancelling the trip
  */
-router.patch('/cancel-trip/:tripId', cancelTrip)
+router.patch('/cancel-trip/:tripId', cancelTrip);
 
 /**
  * @swagger
- * /complete-trip/{tripId}:
+ * /api/v1/driver/complete-trip/{tripId}:
  *   patch:
  *     summary: Complete a trip
  *     tags:
@@ -216,13 +320,38 @@ router.patch('/cancel-trip/:tripId', cancelTrip)
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
  *       404:
  *         description: Not found, the trip with the given id was not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 error:
+ *                   type: string
+ *                   example: Trip not found
  *       500:
  *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 error:
+ *                   type: string
+ *                   example: An error occurred while completing the trip
  */
-router.patch('/complete-trip/:tripId', completeTrip)
+router.patch('/complete-trip/:tripId', completeTrip);
 
 export default router

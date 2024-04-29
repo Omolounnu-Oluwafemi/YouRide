@@ -205,6 +205,8 @@ export async function verifySigninCode(req: Request, res: Response) {
     return res.status(200).json({
       status: 'success',
       message: 'User signed in successfully',
+      token: token,
+      refreshToken: refreshToken,
       data: { user }
     });
   } catch (error) {
@@ -224,14 +226,18 @@ export const socialSignInUser: RequestHandler = async (req, res) => {
           message: "User not found"
         });
       }
-      const token = signToken(user.userId);
+       const token = signToken(user.userId);
+      const refreshToken = signRefreshToken(user.userId);
       // Set the token in a cookie
       res.cookie('token', token, { httpOnly: true });
+      res.cookie('refreshToken', refreshToken, { httpOnly: true });
 
     return res.status(200).json({
       status: 'success',
-      message: 'User signed in successfully',
-      data: { user }
+       message: 'User signed in successfully',
+      token: token,
+      refreshToken: refreshToken,
+      data: { user },
     });
   } catch (error) {
     console.error(error);

@@ -95,7 +95,13 @@ const upload = multer({ dest: 'uploads/' });
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Driver'
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 data:
+ *                   $ref: '#/components/schemas/Driver'
  *       400:
  *         description: Bad request
  *         content:
@@ -103,6 +109,9 @@ const upload = multer({ dest: 'uploads/' });
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 error:
  *                   type: string
  *       500:
@@ -112,6 +121,9 @@ const upload = multer({ dest: 'uploads/' });
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 error:
  *                   type: string
  */
@@ -149,6 +161,9 @@ router.post('/signup',  upload.fields([
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
  *                 data:
@@ -163,6 +178,9 @@ router.post('/signup',  upload.fields([
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
  *       500:
@@ -172,10 +190,13 @@ router.post('/signup',  upload.fields([
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
  */
-router.post('/signin', validateInitialSignUp, DriverSignIn)
+router.post('/signin', validateInitialSignUp, DriverSignIn);
 
 /**
  * @swagger
@@ -201,7 +222,8 @@ router.post('/signin', validateInitialSignUp, DriverSignIn)
  *               type: object
  *               properties:
  *                 status:
- *                   type: string
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
  *                 data:
@@ -213,6 +235,9 @@ router.post('/signin', validateInitialSignUp, DriverSignIn)
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
  *       404:
@@ -233,6 +258,9 @@ router.post('/signin', validateInitialSignUp, DriverSignIn)
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
  */

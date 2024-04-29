@@ -11,8 +11,6 @@ const upload = multer({ dest: 'uploads/' });
  * /api/v1/admin/create:
  *   post:
  *     summary: Create a new admin
- *     security: 
- *       - BearerAuth: {}
  *     tags: [Admin]
  *     requestBody:
  *       required: true
@@ -41,11 +39,39 @@ const upload = multer({ dest: 'uploads/' });
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Admin'
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 data:
+ *                   $ref: '#/components/schemas/Admin'
  *       400:
  *         description: The admin with this email already exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: The admin with this email already exists
  *       500:
  *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: Internal server error
  */
 router.post('/create', isSuperAdmin, ValidateAdminSignup, CreateAdmin);
 
@@ -77,16 +103,52 @@ router.post('/create', isSuperAdmin, ValidateAdminSignup, CreateAdmin);
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
  *                 token:
  *                   type: string
  *       401:
  *         description: Invalid password
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: Invalid password
  *       404:
  *         description: Admin not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: Admin not found
  *       500:
  *         description: Error signing admin in
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: Error signing admin in
  */
 router.post('/signin', ValidateAdminSignIn, AdminLogin);
 
@@ -95,8 +157,6 @@ router.post('/signin', ValidateAdminSignIn, AdminLogin);
  * /api/v1/admin/updatepassword:
  *   patch:
  *     summary: Change temporary password
- *     security: 
- *       - BearerAuth: {}
  *     tags: [Admin]
  *     requestBody:
  *       required: true
@@ -118,24 +178,77 @@ router.post('/signin', ValidateAdminSignIn, AdminLogin);
  *     responses:
  *       200:
  *         description: Password changed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: Password changed successfully
  *       400:
  *         description: New password cannot be the same as the current password
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: New password cannot be the same as the current password
  *       401:
  *         description: Invalid temporary password
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: Invalid temporary password
  *       404:
  *         description: Admin not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: Admin not found
  *       500:
  *         description: Error changing password
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: Error changing password
  */
-router.patch('/updatepassword', isAdmin, ValidateAdminPAsswordUpdate, changeTempPassword)
+router.patch('/updatepassword', isAdmin, ValidateAdminPAsswordUpdate, changeTempPassword);
 
 /**
  * @swagger
  * /api/v1/admin/uploadpicture:
  *   patch:
  *     summary: Update admin profile picture
- *     security: 
- *       - BearerAuth: {}
  *     tags: [Admin]
  *     requestBody:
  *       required: true
@@ -153,23 +266,60 @@ router.patch('/updatepassword', isAdmin, ValidateAdminPAsswordUpdate, changeTemp
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Admin'
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 data:
+ *                   $ref: '#/components/schemas/Admin'
  *       403:
  *         description: No token provided or Invalid or expired token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: No token provided or Invalid or expired token
  *       404:
  *         description: Admin not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: Admin not found
  *       500:
  *         description: Failed to upload image or Failed to update admin profile or Error updating profile picture
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: Failed to upload image or Failed to update admin profile or Error updating profile picture
  */
-router.patch('/uploadpicture', isAdmin, upload.single('profilePicture'), updateProfilePicture)
+router.patch('/uploadpicture', isAdmin, upload.single('profilePicture'), updateProfilePicture);
 
 /**
  * @swagger
  * /api/v1/admin/statusupdate:
  *   post:
  *     summary: Toggle staff active status
- *     security: 
- *       - BearerAuth: {}
  *     tags: [Admin]
  *     requestBody:
  *       required: true
@@ -189,17 +339,67 @@ router.patch('/uploadpicture', isAdmin, upload.single('profilePicture'), updateP
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Admin'
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 data:
+ *                   $ref: '#/components/schemas/Admin'
  *       400:
  *         description: Invalid action
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: Invalid action
  *       403:
  *         description: No token provided
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: No token provided
  *       404:
  *         description: Staff not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: Staff not found
  *       500:
  *         description: Error updating admin status
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: Error updating admin status
  */
-router.patch('/statusupdate', isSuperAdmin, toggleStaffActiveStatus)
+router.patch('/statusupdate', isSuperAdmin, toggleStaffActiveStatus);
 
 /**
  * @swagger
@@ -244,15 +444,4 @@ router.patch('/statusupdate', isSuperAdmin, toggleStaffActiveStatus)
  *         - password
  */
 
-/**
- * @swagger
- * components:
- *   securitySchemes:
- *     BearerAuth:        
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT  
- * security:
- *   - BearerAuth: []
- */
 export default router;

@@ -44,6 +44,9 @@ const router = express.Router();
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
  *                   example: Trip amounts calculated successfully
@@ -66,6 +69,9 @@ const router = express.Router();
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
  *                   example: Invalid input
@@ -76,6 +82,9 @@ const router = express.Router();
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
  *                   example: Vehicle not found
@@ -86,11 +95,14 @@ const router = express.Router();
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
  *                   example: An error occurred while calculating the trip amounts
  */
-router.post('/trip-price', calculateTripAmount)
+router.post('/trip-price', calculateTripAmount);
 
 /**
  * @swagger
@@ -132,18 +144,62 @@ router.post('/trip-price', calculateTripAmount)
  *     responses:
  *       '201':
  *         description: Trip order created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   example: Trip order created successfully
  *       '400':
  *         description: Invalid trip option
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   example: Invalid trip option
  *       '404':
  *         description: User not found or no available drivers found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   example: User not found or no available drivers found
  *       '500':
  *         description: An error occurred while processing your request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   example: An error occurred while processing your request
  */
-router.post('/trip-request', validatetripRequest, TripRequest)
+router.post('/trip-request', validatetripRequest, TripRequest);
 
 /**
  * @swagger
- * /cancel-trip/{tripId}:
+ * /api/v1/user/cancel-trip/{tripId}:
  *   patch:
  *     summary: Cancel a trip
  *     tags:
@@ -163,14 +219,40 @@ router.post('/trip-request', validatetripRequest, TripRequest)
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
+ *                   example: The trip was successfully cancelled
  *       404:
  *         description: Not found, the trip with the given id was not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   example: Not found, the trip with the given id was not found
  *       500:
  *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
  */
-router.patch('/cancel-trip', cancelTrip)
+router.patch('/cancel-trip/:tripId', cancelTrip);
 
 /**
  * @swagger

@@ -9,8 +9,6 @@ const router = express.Router();
  * /api/v1/vehicles/get:
  *   get:
  *     summary: Get all vehicles
- *     security: 
- *       - BearerAuth: {}
  *     tags: [Vehicles]
  *     description: Fetch all vehicles from the database. Only accessible by admins.
  *     responses:
@@ -19,40 +17,61 @@ const router = express.Router();
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   country:
- *                     type: string
- *                     description: The country where the vehicle is located.
- *                   vehicleCategory:
- *                     type: string
- *                     enum: ['Taxi', 'Bus', 'Delivery']
- *                     description: The category of the vehicle.
- *                   baseFare:
- *                     type: number
- *                     format: float
- *                     description: The base fare for the vehicle.
- *                   pricePerKMorMI:
- *                     type: number
- *                     format: float
- *                     description: The price per KM or MI for the vehicle.
- *                   status:
- *                     type: string
- *                     enum: ['Active', 'Inactive']
- *                     description: The status of the vehicle.
- *                   date:
- *                     type: string
- *                     format: date-time
- *                     description: The date when the vehicle was created.
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       country:
+ *                         type: string
+ *                         description: The country where the vehicle is located.
+ *                       vehicleCategory:
+ *                         type: string
+ *                         enum: ['Taxi', 'Bus', 'Delivery']
+ *                         description: The category of the vehicle.
+ *                       baseFare:
+ *                         type: number
+ *                         format: float
+ *                         description: The base fare for the vehicle.
+ *                       pricePerKMorMI:
+ *                         type: number
+ *                         format: float
+ *                         description: The price per KM or MI for the vehicle.
+ *                       status:
+ *                         type: string
+ *                         enum: ['Active', 'Inactive']
+ *                         description: The status of the vehicle.
+ *                       date:
+ *                         type: string
+ *                         format: date-time
+ *                         description: The date when the vehicle was created.
  *             example:
- *               - country: "USA"
- *                 vehicleCategory: "Taxi"
- *                 baseFare: 10.00
- *                 pricePerKMorMI: 1.50
- *                 status: "Active"
- *                 date: "2022-01-01T00:00:00.000Z"
+ *               status: 200
+ *               data:
+ *                 - country: "USA"
+ *                   vehicleCategory: "Taxi"
+ *                   baseFare: 10.00
+ *                   pricePerKMorMI: 1.50
+ *                   status: "Active"
+ *                   date: "2022-01-01T00:00:00.000Z"
+ *       500:
+ *         description: An error occurred while fetching Vehicles
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 error:
+ *                   type: string
+ *                   example: An error occurred while fetching Vehicles
  */
 router.get('/get', isAdmin, GetVehicles);
 
@@ -78,36 +97,79 @@ router.get('/get', isAdmin, GetVehicles);
  *             schema:
  *               type: object
  *               properties:
- *                 country:
- *                   type: string
- *                 baseFare:
- *                   type: number
- *                 pricePerKMorMI:
- *                   type: number
- *                 pricePerMIN:
- *                   type: number
- *                 adminCommission:
- *                   type: number
- *                 surgeStartTime:
- *                   type: string
- *                   format: date-time
- *                 surgeEndTime:
- *                   type: string
- *                   format: date-time
- *                 surgeType:
- *                   type: string
  *                 status:
- *                   type: string
- *                 carImage:
- *                   type: string
- *                 documentImage:
- *                   type: string
- *                 isDocVerified:
- *                   type: boolean
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     country:
+ *                       type: string
+ *                     baseFare:
+ *                       type: number
+ *                     pricePerKMorMI:
+ *                       type: number
+ *                     pricePerMIN:
+ *                       type: number
+ *                     adminCommission:
+ *                       type: number
+ *                     surgeStartTime:
+ *                       type: string
+ *                       format: date-time
+ *                     surgeEndTime:
+ *                       type: string
+ *                       format: date-time
+ *                     surgeType:
+ *                       type: string
+ *                     status:
+ *                       type: string
+ *                     carImage:
+ *                       type: string
+ *                     documentImage:
+ *                       type: string
+ *                     isDocVerified:
+ *                       type: boolean
+ *             example:
+ *               status: 200
+ *               data:
+ *                 country: "USA"
+ *                 baseFare: 10.00
+ *                 pricePerKMorMI: 1.50
+ *                 pricePerMIN: 0.20
+ *                 adminCommission: 2.00
+ *                 surgeStartTime: "2022-01-01T00:00:00.000Z"
+ *                 surgeEndTime: "2022-01-01T01:00:00.000Z"
+ *                 surgeType: "Peak"
+ *                 status: "Active"
+ *                 carImage: "https://example.com/car.jpg"
+ *                 documentImage: "https://example.com/doc.jpg"
+ *                 isDocVerified: true
  *       404:
  *         description: Vehicle not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 error:
+ *                   type: string
+ *                   example: Vehicle not found
  *       500:
  *         description: An error occurred
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 error:
+ *                   type: string
+ *                   example: An error occurred
  */
 router.get('/get/:vehicleId', isAdmin, GetOneVehicle);
 
@@ -115,11 +177,9 @@ router.get('/get/:vehicleId', isAdmin, GetOneVehicle);
  * @swagger
  * /api/v1/vehicles/create:
  *   post:
- *     summary: Create a vehicle
- *     security: 
- *       - BearerAuth: {}
+ *     summary: Create a new vehicle
  *     tags: [Vehicles]
- *     description: Create a new vehicle. Only accessible by admins.
+ *     description: Create a new vehicle record
  *     requestBody:
  *       required: true
  *       content:
@@ -129,78 +189,122 @@ router.get('/get/:vehicleId', isAdmin, GetOneVehicle);
  *             properties:
  *               country:
  *                 type: string
- *                 description: The country where the vehicle is located.
  *               baseFare:
  *                 type: number
- *                 format: float
- *                 description: The base fare for the vehicle.
  *               pricePerKMorMI:
  *                 type: number
- *                 format: float
- *                 description: The price per KM or MI for the vehicle.
  *               pricePerMIN:
  *                 type: number
- *                 format: float
- *                 description: The price per minute for the vehicle.
  *               adminCommission:
  *                 type: number
- *                 format: float
- *                 description: The admin commission for the vehicle.
  *               status:
  *                 type: string
- *                 enum: ['Active', 'Inactive']
- *                 description: The status of the vehicle.
  *               vehicleCategory:
  *                 type: string
- *                 enum: ['Taxi', 'Bus', 'Delivery']
- *                 description: The category of the vehicle.
  *               vehicleName:
  *                 type: string
- *                 enum: ['Datride Vehicle', 'Datride Share', 'Datride Delivery']
- *                 description: The name of the vehicle.
- *               isSurge:
- *                 type: boolean
- *                 description: Whether the vehicle is in surge pricing.
- *               surgeStartTime:
- *                 type: string
- *                 pattern: '^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'
- *                 description: The start time of the surge pricing.
- *               surgeEndTime:
- *                 type: string
- *                 pattern: '^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$'
- *                 description: The end time of the surge pricing.
- *               surgeType:
- *                 type: string
- *                 enum: ['Percentage', 'Fixed']
- *                 description: The type of surge pricing.
  *               carImage:
  *                 type: string
- *                 description: The image of the car.
  *               documentImage:
  *                 type: string
- *                 description: The image of the document.
- *             example:
- *               country: "Nigeria"
- *               baseFare: 100
- *               pricePerKMorMI: 10
- *               pricePerMIN: 10
- *               adminCommission: 50
- *               status: "Active"
- *               vehicleCategory: "Taxi"
- *               vehicleName: "Datride Share"
- *               isSurge: false
- *               surgeStartTime: "08:00"
- *               surgeEndTime: "10:00"
- *               surgeType: "Percentage"
- *               carImage: "https://example.com/car.jpg"
- *               documentImage: "https://example.com/document.jpg"
+ *               isSurge:
+ *                 type: boolean
+ *               surgeStartTime:
+ *                 type: string
+ *                 format: date-time
+ *               surgeEndTime:
+ *                 type: string
+ *                 format: date-time
+ *               surgeType:
+ *                 type: string
+ *               isDocVerified:
+ *                 type: boolean
  *     responses:
  *       200:
- *         description: The vehicle was successfully created.
+ *         description: Vehicle created successfully
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Vehicle'
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                 vehicle:
+ *                   type: object
+ *                   properties:
+ *                     vehicleId:
+ *                       type: string
+ *                     driverId:
+ *                       type: string
+ *                     country:
+ *                       type: string
+ *                     baseFare:
+ *                       type: number
+ *                     pricePerKMorMI:
+ *                       type: number
+ *                     pricePerMIN:
+ *                       type: number
+ *                     adminCommission:
+ *                       type: number
+ *                     isSurge:
+ *                       type: boolean
+ *                     surgeStartTime:
+ *                       type: string
+ *                       format: date-time
+ *                     surgeEndTime:
+ *                       type: string
+ *                       format: date-time
+ *                     surgeType:
+ *                       type: string
+ *                     status:
+ *                       type: string
+ *                     vehicleCategory:
+ *                       type: string
+ *                     vehicleName:
+ *                       type: string
+ *                     carImage:
+ *                       type: string
+ *                     documentImage:
+ *                       type: string
+ *                     isDocVerified:
+ *                       type: boolean
+ *             example:
+ *               status: 200
+ *               message: "Vehicle created successfully"
+ *               vehicle: 
+ *                 vehicleId: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+ *                 driverId: null
+ *                 country: "USA"
+ *                 baseFare: 10.00
+ *                 pricePerKMorMI: 1.50
+ *                 pricePerMIN: 0.20
+ *                 adminCommission: 2.00
+ *                 isSurge: false
+ *                 surgeStartTime: "2022-01-01T00:00:00.000Z"
+ *                 surgeEndTime: "2022-01-01T01:00:00.000Z"
+ *                 surgeType: "Peak"
+ *                 status: "Active"
+ *                 vehicleCategory: "Sedan"
+ *                 vehicleName: "Toyota Camry"
+ *                 carImage: "https://example.com/car.jpg"
+ *                 documentImage: "https://example.com/doc.jpg"
+ *                 isDocVerified: true
+ *       500:
+ *         description: An error occurred
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 error:
+ *                   type: string
+ *                   example: An error occurred while creating the vehicle
  */
 router.post('/create', isAdmin, validateVehicle, CreateVehicle);
 
@@ -263,12 +367,40 @@ router.post('/create', isAdmin, validateVehicle, CreateVehicle);
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
+ *             example:
+ *               status: 200
+ *               message: "Vehicle updated successfully"
  *       404:
  *         description: Vehicle not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 error:
+ *                   type: string
+ *                   example: Vehicle not found
  *       500:
  *         description: An error occurred
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 error:
+ *                   type: string
+ *                   example: An error occurred
  */
 router.put('/update/:vehicleId', isAdmin, validateVehicle, EditVehicle);
 

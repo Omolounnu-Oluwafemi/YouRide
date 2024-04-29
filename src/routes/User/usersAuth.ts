@@ -25,14 +25,25 @@ const router = express.Router();
  *     responses:
  *       200:
  *         description: Verification code sent succesfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: The response message
  */
 router.post('/initialsignup', validateInitialSignUp, initialSignUp)
 
 /**
  * @swagger
- * /api/v1/user/verifysignup:
+ * /api/v1/user/verifySignupCode:
  *   post:
- *     summary: Verify the code sent to your email address
+ *     summary: Verify the sign-in code and receive tokens directly.
  *     tags: [User]
  *     requestBody:
  *       required: true
@@ -40,20 +51,65 @@ router.post('/initialsignup', validateInitialSignUp, initialSignUp)
  *         application/json:
  *           schema:
  *             type: object
+ *             required: [verificationCode]
  *             properties:
  *               verificationCode:
  *                 type: string
+ *                 description: The verification code sent to your email.
  *     responses:
  *       200:
- *         description: User verified succesfully
+ *         description: Verification successful, user signed in.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: The response message
+ *                 email:
+ *                   type: string
+ *                   description: The user's email
+ *                 phoneNumber:
+ *                   type: string
+ *                   description: The user's phone number
+ *       400:
+ *         description: Invalid verification code
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: The error message
+ *       500:
+ *         description: An error occurred while verifying the code
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: The error message
  */
-router.post('/verifysignup', validateVerificationCode, verifySignupCode)
+router.post('/verifySignupCode', validateVerificationCode, verifySignupCode)
 
 /**
  * @swagger
  * /api/v1/user/finalsignup:
  *   post:
- *     summary: Enter your Firstname and Lastname to create a user.
+ *     summary: Register a new user with their first name and last name.
  *     tags: [User]
  *     requestBody:
  *       required: true
@@ -61,22 +117,65 @@ router.post('/verifysignup', validateVerificationCode, verifySignupCode)
  *         application/json:
  *           schema:
  *             type: object
+ *             required: [firstName, lastName]
  *             properties:
  *               firstName:
  *                 type: string
+ *                 description: The first name of the user.
  *               lastName:
  *                 type: string
+ *                 description: The last name of the user.
  *     responses:
- *       200:
- *         description: User created succesfully
+ *       201:
+ *         description: New User created successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                 token:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Missing required fields.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                 error:
+ *                   type: string
  */
-router.post('/finalsignup', validateFinalSignUp, finalSignUp)
+router.post('/finalsignup', validateFinalSignUp, finalSignUp);
 
 /**
  * @swagger
- * /api/v1/user/signin:
+ * /api/v1/user/signIn:
  *   post:
- *     summary: To signin as a Customer, you need to be verified again.
+ *     summary: Sign in as a Customer.
  *     tags: [User]
  *     requestBody:
  *       required: true
@@ -91,18 +190,61 @@ router.post('/finalsignup', validateFinalSignUp, finalSignUp)
  *                 type: string
  *     responses:
  *       200:
- *         description: Verification code sent succesfully
+ *         description: Verification code sent to email
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: The response message
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     verificationCode:
+ *                       type: string
+ *                       description: The verification code
+ *       400:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: The error message
+ *       500:
+ *         description: An error occurred while sending code
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: The error message
  */
 router.post('/signin', validateInitialSignUp, signInUser)
 
 /**
  * @swagger
- * /api/v1/user/verifysignin:
+ * /api/v1/user/verifySigninCode:
  *   post:
- *     summary: Verify the sign-in code
+ *     summary: Verify the signin code for a Customer.
  *     tags: [User]
- *     description: Verifies the sign-in code sent to the user's email. If the code is valid and the user exists, a token is returned in a cookie.
  *     requestBody:
+ *       required: true
  *       content:
  *         application/json:
  *           schema:
@@ -110,62 +252,70 @@ router.post('/signin', validateInitialSignUp, signInUser)
  *             properties:
  *               verificationCode:
  *                 type: string
- *                 description: The verification code sent to the user's email
  *     responses:
- *       '200':
- *         description: Successful operation
+ *       200:
+ *         description: User signed in successfully
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
  *                 status:
- *                   type: string
- *                   description: Status of the operation
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
- *                   description: Success message
+ *                   description: The response message
  *                 data:
  *                   type: object
  *                   properties:
  *                     user:
  *                       type: object
- *                       description: User object
- *       '400':
+ *                       description: The user object
+ *       400:
  *         description: Invalid verification code
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
- *                   description: Error message
- *       '404':
+ *                   description: The error message
+ *       404:
  *         description: User not found
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
- *                   description: Error message
+ *                   description: The error message
  *                 error:
  *                   type: string
- *                   description: Error details
- *       '500':
+ *                   description: The error details
+ *       500:
  *         description: An error occurred while verifying the code
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
- *                   description: Error message
+ *                   description: The error message
  */
-router.post('/verifysignin', validateVerificationCode, verifySigninCode)
+router.post('/verifySigninCode', validateVerificationCode, verifySigninCode)
 
 /**
  * @swagger
@@ -183,6 +333,9 @@ router.post('/verifysignin', validateVerificationCode, verifySigninCode)
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
  *                   description: Success message
@@ -199,6 +352,9 @@ router.post('/verifysignin', validateVerificationCode, verifySigninCode)
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
  *                   description: Error message
@@ -209,6 +365,9 @@ router.post('/verifysignin', validateVerificationCode, verifySigninCode)
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
  *                   description: Error message
@@ -236,6 +395,9 @@ router.get('/google/redirect',
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
  *                   description: Success message
@@ -252,6 +414,9 @@ router.get('/google/redirect',
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
  *                   description: Error message
@@ -262,6 +427,9 @@ router.get('/google/redirect',
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
  *                   description: Error message
@@ -272,6 +440,7 @@ router.get('/facebook/redirect',
   passport.authenticate('facebook', { failureRedirect: '/' }),
   socialSignInUser
 );
+
 /**
  * @swagger
  * /api/v1/user/apple:
@@ -288,6 +457,9 @@ router.get('/facebook/redirect',
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
  *                   description: Success message
@@ -304,6 +476,9 @@ router.get('/facebook/redirect',
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
  *                   description: Error message
@@ -314,55 +489,20 @@ router.get('/facebook/redirect',
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
  *                   description: Error message
  */
 router.get('/apple', passport.authenticate('apple'))
 
+
 router.get('/apple/redirect',
   passport.authenticate('apple', { failureRedirect: '/' }),
   socialSignInUser
 );
-
-/**
- * @openapi
- * /api/v1/user/refresh-token:
- *   post:
- *     summary: Refresh the authentication token
- *     description: This endpoint is used to refresh the authentication token when it expires.
- *     operationId: refreshToken
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               refreshToken:
- *                 type: string
- *                 description: The refresh token received during login or previous token refresh.
- *     responses:
- *       '200':
- *         description: Token refreshed successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *       '403':
- *         description: Invalid or expired refresh token, or User not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- */
-router.post('/refresh-token', refreshToken);
 
 /**
  * @swagger
@@ -384,7 +524,13 @@ router.post('/refresh-token', refreshToken);
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/User'
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 data:
+ *                   $ref: '#/components/schemas/User'
  *       400:
  *         description: User ID is required
  *         content:
@@ -392,6 +538,9 @@ router.post('/refresh-token', refreshToken);
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
  *                   description: User ID is required
@@ -402,6 +551,9 @@ router.post('/refresh-token', refreshToken);
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
  *                   description: User not found
@@ -412,12 +564,60 @@ router.post('/refresh-token', refreshToken);
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 message:
  *                   type: string
  *                   description: An error occurred while retrieving user
  */
-// Route to get user by userId
 router.get('/user/:userId', getUserById);
+
+/**
+ * @swagger
+ * /api/v1/user/refresh-token:
+ *   post:
+ *     summary: Refresh the authentication token
+ *     tags: [Refresh Token]
+ *     description: This endpoint is used to refresh the authentication token when it expires.
+ *     operationId: refreshToken
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *                 description: The refresh token received during login or previous token refresh.
+ *     responses:
+ *       '200':
+ *         description: Token refreshed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *       '403':
+ *         description: Invalid or expired refresh token, or User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 error:
+ *                   type: string
+ */
+router.post('/refresh-token', refreshToken);
 
 
 /**

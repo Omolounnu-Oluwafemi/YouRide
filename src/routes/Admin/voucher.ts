@@ -9,9 +9,7 @@ const router = express.Router();
  * /api/v1/admin/voucher:
  *   post:
  *     summary: Create a new voucher
- *     security: 
- *       - BearerAuth: {}
- *     tags: [Voucher]
+ *     tags: [ Admin Create Voucher]
  *     requestBody:
  *       required: true
  *       content:
@@ -56,9 +54,26 @@ const router = express.Router();
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Voucher'
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 data:
+ *                   $ref: '#/components/schemas/Voucher'
  *       500:
  *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: Internal server error
  */
 router.post('/voucher', isAdmin, createVoucher);
 
