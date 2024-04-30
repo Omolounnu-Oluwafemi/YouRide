@@ -134,16 +134,16 @@ router.get('/getoneuser/:userId', isAdmin, getUserById);
 
 /**
  * @swagger
- * /api/v1/admin/deleteuser/{id}:
+ * /api/v1/admin/deleteuser/{userId}:
  *   delete:
  *     summary: Delete a user by ID. Only accessible by admins.
  *     tags: [Admin Dashboards]
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: userId
+ *         required: true
  *         schema:
  *           type: string
- *         required: true
  *         description: The user ID.
  *     responses:
  *       200:
