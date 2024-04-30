@@ -1,6 +1,6 @@
 import express from 'express'; 
 import passport from 'passport';
-import { initialSignUp, verifySignupCode, verifySigninCode, finalSignUp, signInUser, socialSignInUser, refreshToken, getUserById } from '../../controllers/User/usersController'; 
+import { initialSignUp, verifySignupCode, verifySigninCode, finalSignUp, signInUser, socialSignInUser, refreshToken, getUserById } from '../../controllers/User/usersAuth'; 
 import { validateInitialSignUp, validateFinalSignUp, validateVerificationCode} from '../../utils/middleware';
 
 const router = express.Router();
@@ -110,7 +110,7 @@ router.post('/verifySignupCode', validateVerificationCode, verifySignupCode)
  * /api/v1/user/finalsignup:
  *   post:
  *     summary: Register a new user with their first name and last name.
- *     tags: [User]
+ *     tags: [User Authentication]
  *     requestBody:
  *       required: true
  *       content:
@@ -604,6 +604,12 @@ router.get('/user/:userId', getUserById);
  *                   description: The HTTP status code
  *                 message:
  *                   type: string
+ *                 newToken:
+ *                   type: string
+ *                   description: The new JWT token
+ *                 newRefreshToken:
+ *                   type: string
+ *                   description: The new refresh token
  *       '403':
  *         description: Invalid or expired refresh token, or User not found
  *         content:

@@ -18,6 +18,7 @@ import driverTrip from './routes/Driver/driversTrip';
 import driverDashboard from './routes/Driver/dashboard';
 import usersAuth from './routes/User/usersAuth';
 import usersTrip from './routes/User/usersTrip';
+import usersInfo from './routes/User/usersInfo';
 import adminAuth from './routes/Admin/admin';
 import tripRoutes from './routes/Trip/trip';
 import voucherRoutes from './routes/Admin/voucher';
@@ -64,6 +65,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 app.use('/api/v1/user', usersAuth);
 app.use('/api/v1/user', usersTrip);
+app.use('/api/v1/user', usersInfo);
 app.use('/api/v1/driver', driverAuth);
 app.use('/api/v1/driver', driverTrip);
 app.use('/api/v1/driver/dashboard', driverDashboard);

@@ -271,10 +271,13 @@ export const refreshToken = async (req: Request, res: Response) => {
     }
 
     const newRefreshToken = signRefreshToken(decoded.id);
-    // Set the token in a cookie
-    res.cookie('refreshToken', newRefreshToken, { httpOnly: true });
+    const newToken = signToken(decoded.id)
 
-    return res.status(200).json({ message: 'Token refreshed successfully' });
+    return res.status(200).json({
+      message: 'Token refreshed successfully',
+      newRefreshToken,
+      newToken
+    });
 
   } catch (error) {
     return res.status(403).json({ error: 'Invalid or expired refresh token' });
