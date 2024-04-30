@@ -1,7 +1,8 @@
 import express from 'express';
 import multer from 'multer';
-import { DriverSignup, DriverSignIn, verifyDriverSignIn } from '../../controllers/Driver/driversAuth'
+import { DriverSignup, DriverSignIn, verifyDriverSignIn, getDriverById } from '../../controllers/Driver/driversAuth'
 import { ValidateDriverSignup, validateInitialSignUp, validateVerificationCode, verifySignInLimiter } from '../../utils/middleware';
+import { deleteDriver } from '../../controllers/Driver/driversInfo';
 
 const router = express.Router();
 const upload = multer({ dest: 'uploads/' });
@@ -265,6 +266,131 @@ router.post('/signin', validateInitialSignUp, DriverSignIn);
  *                   type: string
  */
 router.post('/verify', validateVerificationCode, verifySignInLimiter, verifyDriverSignIn)
+
+/**
+ * @swagger
+ * /api/v1/driver/getonedriver/{driverId}:
+ *   get:
+ *     summary: Retrieve a Driver by their unique driverId
+ *     tags: [Driver Account]
+ *     description: This endpoint retrieves driver's details using their unique identifier (driverId).
+ *     parameters:
+ *       - in: path
+ *         name: driverId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The unique identifier of the driver
+ *     responses:
+ *       200:
+ *         description: Driver retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 data:
+ *                   $ref: '#/components/schemas/Driver'
+ *       400:
+ *         description: Driver ID is required
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: Driver ID is required
+ *       404:
+ *         description: Driver not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: Driver not found
+ *       500:
+ *         description: An error occurred while retrieving driver
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: An error occurred while retrieving driver
+ */
+router.get('/getonedriver/:driverId', getDriverById);
+
+/**
+ * @swagger
+ * /api/v1/driver/deletedriver/{userId}:
+ *   delete:
+ *     summary: Driver can delete there account by ID.
+ *     tags: [Driver Account]
+ *     parameters:
+ *       - in: path
+ *         name: driverId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The driver ID.
+ *     responses:
+ *       200:
+ *         description: Driver deleted successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: The success message
+ *       404:
+ *         description: Driver not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 error:
+ *                   type: string
+ *                   description: The error message
+ *       500:
+ *         description: An error occurred while processing your request.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 error:
+ *                   type: string
+ *                   description: The error message
+ */
+router.delete('/deletedriver/:userId', deleteDriver)
 
 /**
  * @swagger

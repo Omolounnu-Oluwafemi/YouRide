@@ -56,7 +56,6 @@ export const updateVehicleDetails = async (req: Request, res: Response) => {
         return res.status(500).json({ error: 'An error occurred while updating vehicle details' });
     }
 };
-
 export const updateAvailability = async (req: Request, res: Response) => {
   const driverId = decodeDriverIdFromToken(req);
   const { latitude, longitude } = req.body; 

@@ -187,5 +187,26 @@ export async function verifyDriverSignIn(req: Request, res: Response) {
     res.status(500).json({ message: 'An error occurred while verifying the code' });
   }
 };
+export const getDriverById = async (req: Request, res: Response) => {
+  try {
+    const { driverId } = req.params;
 
+    if (!driverId) {
+      return res.status(400).json({ message: "Driver ID is required" });
+    }
+
+    const driver = await Driver.findOne({ where: { driverId } });
+
+    if (!driver) {
+      return res.status(404).json({ message: "Driver not found" });
+    }
+
+    return res.status(200).json({
+      message: 'Driver retrieved successfully',
+      data: { driver }
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'An error occurred while retrieving driver' });
+  }
+};
    

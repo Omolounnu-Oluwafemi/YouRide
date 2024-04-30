@@ -506,7 +506,7 @@ router.get('/apple/redirect',
 
 /**
  * @swagger
- * /api/v1/user/{userId}:
+ * /api/v1/user/getoneuser/{userId}:
  *   get:
  *     summary: Retrieve a user by their unique userId
  *     tags: [User Account]
@@ -571,7 +571,7 @@ router.get('/apple/redirect',
  *                   type: string
  *                   description: An error occurred while retrieving user
  */
-router.get('/user/:userId', getUserById);
+router.get('/getoneuser/:userId', getUserById);
 
 /**
  * @swagger
