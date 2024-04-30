@@ -1,15 +1,16 @@
 import express from 'express';
-import { getAllUsers } from '../../controllers/User/usersInfo';
+import { deleteUser, getAllUsers } from '../../controllers/User/usersInfo';
 import { isAdmin } from '../../utils/middleware';
+import { getUserById } from '../../controllers/User/usersAuth';
 
 const router = express.Router();
 
 /**
  * @swagger
- * /api/v1/user/getallusers:
+ * /api/v1/admin/getallusers:
  *   get:
  *     summary: Retrieve a list of all users. Only accessible by admins.
- *     tags: [User]
+ *     tags: [Admin Dashboards]
  *     parameters:
  *       - in: query
  *         name: page
@@ -44,12 +45,8 @@ const router = express.Router();
  *           application/json:
  *             schema:
  *               type: array
- *               properties:
- *                 status:
- *                   type: integer
- *                   description: The HTTP status code
- *                 data:
- *                   $ref: '#/components/schemas/User'
+ *               items:
+ *                 $ref: '#/components/schemas/User'
  *       500:
  *         description: An error occurred while processing your request.
  *         content:
@@ -65,5 +62,130 @@ const router = express.Router();
  *                   description: The error message
  */
 router.get('/getallusers', isAdmin, getAllUsers)
+
+/**
+ * @swagger
+ * /api/v1/admin/getoneuser/{userId}:
+ *   get:
+ *     summary: Retrieve a user by their unique userId
+ *     tags: [Admin Dashboards]
+ *     description: This endpoint retrieves a user's details using their unique identifier (userId).
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The unique identifier of the user
+ *     responses:
+ *       200:
+ *         description: User retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 data:
+ *                   $ref: '#/components/schemas/User'
+ *       400:
+ *         description: User ID is required
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: User ID is required
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: User not found
+ *       500:
+ *         description: An error occurred while retrieving user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: An error occurred while retrieving user
+ */
+router.get('/getoneuser/:userId', isAdmin, getUserById);
+
+/**
+ * @swagger
+ * /api/v1/admin/deleteuser/{id}:
+ *   delete:
+ *     summary: Delete a user by ID. Only accessible by admins.
+ *     tags: [Admin Dashboards]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The user ID.
+ *     responses:
+ *       200:
+ *         description: User deleted successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: The success message
+ *       404:
+ *         description: User not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 error:
+ *                   type: string
+ *                   description: The error message
+ *       500:
+ *         description: An error occurred while processing your request.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 error:
+ *                   type: string
+ *                   description: The error message
+ */
+router.delete('/deleteuser/:userId', isAdmin, deleteUser)
 
 export default router;

@@ -56,3 +56,20 @@ export const getAllUsers = async (req: Request, res: Response) => {
         return res.status(500).json({ error: 'An error occurred while processing your request' });
     }
 }
+export const deleteUser = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const user = await User.findOne({ where: { userId: id } });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    await User.destroy({ where: { userId: id } });
+
+    return res.status(200).json({ message: 'User deleted successfully' });
+  } catch (error) {
+    return res.status(500).json({ error: 'An error occurred while processing your request' });
+  }
+};

@@ -2,6 +2,7 @@ import express from 'express';
 import passport from 'passport';
 import { initialSignUp, verifySignupCode, verifySigninCode, finalSignUp, signInUser, socialSignInUser, refreshToken, getUserById } from '../../controllers/User/usersAuth'; 
 import { validateInitialSignUp, validateFinalSignUp, validateVerificationCode} from '../../utils/middleware';
+import { deleteUser } from '../../controllers/User/usersInfo';
 
 const router = express.Router();
 
@@ -10,7 +11,7 @@ const router = express.Router();
  * /api/v1/user/initialsignup:
  *   post:
  *     summary: To signup as a Customer, you need to be verified.
- *     tags: [User]
+ *     tags: [User Authentication]
  *     requestBody:
  *       required: true
  *       content:
@@ -44,7 +45,7 @@ router.post('/initialsignup', validateInitialSignUp, initialSignUp)
  * /api/v1/user/verifySignupCode:
  *   post:
  *     summary: Verify the sign-in code and receive tokens directly.
- *     tags: [User]
+ *     tags: [User Authentication]
  *     requestBody:
  *       required: true
  *       content:
@@ -176,7 +177,7 @@ router.post('/finalsignup', validateFinalSignUp, finalSignUp);
  * /api/v1/user/signIn:
  *   post:
  *     summary: Sign in as a Customer.
- *     tags: [User]
+ *     tags: [User Authentication]
  *     requestBody:
  *       required: true
  *       content:
@@ -242,7 +243,7 @@ router.post('/signin', validateInitialSignUp, signInUser)
  * /api/v1/user/verifySigninCode:
  *   post:
  *     summary: Verify the signin code for a Customer.
- *     tags: [User]
+ *     tags: [User Authentication]
  *     requestBody:
  *       required: true
  *       content:
@@ -322,7 +323,7 @@ router.post('/verifySigninCode', validateVerificationCode, verifySigninCode)
  * /api/v1/user/google:
  *   get:
  *     tags:
- *       - Authentication
+ *       - User Social Authentication
  *     summary: Google OAuth2.0 authentication
  *     description: Redirects the user to Google for OAuth2.0 authentication. After successful authentication, Google redirects the user back to this endpoint with an authorization code. This endpoint then exchanges the authorization code for an access token.
  *     responses:
@@ -384,7 +385,7 @@ router.get('/google/redirect',
  * /api/v1/user/facebook:
  *   get:
  *     tags:
- *       - Authentication
+ *       - User Social Authentication
  *     summary: Facebook authentication
  *     description: Redirects the user to Facebook authentication. After successful authentication, Facebook redirects the user back to this endpoint with an authorization code. This endpoint then exchanges the authorization code for an access token.
  *     responses:
@@ -446,7 +447,7 @@ router.get('/facebook/redirect',
  * /api/v1/user/apple:
  *   get:
  *     tags:
- *       - Authentication
+ *       - User Social Authentication
  *     summary: Apple authentication
  *     description: Redirects the user to Apple for authentication. After successful authentication, Apple redirects the user back to this endpoint with an authorization code. This endpoint then exchanges the authorization code for an access token.
  *     responses:
@@ -498,7 +499,6 @@ router.get('/facebook/redirect',
  */
 router.get('/apple', passport.authenticate('apple'))
 
-
 router.get('/apple/redirect',
   passport.authenticate('apple', { failureRedirect: '/' }),
   socialSignInUser
@@ -509,7 +509,7 @@ router.get('/apple/redirect',
  * /api/v1/user/{userId}:
  *   get:
  *     summary: Retrieve a user by their unique userId
- *     tags: [User]
+ *     tags: [User Account]
  *     description: This endpoint retrieves a user's details using their unique identifier (userId).
  *     parameters:
  *       - in: path
@@ -578,7 +578,7 @@ router.get('/user/:userId', getUserById);
  * /api/v1/user/refresh-token:
  *   post:
  *     summary: Refresh the authentication token
- *     tags: [Refresh Token]
+ *     tags: [User Authentication]
  *     description: This endpoint is used to refresh the authentication token when it expires.
  *     operationId: refreshToken
  *     requestBody:
@@ -624,6 +624,62 @@ router.get('/user/:userId', getUserById);
  *                   type: string
  */
 router.post('/refresh-token', refreshToken);
+
+/**
+ * @swagger
+ * /api/v1/user/deleteuser/{id}:
+ *   delete:
+ *     summary: Delete a user by ID. Only accessible by admins.
+ *     tags: [User Account]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The user ID.
+ *     responses:
+ *       200:
+ *         description: User deleted successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: The success message
+ *       404:
+ *         description: User not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 error:
+ *                   type: string
+ *                   description: The error message
+ *       500:
+ *         description: An error occurred while processing your request.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 error:
+ *                   type: string
+ *                   description: The error message
+ */
+router.delete('/deleteuser/:userId', deleteUser)
 
 
 /**

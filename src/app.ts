@@ -65,7 +65,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 app.use('/api/v1/user', usersAuth);
 app.use('/api/v1/user', usersTrip);
-app.use('/api/v1/user', usersInfo);
+app.use('/api/v1/admin', usersInfo);
 app.use('/api/v1/driver', driverAuth);
 app.use('/api/v1/driver', driverTrip);
 app.use('/api/v1/driver/dashboard', driverDashboard);
