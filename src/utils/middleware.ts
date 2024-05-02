@@ -1,5 +1,5 @@
 import { NextFunction, Response, Request } from "express";
-import { initiialSignUpValidator, finalSignUpValidator, verificationCodeValidator, AdminSignupValidator, AdminSignInValidator, AdminPasswordUpdate, options, BookTrip, createVehicleSchema, createTripSchema, tripRequestSchema } from "../utils/validate";
+import { initiialSignUpValidator, finalSignUpValidator, verificationCodeValidator, AdminSignupValidator, AdminSignInValidator, AdminPasswordUpdate, options, BookTrip, createVehicleSchema, createTripSchema, tripRequestSchema, countrySchema } from "../utils/validate";
 import { DriverSignupValidator } from '../utils/validate';
 import rateLimit from 'express-rate-limit';
 import { decodeDriverIdFromToken, verifyAdminToken } from "./token";
@@ -169,6 +169,13 @@ export const validateVoucherCreation = (req: Request, res: Response, next: NextF
       errors
     });
   }
+}
+export const validateCountryCreation = (req: Request, res: Response, next: NextFunction)=>{
+  const { error } = countrySchema.validate(req.body, options);
+  if (error) {
+        return res.status(400).json({ error: error.details[0].message });
+    }
+    next();
 }
   
 

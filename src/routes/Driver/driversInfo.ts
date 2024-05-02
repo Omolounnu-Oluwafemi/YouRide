@@ -124,9 +124,15 @@ router.get('/getonedriver/:driverId', isAdmin, getDriverById);
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Driver'
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Driver'
  *       404:
  *         description: No available drivers found.
  *         content:
@@ -134,6 +140,9 @@ router.get('/getonedriver/:driverId', isAdmin, getDriverById);
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 error:
  *                   type: string
  *                   description: The error message
@@ -144,6 +153,9 @@ router.get('/getonedriver/:driverId', isAdmin, getDriverById);
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 error:
  *                   type: string
  *                   description: The error message
@@ -186,6 +198,9 @@ router.get('/getalldrivers', isAdmin, getAllDrivers);
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 totalDrivers:
  *                   type: integer
  *                 totalPages:
@@ -205,6 +220,9 @@ router.get('/getalldrivers', isAdmin, getAllDrivers);
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 error:
  *                   type: string
  *                   description: The error message
@@ -215,11 +233,14 @@ router.get('/getalldrivers', isAdmin, getAllDrivers);
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 error:
  *                   type: string
  *                   description: The error message
  */
-router.get('/getAvailableDrivers', isAdmin, getAvailableDrivers)
+router.get('/getAvailableDrivers', isAdmin, getAvailableDrivers);
 
 /**
  * @swagger
@@ -233,16 +254,22 @@ router.get('/getAvailableDrivers', isAdmin, getAvailableDrivers)
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   driverId:
- *                     type: string
- *                   latitude:
- *                     type: number
- *                   longitude:
- *                     type: number
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       driverId:
+ *                         type: string
+ *                       latitude:
+ *                         type: number
+ *                       longitude:
+ *                         type: number
  *       500:
  *         description: An error occurred while processing your request.
  *         content:
@@ -250,6 +277,9 @@ router.get('/getAvailableDrivers', isAdmin, getAvailableDrivers)
  *             schema:
  *               type: object
  *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
  *                 error:
  *                   type: string
  *                   description: The error message

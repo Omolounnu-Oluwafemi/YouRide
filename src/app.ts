@@ -24,6 +24,7 @@ import adminAuth from './routes/Admin/admin';
 import tripRoutes from './routes/Trip/trip';
 import voucherRoutes from './routes/Admin/voucher';
 import vehicleRoutes from './routes/Vehicle/vehicle';
+import countryRoutes from './routes/Admin/country';
 
 const app = express();
 
@@ -74,6 +75,7 @@ app.use('/api/v1/driver/dashboard', driverDashboard);
 app.use('/api/v1/admin', adminAuth);
 app.use('/api/v1/trips', tripRoutes);
 app.use('/api/v1/admin', voucherRoutes);
+app.use('/api/v1/admin', countryRoutes);
 app.use('/api/v1/vehicles', vehicleRoutes);
 
 // SWAGGER

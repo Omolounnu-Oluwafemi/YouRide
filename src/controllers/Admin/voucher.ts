@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { Voucher } from '../../models/voucher';
 
 export const createVoucher = async (req: Request, res: Response) => {
+    
     const { country, couponCode, description, usageLimit, perUserLimit, discount, activationDate, expiryDate, validity, status } = req.body;
 
     try {

@@ -5,6 +5,7 @@ import { Admin, initAdmin } from '../models/admin';
 import { Vehicle, initVehicle } from '../models/vehicle';
 import { Trip, initTrip } from '../models/trip';
 import { Voucher, initVoucher } from '../models/voucher';
+import { Country, initCountry } from '../models/countries';
 
 const database = process.env.DB_NAME || 'postgres';
 const username = process.env.DB_USER || 'postgres';
@@ -23,6 +24,7 @@ initVehicle(sequelize);
 initAdmin(sequelize);
 initVoucher(sequelize);
 initTrip(sequelize);
+initCountry(sequelize);
 
 
 // Define associations

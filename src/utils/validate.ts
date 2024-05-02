@@ -195,6 +195,15 @@ export const tripRequestSchema = Joi.object({
     destinationLatitude: Joi.number().required(),
     destinationLongitude: Joi.number().required(),
 });
+export const countrySchema = Joi.object({
+    name: Joi.string().required(),
+    email: Joi.string().email().required(),
+    currency: Joi.string().required(),
+    usdConversionRatio: Joi.number().required(),
+    distanceUnit: Joi.string().valid('KM', 'MI').required(),
+    paymentOption: Joi.string().valid('Stripe Payment', 'Paystack Payment').required(),
+});
+
 export const options = {
     abortEarly: false,
     errors: {
