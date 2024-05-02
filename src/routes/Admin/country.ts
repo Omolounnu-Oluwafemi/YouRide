@@ -1,5 +1,5 @@
 import express from 'express'
-import { createCountry } from '../../controllers/Admin/countries'
+import { createCountry, getAllCountries, getCountryById   } from '../../controllers/Admin/countries'
 import { isAdmin, validateCountryCreation } from '../../utils/middleware'
 
 const router = express.Router() 
@@ -74,6 +74,151 @@ const router = express.Router()
  *                   type: string
  */
 router.post('/createCountry', isAdmin, validateCountryCreation, createCountry)
+
+/**
+ * @swagger
+ * /api/v1/admin/countries:
+ *   get:
+ *     summary: Get all countries
+ *     tags: [Admin Dashboards]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: The page number to return
+ *       - in: query
+ *         name: pageSize
+ *         schema:
+ *           type: integer
+ *         description: The number of countries to return per page
+ *       - in: query
+ *         name: email
+ *         schema:
+ *           type: string
+ *         description: The email to filter countries by
+ *       - in: query
+ *         name: name
+ *         schema:
+ *           type: string
+ *         description: The name to filter countries by
+ *       - in: query
+ *         name: currency
+ *         schema:
+ *           type: string
+ *         description: The currency to filter countries by
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: The search string to filter countries by
+ *       - in: query
+ *         name: date
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: The date to filter countries by
+ *     responses:
+ *       '200':
+ *         description: A list of countries
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 statusCode:
+ *                   type: integer
+ *                 totalCountries:
+ *                   type: integer
+ *                 totalPages:
+ *                   type: integer
+ *                 currentPage:
+ *                   type: integer
+ *                 pageSize:
+ *                   type: integer
+ *                 countries:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Country'
+ *       '404':
+ *         description: No countries found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 statusCode:
+ *                   type: integer
+ *                 error:
+ *                   type: string
+ *       '500':
+ *         description: An error occurred while processing your request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 statusCode:
+ *                   type: integer
+ *                 error:
+ *                   type: string
+ */
+router.get('/countries', isAdmin, getAllCountries);
+
+/**
+ * @swagger
+ * /api/v1/admin/country/{countryId}:
+ *   get:
+ *     summary: Retrieve a country by its ID.
+ *     tags: [Admin Dashboards]
+ *     parameters:
+ *       - in: path
+ *         name: countryId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the country.
+ *     responses:
+ *       200:
+ *         description: The country data.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 data:
+ *                   $ref: '#/components/schemas/Country'
+ *       404:
+ *         description: Country not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 error:
+ *                   type: string
+ *                   description: The error message
+ *       500:
+ *         description: An error occurred while processing your request.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 error:
+ *                   type: string
+ *                   description: The error message
+ */
+router.get('/country/:countryId', isAdmin, getCountryById);
 
 /**
  * @swagger
