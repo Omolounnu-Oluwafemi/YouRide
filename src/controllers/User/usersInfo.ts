@@ -8,12 +8,19 @@ export const getAllUsers = async (req: Request, res: Response) => {
         const pageSize = Number(req.query.pageSize) || 10;
         const email = req.query.email || '';
         const phoneNumber = req.query.phoneNumber || '';
+        const search = req.query.search || '';
         let date = req.query.date ? new Date(req.query.date as string) : null;
 
         const whereClause: {
             email?: { [Op.like]: string },
             phoneNumber?: { [Op.like]: string },
-            createdAt?: { [Op.gte]: Date } | { [Op.between]: Date[] }
+            createdAt?: { [Op.gte]: Date } | { [Op.between]: Date[] },
+              [Op.or]?: {
+                firstName?: { [Op.like]: string },
+                lastName?: { [Op.like]: string },
+                email?: { [Op.like]: string },
+                phoneNumber?: {[Op.like]: string },
+            }
         } = {
             email: {
                 [Op.like]: `%${email}%`
@@ -22,6 +29,15 @@ export const getAllUsers = async (req: Request, res: Response) => {
                 [Op.like]: `%${phoneNumber}%`
             }
         };
+
+         if (search) {
+            whereClause[Op.or] = {
+                firstName: { [Op.like]: `%${search}%` },
+                lastName: { [Op.like]: `%${search}%` },
+                email: { [Op.like]: `%${search}%` },
+                phoneNumber: { [Op.like]: `%${search}%` }
+            };
+        }
 
         if (date) {
             let startOfDay = new Date(date.setHours(0,0,0,0));
@@ -34,6 +50,11 @@ export const getAllUsers = async (req: Request, res: Response) => {
         const totalUsers = await User.count({
             where: whereClause
         });
+
+         if (totalUsers === 0) {
+            return res.status(404).json({ error: 'No users found' });
+         }
+        
         const totalPages = Math.ceil(totalUsers / pageSize);
 
         const users = await User.findAll({

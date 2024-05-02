@@ -1,6 +1,6 @@
 import express from 'express';
 import { getDriverById } from '../../controllers/Driver/driversAuth';
-import { deleteDriver, getAllDrivers } from '../../controllers/Driver/driversInfo';
+import { deleteDriver, getAllDrivers, getAvailableDrivers, getAllDriversLocations } from '../../controllers/Driver/driversInfo';
 import { isAdmin } from '../../utils/middleware';
 
 
@@ -103,21 +103,21 @@ router.get('/getonedriver/:driverId', isAdmin, getDriverById);
  *           type: string
  *         description: The phone number to filter by.
  *       - in: query
- *         name: driversLicense
+ *         name: driverLicense
  *         schema:
  *           type: string
  *         description: The driver's license to filter by.
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: The general search query to filter by.
  *       - in: query
  *         name: date
  *         schema:
  *           type: string
  *           format: date
  *         description: The exact creation date to filter by.
- *       - in: query
- *         name: isAvailable
- *         schema:
- *           type: boolean
- *         description: The availability status to filter by.
  *     responses:
  *       200:
  *         description: A list of drivers.
@@ -127,6 +127,16 @@ router.get('/getonedriver/:driverId', isAdmin, getDriverById);
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Driver'
+ *       404:
+ *         description: No available drivers found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: The error message
  *       500:
  *         description: An error occurred while processing your request.
  *         content:
@@ -134,18 +144,121 @@ router.get('/getonedriver/:driverId', isAdmin, getDriverById);
  *             schema:
  *               type: object
  *               properties:
- *                 status:
- *                   type: integer
- *                   description: The HTTP status code
  *                 error:
  *                   type: string
  *                   description: The error message
  */
-router.get('/getalldrivers', isAdmin, getAllDrivers)
+router.get('/getalldrivers', isAdmin, getAllDrivers);
 
 /**
  * @swagger
- * /api/v1/admin/deletedriver/{userId}:
+ * /api/v1/admin/getAvailableDrivers:
+ *   get:
+ *     summary: Retrieve a list of all available drivers. Only accessible by admins.
+ *     tags: [Admin Dashboards]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: The page number.
+ *       - in: query
+ *         name: pageSize
+ *         schema:
+ *           type: integer
+ *         description: The number of items per page.
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: The general search query to filter by.
+ *       - in: query
+ *         name: date
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: The exact creation date to filter by.
+ *     responses:
+ *       200:
+ *         description: A list of available drivers.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 totalDrivers:
+ *                   type: integer
+ *                 totalPages:
+ *                   type: integer
+ *                 currentPage:
+ *                   type: integer
+ *                 pageSize:
+ *                   type: integer
+ *                 drivers:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Driver'
+ *       404:
+ *         description: No available drivers found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: The error message
+ *       500:
+ *         description: An error occurred while processing your request.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: The error message
+ */
+router.get('/getAvailableDrivers', isAdmin, getAvailableDrivers)
+
+/**
+ * @swagger
+ * /api/v1/admin/getLocations:
+ *   get:
+ *     summary: Retrieve a list of all drivers' locations. Only accessible by admins.
+ *     tags: [Admin Dashboards]
+ *     responses:
+ *       200:
+ *         description: A list of drivers' locations.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   driverId:
+ *                     type: string
+ *                   latitude:
+ *                     type: number
+ *                   longitude:
+ *                     type: number
+ *       500:
+ *         description: An error occurred while processing your request.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: The error message
+ */
+router.get('/getLocations', isAdmin, getAllDriversLocations);
+
+/**
+ * @swagger
+ * /api/v1/admin/deletedriver/{driverId}:
  *   delete:
  *     summary: Delete a driver by ID. Only accessible by admins.
  *     tags: [Admin Dashboards]
@@ -197,6 +310,6 @@ router.get('/getalldrivers', isAdmin, getAllDrivers)
  *                   type: string
  *                   description: The error message
  */
-router.delete('/deletedriver/:userId', isAdmin, deleteDriver)
+router.delete('/deletedriver/:driverId', isAdmin, deleteDriver)
 
 export default router;

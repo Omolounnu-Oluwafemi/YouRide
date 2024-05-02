@@ -33,6 +33,11 @@ const router = express.Router();
  *           type: string
  *         description: The phone number to filter by.
  *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: The search term to filter by.
+ *       - in: query
  *         name: date
  *         schema:
  *           type: string
@@ -44,9 +49,29 @@ const router = express.Router();
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/User'
+ *               type: object
+ *               properties:
+ *                 totalUsers:
+ *                   type: integer
+ *                 totalPages:
+ *                   type: integer
+ *                 currentPage:
+ *                   type: integer
+ *                 pageSize:
+ *                   type: integer
+ *                 users:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/User'
+ *       404:
+ *         description: No users found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
  *       500:
  *         description: An error occurred while processing your request.
  *         content:
@@ -54,12 +79,8 @@ const router = express.Router();
  *             schema:
  *               type: object
  *               properties:
- *                 status:
- *                   type: integer
- *                   description: The HTTP status code
  *                 error:
  *                   type: string
- *                   description: The error message
  */
 router.get('/getallusers', isAdmin, getAllUsers)
 
