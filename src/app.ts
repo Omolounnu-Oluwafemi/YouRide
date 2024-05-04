@@ -22,6 +22,7 @@ import usersTrip from './routes/User/usersTrip';
 import usersInfo from './routes/User/usersInfo';
 import adminAuth from './routes/Admin/admin';
 import tripRoutes from './routes/Trip/trip';
+import adminTrips from './routes/Admin/trip';
 import voucherRoutes from './routes/Admin/voucher';
 import vehicleRoutes from './routes/Vehicle/vehicle';
 import countryRoutes from './routes/Admin/country';
@@ -76,6 +77,7 @@ app.use('/api/v1/admin', adminAuth);
 app.use('/api/v1/trips', tripRoutes);
 app.use('/api/v1/admin', voucherRoutes);
 app.use('/api/v1/admin', countryRoutes);
+app.use('/api/v1/admin', adminTrips);
 app.use('/api/v1/vehicles', vehicleRoutes);
 
 // SWAGGER

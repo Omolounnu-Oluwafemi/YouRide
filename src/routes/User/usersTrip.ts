@@ -106,12 +106,19 @@ router.post('/trip-price', calculateTripAmount);
 
 /**
  * @swagger
- * /api/v1/user/trip-request:
+ * /api/v1/user/{userId}/trip-request:
  *   post:
  *     tags:
  *       - User-Trips
  *     summary: Create a new trip
  *     description: This endpoint allows for the creation of a new trip.
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the user
  *     requestBody:
  *       required: true
  *       content:
@@ -195,7 +202,7 @@ router.post('/trip-price', calculateTripAmount);
  *                   type: string
  *                   example: An error occurred while processing your request
  */
-router.post('/trip-request', validatetripRequest, TripRequest);
+router.post('/:userId/trip-request', validatetripRequest, TripRequest);
 
 /**
  * @swagger
@@ -264,8 +271,17 @@ router.patch('/cancel-trip/:tripId', cancelTrip);
  *         - tripId
  *         - userId
  *         - pickupLocation
- *         - dropoffLocation
+ *         - destination
  *         - status
+ *         - vehicleName
+ *         - country
+ *         - paymentMethod
+ *         - tripAmount
+ *         - pickupLatitude
+ *         - pickupLongitude
+ *         - destinationLatitude
+ *         - destinationLongitude
+ *         - totalDistance
  *       properties:
  *         tripId:
  *           type: string
@@ -279,12 +295,50 @@ router.patch('/cancel-trip/:tripId', cancelTrip);
  *           type: string
  *           format: uuid
  *           description: The ID of the user who booked the trip.
+ *         userName:
+ *           type: string
+ *           description: The name of the user who booked the trip.
+ *         driverName:
+ *           type: string
+ *           description: The name of the driver for the trip.
+ *         vehicleName:
+ *           type: string
+ *           description: The name of the vehicle for the trip.
+ *         country:
+ *           type: string
+ *           description: The country where the trip is taking place.
+ *         vehicleId:
+ *           type: string
+ *           format: uuid
+ *           description: The ID of the vehicle for the trip.
+ *         paymentMethod:
+ *           type: string
+ *           enum: ['Cash', 'Card Payment', 'Datride Wallet']
+ *           description: The payment method for the trip.
+ *         tripAmount:
+ *           type: number
+ *           description: The amount of the trip.
  *         pickupLocation:
  *           type: string
  *           description: The pickup location for the trip.
  *         destination:
  *           type: string
  *           description: The dropoff location for the trip.
+ *         pickupLatitude:
+ *           type: number
+ *           description: The latitude of the pickup location for the trip.
+ *         pickupLongitude:
+ *           type: number
+ *           description: The longitude of the pickup location for the trip.
+ *         destinationLatitude:
+ *           type: number
+ *           description: The latitude of the destination for the trip.
+ *         destinationLongitude:
+ *           type: number
+ *           description: The longitude of the destination for the trip.
+ *         totalDistance:
+ *           type: number
+ *           description: The total distance of the trip.
  *         pickupTime:
  *           type: string
  *           format: date-time
@@ -295,17 +349,29 @@ router.patch('/cancel-trip/:tripId', cancelTrip);
  *           description: The dropoff time for the trip.
  *         status:
  *           type: string
- *           enum: ['pending', 'accepted', 'in-progress', 'completed', 'cancelled']
+ *           enum: ['current', 'scheduled', 'completed' , 'cancelled']
  *           description: The status of the trip.
  *       example:
  *         tripId: "123e4567-e89b-12d3-a456-426614174000"
  *         driverId: "123e4567-e89b-12d3-a456-426614174000"
  *         userId: "123e4567-e89b-12d3-a456-426614174000"
+ *         userName: "John Doe"
+ *         driverName: "Jane Doe"
+ *         vehicleName: "Toyota Camry"
+ *         country: "USA"
+ *         vehicleId: "123e4567-e89b-12d3-a456-426614174000"
+ *         paymentMethod: "Card Payment"
+ *         tripAmount: 50
  *         pickupLocation: "123 Main St"
- *         dropoffLocation: "456 Elm St"
+ *         destination: "456 Elm St"
+ *         pickupLatitude: 40.712776
+ *         pickupLongitude: -74.005974
+ *         destinationLatitude: 40.712776
+ *         destinationLongitude: -74.005974
+ *         totalDistance: 10
  *         pickupTime: "2022-01-01T00:00:00Z"
  *         dropoffTime: "2022-01-01T01:00:00Z"
- *         status: "pending"
+ *         status: "scheduled"
  */
 
 export default router;

@@ -1,5 +1,6 @@
 import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
 import { Trip, TripCreationAttributes } from './trip';
+
 interface UserAttributes {
   userId: string;
   phoneNumber: string;
@@ -10,9 +11,10 @@ interface UserAttributes {
   googleId: string;
   facebookId: string;
   appleId: string;
+  verificationCode: string | null;
 }
 
-interface UserCreationAttributes extends Optional<UserAttributes, 'userId'> { }
+interface UserCreationAttributes extends Optional<UserAttributes, 'userId'> {}
 
 class User extends Model<UserAttributes, UserCreationAttributes> {
   public userId!: string;
@@ -24,16 +26,16 @@ class User extends Model<UserAttributes, UserCreationAttributes> {
   public googleId!: string;
   public facebookId!: string;
   public appleId!: string;
+  public verificationCode!: string | null;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
   public static associate(models: { [key: string]: any }) {
-    User.hasMany(models.Trip, { foreignKey: 'userId', as: 'trips'});
+    User.hasMany(models.Trip, { foreignKey: 'userId', as: 'trips' });
   }
   // Add the createTrip method to the User class
   public createTrip!: (trip: TripCreationAttributes) => Promise<Trip>;
 }
-
 
 const initUser = (sequelize: Sequelize) => {
   User.init(
@@ -74,6 +76,10 @@ const initUser = (sequelize: Sequelize) => {
       allowNull: true,
       },
       ssoProvider: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+       verificationCode: {
         type: DataTypes.STRING,
         allowNull: true,
       },

@@ -25,7 +25,7 @@ const router = express.Router();
  *                 type: string
  *     responses:
  *       200:
- *         description: Verification code sent succesfully
+ *         description: Verification code sent successfully
  *         content:
  *           application/json:
  *             schema:
@@ -37,15 +37,51 @@ const router = express.Router();
  *                 message:
  *                   type: string
  *                   description: The response message
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     userId:
+ *                       type: string
+ *                     verificationCode:
+ *                       type: string
+ *       400:
+ *         description: Email or phone number already exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                 message:
+ *                   type: string
+ *       500:
+ *         description: An error occurred while sending code
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                 message:
+ *                   type: string
  */
 router.post('/initialsignup', validateInitialSignUp, initialSignUp)
 
 /**
  * @swagger
- * /api/v1/user/verifySignupCode:
+ * /api/v1/user/verifySignupCode/{userId}:
  *   post:
  *     summary: Verify the sign-in code and receive tokens directly.
  *     tags: [User Authentication]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The user's ID
  *     requestBody:
  *       required: true
  *       content:
@@ -59,7 +95,7 @@ router.post('/initialsignup', validateInitialSignUp, initialSignUp)
  *                 description: The verification code sent to your email.
  *     responses:
  *       200:
- *         description: Verification successful, user signed in.
+ *         description: Verification successful
  *         content:
  *           application/json:
  *             schema:
@@ -71,14 +107,8 @@ router.post('/initialsignup', validateInitialSignUp, initialSignUp)
  *                 message:
  *                   type: string
  *                   description: The response message
- *                 email:
- *                   type: string
- *                   description: The user's email
- *                 phoneNumber:
- *                   type: string
- *                   description: The user's phone number
  *       400:
- *         description: Invalid verification code
+ *         description: Invalid verification code or user ID
  *         content:
  *           application/json:
  *             schema:
@@ -104,14 +134,21 @@ router.post('/initialsignup', validateInitialSignUp, initialSignUp)
  *                   type: string
  *                   description: The error message
  */
-router.post('/verifySignupCode', validateVerificationCode, verifySignupCode)
+router.post('/verifySignupCode/:userId', validateVerificationCode, verifySignupCode)
 
 /**
  * @swagger
- * /api/v1/user/finalsignup:
+ * /api/v1/user/finalSignup/{userId}:
  *   post:
  *     summary: Register a new user with their first name and last name.
  *     tags: [User Authentication]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The user's ID
  *     requestBody:
  *       required: true
  *       content:
@@ -127,8 +164,8 @@ router.post('/verifySignupCode', validateVerificationCode, verifySignupCode)
  *                 type: string
  *                 description: The last name of the user.
  *     responses:
- *       201:
- *         description: New User created successfully.
+ *       200:
+ *         description: User updated successfully.
  *         content:
  *           application/json:
  *             schema:
@@ -139,12 +176,17 @@ router.post('/verifySignupCode', validateVerificationCode, verifySignupCode)
  *                   description: The HTTP status code
  *                 message:
  *                   type: string
+ *                   description: The response message
  *                 token:
  *                   type: string
+ *                   description: The JWT token
+ *                 refreshToken:
+ *                   type: string
+ *                   description: The refresh token
  *                 data:
  *                   $ref: '#/components/schemas/User'
  *       400:
- *         description: Missing required fields.
+ *         description: User not found or missing required fields.
  *         content:
  *           application/json:
  *             schema:
@@ -155,6 +197,7 @@ router.post('/verifySignupCode', validateVerificationCode, verifySignupCode)
  *                   description: The HTTP status code
  *                 message:
  *                   type: string
+ *                   description: The error message
  *       500:
  *         description: Internal server error
  *         content:
@@ -167,16 +210,15 @@ router.post('/verifySignupCode', validateVerificationCode, verifySignupCode)
  *                   description: The HTTP status code
  *                 message:
  *                   type: string
- *                 error:
- *                   type: string
+ *                   description: The error message
  */
-router.post('/finalsignup', validateFinalSignUp, finalSignUp);
+router.post('/finalsignup/:userId', validateFinalSignUp, finalSignUp);
 
 /**
  * @swagger
  * /api/v1/user/signIn:
  *   post:
- *     summary: Sign in as a Customer.
+ *     summary: Sign in as a user.
  *     tags: [User Authentication]
  *     requestBody:
  *       required: true
@@ -184,11 +226,14 @@ router.post('/finalsignup', validateFinalSignUp, finalSignUp);
  *         application/json:
  *           schema:
  *             type: object
+ *             required: [phoneNumber, email]
  *             properties:
  *               phoneNumber:
  *                 type: string
+ *                 description: The phone number of the user.
  *               email:
  *                 type: string
+ *                 description: The email of the user.
  *     responses:
  *       200:
  *         description: Verification code sent to email
@@ -208,7 +253,10 @@ router.post('/finalsignup', validateFinalSignUp, finalSignUp);
  *                   properties:
  *                     verificationCode:
  *                       type: string
- *                       description: The verification code
+ *                       description: The verification code sent to the user's email
+ *                     userId:
+ *                       type: string
+ *                       description: The user's ID
  *       400:
  *         description: User not found
  *         content:
@@ -236,23 +284,32 @@ router.post('/finalsignup', validateFinalSignUp, finalSignUp);
  *                   type: string
  *                   description: The error message
  */
-router.post('/signin', validateInitialSignUp, signInUser)
+router.post('/signin', validateInitialSignUp, signInUser);
 
 /**
  * @swagger
- * /api/v1/user/verifySigninCode:
+ * /api/v1/user/verifySigninCode/{userId}:
  *   post:
- *     summary: Verify the signin code for a Customer.
+ *     summary: Verify the signin code for a user.
  *     tags: [User Authentication]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The user ID
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required: [verificationCode]
  *             properties:
  *               verificationCode:
  *                 type: string
+ *                 description: The verification code of the user.
  *     responses:
  *       200:
  *         description: User signed in successfully
@@ -267,6 +324,12 @@ router.post('/signin', validateInitialSignUp, signInUser)
  *                 message:
  *                   type: string
  *                   description: The response message
+ *                 token:
+ *                   type: string
+ *                   description: The JWT access token
+ *                 refreshToken:
+ *                   type: string
+ *                   description: The JWT refresh token
  *                 data:
  *                   type: object
  *                   properties:
@@ -274,20 +337,7 @@ router.post('/signin', validateInitialSignUp, signInUser)
  *                       type: object
  *                       description: The user object
  *       400:
- *         description: Invalid verification code
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: integer
- *                   description: The HTTP status code
- *                 message:
- *                   type: string
- *                   description: The error message
- *       404:
- *         description: User not found
+ *         description: Verification not successful
  *         content:
  *           application/json:
  *             schema:
@@ -316,7 +366,7 @@ router.post('/signin', validateInitialSignUp, signInUser)
  *                   type: string
  *                   description: The error message
  */
-router.post('/verifySigninCode', validateVerificationCode, verifySigninCode)
+router.post('/verifySigninCode/:userId', validateVerificationCode, verifySigninCode);
 
 /**
  * @swagger

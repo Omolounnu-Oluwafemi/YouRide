@@ -1,45 +1,14 @@
-// import { QueryTypes } from 'sequelize';
-import geolib from 'geolib';
+import * as geolib from 'geolib';
 import { Request, Response } from "express";
 import { Trip } from "../../models/trip";
 import { User } from "../../models/usersModel";
 import { Driver } from "../../models/drivers";
 import { Vehicle } from "../../models/vehicle";
 import { v4 as uuidv4 } from "uuid";
-import { decodeDriverIdFromToken, decodeUserIdFromToken } from "../../utils/token";
 import { Voucher } from "../../models/voucher";
 import { tripAmountschema } from '../../utils/validate'
 import { io, driverSocketMap } from '../../config/socket';
-// import { sequelize } from '../../config/config';
 
-// async function findClosestDriver(latitude: number, longitude: number, vehicleName: string) {
-//     const userLocation = `ST_MakePoint(${longitude}, ${latitude})`;
-
-//     // Find the vehicle with the given name
-//     const vehicle = await Vehicle.findOne({ where: { vehicleName } });
-
-//     if (!vehicle) {
-//         throw new Error('Vehicle not found');
-//     }
-
-//     const driverData = await sequelize.query(`
-//         SELECT "Drivers".*, "Vehicles"."vehicleName", 
-//                ST_Distance(ST_MakePoint("Drivers"."longitude", "Drivers"."latitude"), ${userLocation}) AS distance
-//         FROM "Drivers"
-//         INNER JOIN "Vehicles" ON "Drivers"."vehicleId" = "Vehicles"."vehicleId"
-//         WHERE "Drivers"."isAvailable" = true AND "Vehicles"."vehicleName" = :vehicleName
-//         ORDER BY distance ASC
-//         LIMIT 1
-//     `, {
-//         replacements: { vehicleName },
-//         type: QueryTypes.SELECT,
-//         model: Driver,
-//         mapToModel: true,
-//         nest: true,
-//     });
-
-//     return driverData[0];
-// }
 
 async function findClosestDriver(pickupLatitude: number, pickupLongitude: number, vehicleName: string) {
     // Fetch all available drivers who are driving the requested vehicle type
@@ -104,7 +73,8 @@ export const calculateTripAmount = async (req: Request, res: Response) => {
 
         // Apply the discount to the base trip amount
         const discountedTripAmount = baseTripAmount - (baseTripAmount * discount / 100);
-            
+
+        // Calculate the trip amounts for all vehicle types
         const tripAmounts = {
             'Datride Vehicle': discountedTripAmount,
             'Datride Share': discountedTripAmount / 4,
@@ -127,14 +97,12 @@ export const calculateTripAmount = async (req: Request, res: Response) => {
             tripAmounts
         });
     } catch (error: any) {
-        res.status(500).json({
-            message: 'An error occurred while calculating the trip amounts', error: error.message
-        });
+        res.status(500).json({ message: 'An error occurred while calculating the trip amounts', error: error.message });
     }
 };
 export const TripRequest = async (req: Request, res: Response) => {
     const tripId = uuidv4();
-    const userId = decodeUserIdFromToken(req)
+    const userId = req.params.userId;
     
     const { country, pickupLocation, destination, vehicleName, paymentMethod, tripAmount, totalDistance, pickupLatitude, pickupLongitude, destinationLatitude, destinationLongitude } = req.body;
 
@@ -144,15 +112,22 @@ export const TripRequest = async (req: Request, res: Response) => {
             return res.status(400).json({ error: "Invalid Trip option" });
         }
 
-         if (!userId) {
-        return res.status(401).json({ error: "Unauthorized" });
-        }
-
         // Fetch user details
         const userData = await User.findOne({ where: { userId: userId } });
 
         if (!userData) {
             return res.status(404).json({ error: "User not found" });
+        }
+
+        if (!pickupLocation || pickupLatitude === undefined || pickupLongitude === undefined) {
+            throw new Error('Invalid pickup location');
+        }
+
+        // Find the closest driver
+        const driverData = await findClosestDriver(pickupLatitude, pickupLongitude, vehicleName);
+
+        if (!driverData) {
+            return res.status(404).json({ error: "No available drivers found" });
         }
 
         // Create a new Trip record
@@ -162,11 +137,11 @@ export const TripRequest = async (req: Request, res: Response) => {
             driverId: null, 
             userName: userData.firstName + ' ' + userData.lastName,
             vehicleId: null,
+            vehicleName,
             paymentMethod,
             totalDistance,
             tripAmount,
             country,
-            vehicleName,
             driverName: null,
             pickupLocation,
             destination,
@@ -179,18 +154,6 @@ export const TripRequest = async (req: Request, res: Response) => {
             status: 'scheduled',
         });
 
-        // const newTrip = await userData.createTrip(trip);
-        if (!pickupLocation || pickupLatitude === undefined || pickupLongitude === undefined) {
-            throw new Error('Invalid pickup location');
-        }
-
-        // Find the closest driver
-        const driverData = await findClosestDriver(pickupLatitude, pickupLongitude, vehicleName);
-
-        if (!driverData) {
-            return res.status(404).json({ error: "No available drivers found" });
-        }
-
         // Emit the new trip to the closest driver
         const driverSocketId = driverSocketMap.get(driverData.driverId);
         if (driverSocketId) {
@@ -202,6 +165,7 @@ export const TripRequest = async (req: Request, res: Response) => {
             data: newTrip
         });
     } catch (error: any) {
+        console.log(error)
         res.status(500).json({
             error: "An error occurred while processing your request",
             message: error.message
@@ -210,7 +174,7 @@ export const TripRequest = async (req: Request, res: Response) => {
 }
 export const acceptTrip = async (req: Request, res: Response) => {
     const { tripId } = req.body;
-    const driverId = decodeDriverIdFromToken(req);
+    const driverId = req.params.driverId;
 
     try {
         const driver = await Driver.findOne({ where: { driverId: driverId } });
@@ -229,7 +193,9 @@ export const acceptTrip = async (req: Request, res: Response) => {
 
         // Check if the trip is already accepted
         if (trip.driverId) {
-            return res.status(400).json({ error: 'Trip is already accepted by another driver' });
+            return res.status(400).json({
+                error: 'Trip is already accepted by another driver'
+            });
         }
 
         // Update the trip with the driverId and change the status to 'accepted'
@@ -324,7 +290,6 @@ export const cancelTrip = async (req: Request, res: Response) => {
         if (!trip) {
             return res.status(404).json({ error: 'Trip not found' });
         }
-
         // Update the status of the trip
         trip.status = 'cancelled';
         await trip.save();
@@ -349,7 +314,7 @@ export const completeTrip = async (req: Request, res: Response) => {
             return res.status(404).json({ error: 'Trip not found' });
         }
 
-        // Update the status and drop-off time of the trip
+        // Update the status of the trip
         trip.status = 'completed';
         trip.dropoffTime = new Date(); 
         await trip.save();

@@ -1,17 +1,24 @@
 import express from 'express'; 
-import { acceptTrip, cancelTrip, completeTrip, skipTrip, startTrip } from '../../controllers/Trip/trip';
+import { acceptTrip, skipTrip, startTrip, cancelTrip, completeTrip } from '../../controllers/Trip/trip';
 
 const router = express.Router();
 
 /**
  * @swagger
- * /api/v1/driver/accept-trip:
+ * /api/v1/driver/{driverId}/accept-trip:
  *   patch:
  *     summary: Accept a trip
  *     tags:
  *       - Driver-Trips
  *     description: This endpoint allows a driver to accept a trip.
  *     operationId: acceptTrip
+ *     parameters:
+ *       - in: path
+ *         name: driverId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the driver
  *     requestBody:
  *       description: Trip ID to accept
  *       required: true
@@ -91,7 +98,7 @@ const router = express.Router();
  *                   type: string
  *                   example: An error occurred while accepting the trip
  */
-router.patch('/accept-trip', acceptTrip)
+router.patch('/:driverId/accept-trip', acceptTrip);
 
 /**
  * @swagger

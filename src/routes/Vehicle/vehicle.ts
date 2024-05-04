@@ -1,6 +1,6 @@
 import express from 'express';
 import { isAdmin, validateVehicle } from '../../utils/middleware';
-import { CreateVehicle, GetVehicles, EditVehicle, GetOneVehicle} from '../../controllers/Vehicle/vehicle';
+import { CreateVehicle, GetVehicles, EditVehicle, GetOneVehicle} from '../../controllers/Admin/vehicle';
 
 const router = express.Router();
 

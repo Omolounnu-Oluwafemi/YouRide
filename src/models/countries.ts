@@ -23,6 +23,10 @@ class Country extends Model<CountryAttributes, CountryCreationAttributes> implem
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
+
+    public static associate(models: { [key: string]: any }) {
+    Country.belongsToMany(models.Vehicle, { through: models.CountryVehicle, foreignKey: 'countryId', as: 'vehicles' });
+}
 }
 
 const initCountry = (sequelize: Sequelize) => {

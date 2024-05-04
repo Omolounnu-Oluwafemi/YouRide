@@ -20,12 +20,12 @@ export const sendEmail = async (options: { email: string; subject: any; message:
     await transporter.sendMail(mailOptions)
 }
 
-export async function sendVerificationCode(email: string, verificationCode: number) {
+export async function sendVerificationCode(email: string, verificationCode: string | null) {
    try {
 
     await sendEmail({
       email: email,
-      subject: 'Verification Code', // Subject line
+      subject: 'Verification Code', 
       message: `Your verification code is ${verificationCode}`,
       html: `<b>Your verification code is ${verificationCode}</b>`, 
     });

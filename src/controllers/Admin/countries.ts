@@ -1,4 +1,4 @@
-import { Request, Response, Router } from 'express';
+import { Request, Response } from 'express';
 import { Op } from 'sequelize'; 
 import { Country } from '../../models/countries';
 

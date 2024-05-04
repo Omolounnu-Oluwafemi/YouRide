@@ -1,4 +1,5 @@
 import Joi from 'joi'
+import { isValidNumber } from 'libphonenumber-js';
 
 enum Gender {
   Male = 'Male',
@@ -34,7 +35,19 @@ enum Role {
 }
 
 export const initiialSignUpValidator = Joi.object().keys({
-    phoneNumber: Joi.string().pattern(/^[0-9]{11}$/).message('Invalid phone number format').required(),
+      phoneNumber: Joi.string().custom((value, helpers) => {
+    if (!isValidNumber(value)) {
+      return helpers.error('any.invalid');
+    }
+    return value;
+  }, 'Phone Number Validation').error(errors => {
+    errors.forEach(err => {
+      if (err.code === 'any.invalid') {
+        err.message = 'Invalid phone number format';
+      }
+    });
+    return errors;
+  }).required(),
     email: Joi.string().email({ minDomainSegments: 2 }).lowercase().required().messages({
       'string.email': 'email must be a valid email'
     }),
@@ -57,7 +70,19 @@ export const verificationCodeValidator = Joi.object().keys({
   }),
 });
 export const DriverSignupValidator = Joi.object({
-    phoneNumber: Joi.string().pattern(/^[0-9]{11}$/).message('Invalid phone number format').required(),
+      phoneNumber: Joi.string().custom((value, helpers) => {
+    if (!isValidNumber(value)) {
+      return helpers.error('any.invalid');
+    }
+    return value;
+  }, 'Phone Number Validation').error(errors => {
+    errors.forEach(err => {
+      if (err.code === 'any.invalid') {
+        err.message = 'Invalid phone number format';
+      }
+    });
+    return errors;
+  }).required(),
     email: Joi.string().email({ minDomainSegments: 2 }).lowercase().required().messages({
       'string.email': 'email must be a valid email'
     }),

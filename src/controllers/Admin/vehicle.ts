@@ -42,7 +42,6 @@ export const GetOneVehicle = async (req: Request, res: Response) => {
 
 export const CreateVehicle = async (req: Request, res: Response) => {
     try {
-
         const vehicleId = uuidv4();
         
         const { country, baseFare, pricePerKMorMI, pricePerMIN, adminCommission, status, vehicleCategory, vehicleName, carImage, documentImage, isSurge, surgeStartTime, surgeEndTime, surgeType, isDocVerified } = req.body;
@@ -71,7 +70,9 @@ export const CreateVehicle = async (req: Request, res: Response) => {
         // Save the vehicle to the database
         const newVehicle = await Vehicle.create(vehicle);
 
-        return res.status(200).json({ message: 'Vehicle created successfully', vehicle: newVehicle });
+      return res.status(200).json({
+        message: 'Vehicle created successfully', vehicle: newVehicle
+      });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ error: 'An error occurred while creating the vehicle' });

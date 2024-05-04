@@ -6,6 +6,7 @@ import { Vehicle, initVehicle } from '../models/vehicle';
 import { Trip, initTrip } from '../models/trip';
 import { Voucher, initVoucher } from '../models/voucher';
 import { Country, initCountry } from '../models/countries';
+import { CountryVehicle, initCountryVehicle } from '../models/countryVehicle'; 
 
 const database = process.env.DB_NAME || 'postgres';
 const username = process.env.DB_USER || 'postgres';
@@ -25,6 +26,7 @@ initAdmin(sequelize);
 initVoucher(sequelize);
 initTrip(sequelize);
 initCountry(sequelize);
+initCountryVehicle(sequelize);
 
 
 // Define associations
@@ -36,4 +38,6 @@ Trip.belongsTo(User, { foreignKey: 'userId' });
 Trip.belongsTo(Driver, { foreignKey: 'driverId' });
 Trip.belongsTo(Vehicle, { foreignKey: 'vehicleId' });
 Driver.belongsTo(Vehicle, { foreignKey: 'driverId', as: 'vehicle' });
+Country.belongsToMany(Vehicle, { through: CountryVehicle, foreignKey: 'countryId', as: 'vehicles' }); // new association
+Vehicle.belongsToMany(Country, { through: CountryVehicle, foreignKey: 'vehicleId', as: 'countries' }); // new association
 

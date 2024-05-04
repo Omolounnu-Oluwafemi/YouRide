@@ -24,6 +24,7 @@ interface DriversAttributes {
   isAvailable: boolean;
   latitude: string; 
   longitude: string; 
+  verificationCode: string | null;
 }
 
 interface DriverCreationAttributes extends Optional<DriversAttributes, 'driverId'> {}
@@ -52,6 +53,8 @@ class Driver extends Model<DriversAttributes, DriverCreationAttributes> implemen
   public isAvailable!: boolean;
   public latitude!: string; 
   public longitude!: string; 
+  public verificationCode!: string | null;
+
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
@@ -70,12 +73,12 @@ const initDriver = (sequelize: Sequelize) => {
         primaryKey: true,
       },
       vehicleId: {
-          type: DataTypes.UUID,
-          allowNull: true,
-          references: {
-              model: 'Vehicles',
-              key: 'vehicleId'
-          }
+                type: DataTypes.UUID,
+                allowNull: true,
+                references: {
+                    model: 'Vehicles',
+                    key: 'vehicleId'
+                }
       },
       phoneNumber: {
         type: DataTypes.STRING,
@@ -168,7 +171,10 @@ const initDriver = (sequelize: Sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-   
+        verificationCode: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
     },
     {
       sequelize,
