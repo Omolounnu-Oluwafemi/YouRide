@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-import { CreateAdmin, AdminLogin, changeTempPassword, updateProfilePicture, toggleStaffActiveStatus} from '../../controllers/Admin/admin'
+import { CreateAdmin, AdminLogin, changeTempPassword, updateProfilePicture, toggleStaffActiveStatus, getAllAdmins} from '../../controllers/Admin/admin'
 import { ValidateAdminSignup, ValidateAdminSignIn, ValidateAdminPAsswordUpdate, isAdmin, isSuperAdmin } from '../../utils/middleware';
 
 const router = express.Router();
@@ -400,6 +400,54 @@ router.patch('/uploadpicture', isAdmin, upload.single('profilePicture'), updateP
  *                   description: Error updating admin status
  */
 router.patch('/statusupdate', isSuperAdmin, toggleStaffActiveStatus);
+
+/**
+ * @swagger
+ * /api/v1/admin/admins:
+ *   get:
+ *     summary: Retrieve a list of admins
+ *     tags: [Admin]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: The page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: The number of items per page
+ *     responses:
+ *       200:
+ *         description: A list of admins
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Admin'
+ *       500:
+ *         description: An error occurred while fetching the admins
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: The error message
+ */
+router.get('/admins', isAdmin, getAllAdmins)
 
 /**
  * @swagger

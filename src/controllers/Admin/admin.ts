@@ -220,3 +220,20 @@ export const toggleStaffActiveStatus = async (req: Request, res: Response) => {
   }
 };
 
+export const getAllAdmins = async (req: Request, res: Response) => {
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 10; 
+  const offset = (page - 1) * limit;
+
+  try {
+    const admins = await Admin.findAll({
+      offset: offset,
+      limit: limit
+    });
+
+    res.status(200).json({ status: 200, data: admins });
+  } catch (error) {
+    res.status(500).json({ status: 500, message: 'An error occurred while fetching the admins.' });
+  }
+};
+
