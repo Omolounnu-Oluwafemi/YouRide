@@ -1,17 +1,37 @@
 import { Request, Response } from 'express';
 import { Op } from 'sequelize';
+import { parsePhoneNumberFromString } from 'libphonenumber-js'
+import countries from 'i18n-iso-countries';
 import { v4 as uuidv4 } from "uuid";
 import { Driver } from '../../models/drivers';
-import { Vehicle } from '../../models/vehicle';
 import cloudinary from '../../utils/cloudinary';
 import  { sendVerificationCode } from '../../utils/email';
 import { signToken, generateVerificationCode, signRefreshToken} from "../../utils/token";
+import { VehicleCategory } from '../../models/vehicle';
+import { Country } from '../../models/countries';
 
-const uploadToCloudinary = async (file: Express.Multer.File) => {
-  const result = await cloudinary.uploader.upload(file.path);
-  return result.secure_url;
+const uploadToCloudinary = async (fileBuffer: Buffer) => {
+  let secure_url: string | undefined;
+
+  await new Promise((resolve, reject) => {
+    cloudinary.uploader.upload_stream({ resource_type: 'raw' }, (error, result) => {
+      if (error) {
+        console.error('Cloudinary error:', error.message); // Log the error message
+        reject(error.message);
+      }
+      if (result) {
+        secure_url = result.secure_url;
+        resolve(result);
+      }
+    }).end(fileBuffer);
+  });
+
+  if (!secure_url) {
+    throw new Error('Failed to upload file to Cloudinary');
+  }
+
+  return secure_url;
 };
-  
 export const DriverSignup = async (req: Request, res: Response) => {
   try {
     // Generate driver ID
@@ -23,32 +43,52 @@ export const DriverSignup = async (req: Request, res: Response) => {
       email,
       firstName,
       lastName,
-      country,
       gender,
-      vehicleCategory,
+      category,
       referralCode,
       vehicleYear,
       vehicleManufacturer,
       vehicleColor,
       licensePlate,
-      vehicleNumber,
+      driverLicense,
+      vehicleLogBook,
+      privateHireLicenseBadge,
+      insuranceCertificate,
+      motTestCertificate
     } = req.body;
+
+        // Parse the phone number to get the country code
+    const parsedPhoneNumber = parsePhoneNumberFromString(phoneNumber);
+    if (!parsedPhoneNumber) {
+      return res.status(400).json({
+        status: 400,
+        message: 'Invalid phone number'
+      });
+    }
+    const countryCode = parsedPhoneNumber.country;
+    if (!countryCode) {
+      return res.status(400).json({
+        status: 400,
+        message: 'Country code could not be determined from the phone number'
+      });
+    }
+    const country = countries.getName(countryCode, "en");
 
     // Check if the email or phoneNumber already exists in the database
     const existingDriver = await Driver.findOne({ 
       where: { 
         [Op.or]: [
-          { email: req.body.email },
-          { phoneNumber: req.body.phoneNumber }
+          { email: email },
+          { phoneNumber: phoneNumber }
         ] 
       } 
     });
 
     if (existingDriver) {
       let message = '';
-      if (existingDriver.email === req.body.email) {
+      if (existingDriver.email === email) {
         message = 'Email already exists';
-      } else if (existingDriver.phoneNumber === req.body.phoneNumber) {
+      } else if (existingDriver.phoneNumber === phoneNumber) {
         message = 'Phone number already exists';
       }
       return res.status(400).json({
@@ -57,54 +97,70 @@ export const DriverSignup = async (req: Request, res: Response) => {
       });
     }
 
-     // Check if the vehicleCategory exists in the Vehicle table
-    const vehicleCategoryExists = await Vehicle.findOne({ where: { vehicleCategory } });
+    // Check if the country exists in the database
+    const existingCountry = await Country.findOne({ 
+      where: { 
+        name: country as string
+      } 
+    });
 
-    if (!vehicleCategoryExists) {
+    if (!existingCountry) {
       return res.status(400).json({
         status: 400,
-        message: 'Invalid vehicle category'
+        message: 'We do not operate in your country yet ' + country
       });
     }
 
-      // Check if all required files are present
-      const requiredFiles = ['driverLicense', 'vehicleLogBook', 'privateHireLicenseBadge', 'insuranceCertificate', 'motTestCertificate'];
-      for (const file of requiredFiles) {
-        if (!req.files || !(req.files as { [fieldname: string]: Express.Multer.File[] })[file] || (req.files as { [fieldname: string]: Express.Multer.File[] })[file].length === 0) {
-          return res.status(400).json({
-            statu: 400,
-            error: `${file} file is missing`
-          });
-        }
-      }
+    // Check if the category exists in the database
+    const existingCategory = await VehicleCategory.findOne({ 
+      where: { 
+        categoryName: category 
+      } 
+    });
 
-      // Upload files to Cloudinary and obtain URLs
-      const driverLicenseUrl = await uploadToCloudinary((req.files as { [fieldname: string]: Express.Multer.File[] })['driverLicense'][0]);
-      const vehicleLogBookUrl = await uploadToCloudinary((req.files as { [fieldname: string]: Express.Multer.File[] })['vehicleLogBook'][0]);
-      const privateHireLicenseBadgeUrl = await uploadToCloudinary((req.files as { [fieldname: string]: Express.Multer.File[] })['privateHireLicenseBadge'][0]);
-      const insuranceCertificateUrl = await uploadToCloudinary((req.files as { [fieldname: string]: Express.Multer.File[] })['insuranceCertificate'][0]);
-      const motTestCertificateUrl = await uploadToCloudinary((req.files as { [fieldname: string]: Express.Multer.File[] })['motTestCertificate'][0]);
+    if (!existingCategory) {
+      return res.status(400).json({
+        status: 400,
+        message: 'Category does not exist'
+      });
+    } 
 
-     // Generate a JWT token for the user
+    try {
+  // Upload files to Cloudinary and obtain URLs
+  const driverLicenseUrl = await uploadToCloudinary(Buffer.from(driverLicense, 'base64'));
+  const vehicleLogBookUrl = await uploadToCloudinary(Buffer.from(vehicleLogBook, 'base64'));
+  const privateHireLicenseBadgeUrl = await uploadToCloudinary(Buffer.from(privateHireLicenseBadge, 'base64'));
+  const insuranceCertificateUrl = await uploadToCloudinary(Buffer.from(insuranceCertificate, 'base64'));
+  const motTestCertificateUrl = await uploadToCloudinary(Buffer.from(motTestCertificate, 'base64'));
+
+      
+    // Generate a JWT token for the user
     const token = signToken(driverId);
+    const refreshToken = signRefreshToken(driverId);
 
-    // Create new Rider instance in database
-    const newDriver = await Driver.create({
+      if (!country) {
+      return res.status(400).json({
+        status: 400,
+        message: 'Country could not be determined from the phone number'
+      });
+    }
+    // Create new Driver instance in database
+    const driver = await Driver.create({
       driverId,
-      vehicleId: null,
+      countryId: existingCountry.countryId,
+      categoryId: existingCategory.categoryId,
       phoneNumber,
       email,
       country,
       firstName,
       lastName,
       gender,
-      vehicleCategory,
+      category,
       referralCode,
       vehicleYear,
       vehicleManufacturer,
       vehicleColor,
       licensePlate,
-      vehicleNumber,
       isAvailable: false, 
       driverLicense: driverLicenseUrl,
       vehicleLogBook: vehicleLogBookUrl,
@@ -112,7 +168,8 @@ export const DriverSignup = async (req: Request, res: Response) => {
       insuranceCertificate: insuranceCertificateUrl,
       motTestCertificate: motTestCertificateUrl,
       latitude: '0',
-      longitude: '0'
+      longitude: '0',
+      numberOfRatings: 0 
     });
 
     // Send response
@@ -120,8 +177,17 @@ export const DriverSignup = async (req: Request, res: Response) => {
       status: 201,
       message: 'Driver created successfully',
       token: token,
-      newDriver
+      refreshToken: refreshToken,
+      data: { driver }
     });
+  // Continue with your code...
+} catch (error) {
+  console.error('Failed to upload file:', error);
+  res.status(500).json({ 
+    status: 500,
+    error: 'Failed to upload file' 
+  });
+}
   } catch (error) {
     if ((error as Error).name === 'ValidationError') {
       res.status(400).json({
@@ -130,7 +196,7 @@ export const DriverSignup = async (req: Request, res: Response) => {
       });
     } else {
       res.status(500).json({
-        status: 400,
+        status: 500,
         error: (error as Error).message
       });
     }
@@ -175,8 +241,7 @@ export const DriverSignIn = async (req: Request, res: Response) => {
 };
 export async function verifyDriverSignIn(req: Request, res: Response) {
   try {
-    const { verificationCode } = req.body;
-    const { driverId } = req.params;
+    const { verificationCode, driverId } = req.body;
 
      // Fetch the user from the database using the verification code
     const driver = await Driver.findOne({ where: { driverId, verificationCode } });
@@ -185,7 +250,7 @@ export async function verifyDriverSignIn(req: Request, res: Response) {
       return res.status(404).json({
       status: 404,
         message: 'Sign up instead?',
-        error: 'User not found',
+        error: 'Driver not found',
       });
     }
 
@@ -193,14 +258,14 @@ export async function verifyDriverSignIn(req: Request, res: Response) {
     driver.verificationCode = null;
     await driver.save();
 
-    const token = signToken(driver.driverId);
-    const refreshToken = signRefreshToken(driver.driverId); 
+    // const token = signToken(driver.driverId);
+    // const refreshToken = signRefreshToken(driver.driverId); 
 
     return res.status(200).json({
       status: 200,
-      message: 'User signed in successfully',
-      token: token,
-      refreshToken: refreshToken,
+      message: 'Driver signed in successfully',
+      // token: token,
+      // refreshToken: refreshToken,
       data: { driver }
     });
   } catch (error) {

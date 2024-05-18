@@ -59,7 +59,7 @@ export const getAllDrivers = async (req: Request, res: Response) => {
         });
 
         if (totalDrivers === 0) {
-            return res.status(404).json({ error: 'No available drivers found' });
+            return res.status(404).json({ error: 'No drivers found' });
         }
         const totalPages = Math.ceil(totalDrivers / pageSize);
 
@@ -80,11 +80,9 @@ export const getAllDrivers = async (req: Request, res: Response) => {
             drivers
         });
     } catch (error) {
-        // console.error(error.message);
         return res.status(500).json({ error: 'An error occurred while processing your request' });
     }
 };
-
 export const getAvailableDrivers = async (req: Request, res: Response) => {
     try {
         const page = Number(req.query.page) || 1;
@@ -154,7 +152,6 @@ export const getAvailableDrivers = async (req: Request, res: Response) => {
         return res.status(500).json({ error: 'An error occurred while processing your request' });
     }
 }
-
 export const getAllDriversLocations = async (req: Request, res: Response) => {
       try {
         const drivers = await Driver.findAll({
@@ -166,7 +163,6 @@ export const getAllDriversLocations = async (req: Request, res: Response) => {
         return res.status(500).json({ error: 'An error occurred while processing your request' });
     }
 }
-
 export const deleteDriver = async (req: Request, res: Response) => {
   const { driverId } = req.params;
 
