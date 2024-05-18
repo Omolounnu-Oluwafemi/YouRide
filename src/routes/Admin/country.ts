@@ -315,7 +315,7 @@ router.get('/country/:countryId', isAdmin, getCountryById);
  *                   type: string
  *                   example: An error occurred while processing your request
  */
-router.put('/country/:countryId', isAdmin, updateCountry);
+router.put('/country/:countryId', isAdmin, validateCountryCreation, updateCountry);
 
 
 /**
