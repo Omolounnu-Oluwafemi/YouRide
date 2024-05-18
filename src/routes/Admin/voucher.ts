@@ -9,7 +9,7 @@ const router = express.Router();
  * /api/v1/admin/voucher:
  *   post:
  *     summary: Create a new voucher
- *     tags: [Admin Dashboards]
+ *     tags: [ Admin Dashboards]
  *     requestBody:
  *       required: true
  *       content:

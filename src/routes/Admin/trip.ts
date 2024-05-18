@@ -163,6 +163,60 @@ router.get('/trips', isAdmin, getAllTrips)
  */
 router.get('/trip/:tripId', isAdmin, getTripById)
 
+/**
+ * @swagger
+ * /api/v1/admin/trip/{tripId}:
+ *   get:
+ *     summary: Retrieve a trip by its ID
+ *     tags: [Admin Dashboards]
+ *     parameters:
+ *       - in: path
+ *         name: tripId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the trip
+ *     responses:
+ *       200:
+ *         description: The trip data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 data:
+ *                   $ref: '#/components/schemas/Trip'
+ *       404:
+ *         description: Trip not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 error:
+ *                   type: string
+ *                   description: The error message
+ *       500:
+ *         description: An error occurred while processing your request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 error:
+ *                   type: string
+ *                   description: The error message
+ */
+router.get('/trip/:tripId', isAdmin, getAllTrips)
 
 /**
  * @swagger

@@ -4,7 +4,6 @@ import { CreateAdmin, AdminLogin, changeTempPassword, updateProfilePicture, togg
 import { ValidateAdminSignup, ValidateAdminSignIn, ValidateAdminPAsswordUpdate, isAdmin, isSuperAdmin } from '../../utils/middleware';
 
 const router = express.Router();
-
 const upload = multer({ dest: 'uploads/' });
 
 /**
@@ -74,7 +73,7 @@ const upload = multer({ dest: 'uploads/' });
  *                   type: string
  *                   description: Internal server error
  */
-router.post('/create', isSuperAdmin, ValidateAdminSignup, CreateAdmin);
+router.post('/create', ValidateAdminSignup, CreateAdmin);
 
 /**
  * @swagger

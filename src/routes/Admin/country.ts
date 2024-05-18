@@ -1,5 +1,5 @@
 import express from 'express'
-import { createCountry, getAllCountries, getCountryById   } from '../../controllers/Admin/countries'
+import { createCountry, getCountryById, getAllCountries } from '../../controllers/Admin/countries'
 import { isAdmin, validateCountryCreation } from '../../utils/middleware'
 
 const router = express.Router() 
@@ -219,6 +219,7 @@ router.get('/countries', isAdmin, getAllCountries);
  *                   description: The error message
  */
 router.get('/country/:countryId', isAdmin, getCountryById);
+
 
 /**
  * @swagger
