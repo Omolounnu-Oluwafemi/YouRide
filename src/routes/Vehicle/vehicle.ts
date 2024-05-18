@@ -1,15 +1,17 @@
 import express from 'express';
-import { isAdmin, validateVehicle } from '../../utils/middleware';
-import { CreateVehicle, GetVehicles, EditVehicle, GetOneVehicle} from '../../controllers/Admin/vehicle';
+import multer from 'multer';
+import { isAdmin, validateVehicle, validateVehicleUpdate } from '../../utils/middleware';
+import { CreateVehicleCategory, GetVehicleCategories, EditVehicleCategory, GetOneVehicleCategory, DeleteVehicleCategory } from '../../controllers/Admin/vehicle';
 
+const upload = multer({ dest: 'uploads/' }); 
 const router = express.Router();
 
 /**
  * @swagger
- * /api/v1/vehicles/get:
+ * /api/v1/vehiclecategories/get:
  *   get:
  *     summary: Get all vehicles
- *     tags: [Vehicles]
+ *     tags: [Admin Dashboards]
  *     description: Fetch all vehicles from the database. Only accessible by admins.
  *     responses:
  *       200:
@@ -59,6 +61,19 @@ const router = express.Router();
  *                   pricePerKMorMI: 1.50
  *                   status: "Active"
  *                   date: "2022-01-01T00:00:00.000Z"
+ *       404:
+ *         description: No vehicle categories found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 error:
+ *                   type: string
+ *                   example: No vehicle categories found
  *       500:
  *         description: An error occurred while fetching Vehicles
  *         content:
@@ -73,18 +88,18 @@ const router = express.Router();
  *                   type: string
  *                   example: An error occurred while fetching Vehicles
  */
-router.get('/get', isAdmin, GetVehicles);
+router.get('/get', isAdmin, GetVehicleCategories);
 
 /**
  * @swagger
- * /api/v1/vehicles/get/{vehicleId}:
+ * /api/v1/vehicleCategories/get/{categoryId}:
  *   get:
  *     summary: Get a vehicle
- *     tags: [Vehicles]
+ *     tags: [Admin Dashboards]
  *     description: Get the details of a specific vehicle
  *     parameters:
  *       - in: path
- *         name: vehicleId
+ *         name: categoryId
  *         schema:
  *           type: string
  *         required: true
@@ -171,19 +186,19 @@ router.get('/get', isAdmin, GetVehicles);
  *                   type: string
  *                   example: An error occurred
  */
-router.get('/get/:vehicleId', isAdmin, GetOneVehicle);
+router.get('/get/:categoryId', isAdmin, GetOneVehicleCategory);
 
 /**
  * @swagger
- * /api/v1/vehicles/create:
+ * /api/v1/vehicleCategories/create:
  *   post:
  *     summary: Create a new vehicle
- *     tags: [Vehicles]
+ *     tags: [Admin Dashboards]
  *     description: Create a new vehicle record
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -199,13 +214,7 @@ router.get('/get/:vehicleId', isAdmin, GetOneVehicle);
  *                 type: number
  *               status:
  *                 type: string
- *               vehicleCategory:
- *                 type: string
- *               vehicleName:
- *                 type: string
- *               carImage:
- *                 type: string
- *               documentImage:
+ *               categoryName:
  *                 type: string
  *               isSurge:
  *                 type: boolean
@@ -219,6 +228,12 @@ router.get('/get/:vehicleId', isAdmin, GetOneVehicle);
  *                 type: string
  *               isDocVerified:
  *                 type: boolean
+ *               carImage:
+ *                 type: string
+ *                 format: binary
+ *               documentImage:
+ *                 type: string
+ *                 format: binary
  *     responses:
  *       200:
  *         description: Vehicle created successfully
@@ -235,7 +250,7 @@ router.get('/get/:vehicleId', isAdmin, GetOneVehicle);
  *                 vehicle:
  *                   type: object
  *                   properties:
- *                     vehicleId:
+ *                     categoryId:
  *                       type: string
  *                     driverId:
  *                       type: string
@@ -261,9 +276,7 @@ router.get('/get/:vehicleId', isAdmin, GetOneVehicle);
  *                       type: string
  *                     status:
  *                       type: string
- *                     vehicleCategory:
- *                       type: string
- *                     vehicleName:
+ *                     categoryName:
  *                       type: string
  *                     carImage:
  *                       type: string
@@ -274,8 +287,8 @@ router.get('/get/:vehicleId', isAdmin, GetOneVehicle);
  *             example:
  *               status: 200
  *               message: "Vehicle created successfully"
- *               vehicle: 
- *                 vehicleId: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+ *               category: 
+ *                 categoryId: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
  *                 driverId: null
  *                 country: "USA"
  *                 baseFare: 10.00
@@ -283,12 +296,11 @@ router.get('/get/:vehicleId', isAdmin, GetOneVehicle);
  *                 pricePerMIN: 0.20
  *                 adminCommission: 2.00
  *                 isSurge: false
- *                 surgeStartTime: "2022-01-01T00:00:00.000Z"
- *                 surgeEndTime: "2022-01-01T01:00:00.000Z"
+ *                 surgeStartTime: "22:00"
+ *                 surgeEndTime: "23:00"
  *                 surgeType: "Peak"
  *                 status: "Active"
- *                 vehicleCategory: "Sedan"
- *                 vehicleName: "Toyota Camry"
+ *                 categoryName: "Economy"
  *                 carImage: "https://example.com/car.jpg"
  *                 documentImage: "https://example.com/doc.jpg"
  *                 isDocVerified: true
@@ -306,18 +318,18 @@ router.get('/get/:vehicleId', isAdmin, GetOneVehicle);
  *                   type: string
  *                   example: An error occurred while creating the vehicle
  */
-router.post('/create', isAdmin, validateVehicle, CreateVehicle);
+router.post('/create', upload.fields([{ name: 'carImage', maxCount: 1 }, { name: 'documentImage', maxCount: 1 }]), isAdmin, validateVehicle, CreateVehicleCategory);
 
 /**
  * @swagger
- * /api/v1/vehicles/update/{vehicleId}:
- *   put:
+ * /api/v1/vehicleCategories/update/{categoryId}:
+ *   patch:
  *     summary: Update a vehicle
- *     tags: [Vehicles]
+ *     tags: [Admin Dashboards]
  *     description: Update the details of a specific vehicle
  *     parameters:
  *       - in: path
- *         name: vehicleId
+ *         name: categoryId
  *         schema:
  *           type: string
  *         required: true
@@ -325,12 +337,10 @@ router.post('/create', isAdmin, validateVehicle, CreateVehicle);
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
- *               country:
- *                 type: string
  *               baseFare:
  *                 type: number
  *               pricePerKMorMI:
@@ -343,10 +353,14 @@ router.post('/create', isAdmin, validateVehicle, CreateVehicle);
  *                 type: string
  *               vehicleCategory:
  *                 type: string
+ *               vehicleName:
+ *                 type: string
  *               carImage:
  *                 type: string
+ *                 format: binary
  *               documentImage:
  *                 type: string
+ *                 format: binary
  *               isSurge:
  *                 type: boolean
  *               surgeStartTime:
@@ -402,22 +416,53 @@ router.post('/create', isAdmin, validateVehicle, CreateVehicle);
  *                   type: string
  *                   example: An error occurred
  */
-router.put('/update/:vehicleId', isAdmin, validateVehicle, EditVehicle);
+router.patch('/update/:categoryId', upload.fields([{ name: 'carImage', maxCount: 1 }, { name: 'documentImage', maxCount: 1 }]), isAdmin, validateVehicleUpdate, EditVehicleCategory);
+
+/**
+ * @swagger
+ * /api/v1/vehicleCategories/delete/{categoryId}:
+ *   delete:
+ *     summary: Delete a vehicle category
+ *     tags: [Admin Dashboards]
+ *     parameters:
+ *       - in: path
+ *         name: categoryId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The id of the vehicle category
+ *     responses:
+ *       200:
+ *         description: The vehicle category was deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The status code
+ *                 message:
+ *                   type: string
+ *                   description: The status message
+ *       404:
+ *         description: The vehicle category was not found
+ *       500:
+ *         description: There was an error
+ */
+router.delete('/delete/:categoryId', isAdmin, DeleteVehicleCategory)
 
 /**
  * @swagger
  * components:
  *   schemas:
- *     Vehicle:
+ *     VehicleCategories:
  *       type: object
  *       properties:
- *         vehicleId:
+ *         categoryId:
  *           type: string
  *           format: uuid
  *           description: The unique identifier for the vehicle.
- *         country:
- *           type: string
- *           description: The country where the vehicle operates.
  *         baseFare:
  *           type: number
  *           format: float
@@ -442,10 +487,6 @@ router.put('/update/:vehicleId', isAdmin, validateVehicle, EditVehicle);
  *           type: string
  *           enum: [Taxi, Bus, Delivery]
  *           description: The category of the vehicle.
- *         vehicleName:
- *           type: string
- *           enum: [Datride Vehicle, Datride Share, Datride Delivery]
- *           description: The name of the vehicle.
  *         carImage:
  *           type: string
  *           format: uri
@@ -473,7 +514,6 @@ router.put('/update/:vehicleId', isAdmin, validateVehicle, EditVehicle);
  *           type: boolean
  *           description: Whether the vehicle's documents are verified.
  *       required:
- *         - country
  *         - baseFare
  *         - pricePerKMorMI
  *         - pricePerMIN
@@ -481,18 +521,5 @@ router.put('/update/:vehicleId', isAdmin, validateVehicle, EditVehicle);
  *         - status
  *         - vehicleCategory
  *         - isSurge
- */
-
-
-/**
- * @swagger
- * components:
- *   securitySchemes:
- *     BearerAuth:        
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT  
- * security:
- *   - BearerAuth: []
  */
 export default router;

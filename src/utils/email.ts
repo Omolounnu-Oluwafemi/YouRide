@@ -1,16 +1,21 @@
 import nodemailer from 'nodemailer';
+import smtpTransport from 'nodemailer-smtp-transport';
 
 export const sendEmail = async (options: { email: string; subject: any; message: any; html: any;}) => {
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
+
+  const transporter = nodemailer.createTransport(smtpTransport({
+        host: process.env.EMAIL_SERVER,
+        // host: 'smtp.mailgun.org',
+        port: 587,
+        secure: false,
         auth:{
-            user: process.env.EMAIL_USERNAME,
-            pass: process.env.EMAIL_PASSWORD
+          user: 'gk677786@fh-muenster.de',
+          pass: 'JTnpxy2936*AE'
         }
-    })
+    }))
 
     const mailOptions = {
-        from:'YouRide Inc',
+        from:'DatRide Inc',
         to: options.email,
         subject: options.subject,
         text: options.message,
@@ -19,13 +24,12 @@ export const sendEmail = async (options: { email: string; subject: any; message:
 
     await transporter.sendMail(mailOptions)
 }
-
 export async function sendVerificationCode(email: string, verificationCode: string | null) {
    try {
 
     await sendEmail({
       email: email,
-      subject: 'Verification Code', 
+      subject: 'Verification Code',
       message: `Your verification code is ${verificationCode}`,
       html: `<b>Your verification code is ${verificationCode}</b>`, 
     });
@@ -57,4 +61,3 @@ export async function sendTemporaryPassword(email: string, tempPassword: string)
      return false;
    }
 }
-         

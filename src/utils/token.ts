@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { Request } from 'express';
  
+// Generates a JSON Web Token (JWT) for a user.
 export const signToken = (id: string): string => {
   const secret = process.env.JWT_SECRET;
   const expiresIn = process.env.JWT_EXPIRES_IN;
@@ -12,9 +13,10 @@ export const signToken = (id: string): string => {
 
   return token;
 };
+
 export const signRefreshToken = (id: string): string => {
   const secret = process.env.JWT_SECRET;
-  const expiresIn = process.env.JWT_REFRESH_EXPIRES_IN;
+  const expiresIn = '15d';
 
   if (!secret || !expiresIn) {
     throw new Error('JWT secret or expiration time not provided');
@@ -23,15 +25,13 @@ export const signRefreshToken = (id: string): string => {
 
   return token;
 };
-
-export const signAdminToken = (adminId: string, role: string): string => {
+export const signAdminToken = (id: string, role: string): string => {
   const secret = process.env.JWT_SECRET;
   const expiresIn = process.env.JWT_EXPIRES_IN;
 
   if (!secret || !expiresIn) {
     throw new Error('JWT secret or expiration time not provided');
   }
-  const id =  adminId;
   const token = jwt.sign({ id, role }, secret, { expiresIn });
 
   return token;
@@ -46,9 +46,7 @@ export const verifyAdminToken = (token: string): any => {
 
   try {
     const decoded = jwt.verify(token, secret);
-  
     return decoded;
-    
   } catch (error) {
     console.error(error);
     throw new Error('Invalid token');
@@ -79,6 +77,7 @@ export const decodeDriverIdFromToken = (req: Request) => {
   }
 
 };
+
 export const decodeUserIdFromToken = (req: Request) => {
   try {
     const secret = process.env.JWT_SECRET;
@@ -99,35 +98,10 @@ export const decodeUserIdFromToken = (req: Request) => {
   }
   catch (error) {
     console.error(error);
-    return null;
-  }
-
-};
-export const decodeAdminIdFromToken = (req: Request) => {
-  try {
-    const secret = process.env.JWT_SECRET;
-    const token = req.cookies.token;
-
-  if (!token) {
-    throw new Error('No token provided in cookies');
-  }
-
-  if (!secret) {
-    throw new Error('JWT secret not provided');
-  }
-
-    const decoded = jwt.verify(token, secret) as { id: string };
-    const adminId = decoded.id;
-
-  return adminId;
-  }
-  catch (error) {
-    console.error(error);
     throw new Error('Invalid token');
   }
-};
 
+};
  export const generateVerificationCode = (): number  => {
       return Math.floor(1000 + Math.random() * 9000);
- }
-
+}

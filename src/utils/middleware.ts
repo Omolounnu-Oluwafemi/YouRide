@@ -1,8 +1,8 @@
 import { NextFunction, Response, Request } from "express";
-import { initiialSignUpValidator, finalSignUpValidator, verificationCodeValidator, AdminSignupValidator, AdminSignInValidator, AdminPasswordUpdate, options, BookTrip, createVehicleSchema, createTripSchema, tripRequestSchema, countrySchema } from "../utils/validate";
-import { DriverSignupValidator } from '../utils/validate';
+import dns from 'dns';
+import { initiialSignUpValidator, finalSignUpValidator, verificationCodeValidator, AdminSignupValidator, AdminSignInValidator, AdminPasswordUpdate,options, createVehicleSchema, createTripSchema, tripRequestSchema, DriverSignupValidator, countrySchema, verificationDriverCodeValidator, updateVehicleSchema, editPhoneNumberValidator, editLocation, editHomeAddress, editWorkAddress, communicationMethod, ratingUserSchema, ratingDriverSchema} from "../utils/validate";
 import rateLimit from 'express-rate-limit';
-import { decodeDriverIdFromToken, verifyAdminToken } from "./token";
+import { verifyAdminToken } from "./token";
 
 export function validateFinalSignUp(req: Request, res: Response, next: NextFunction) {
   const { error } = finalSignUpValidator.validate(req.body);
@@ -31,10 +31,20 @@ export function validateVerificationCode(req: Request, res: Response, next: Next
   }
   next();
 }
+export function validateDriverVerificationCode(req: Request, res: Response, next: NextFunction) {
+  const { error } = verificationDriverCodeValidator.validate(req.body);
+  if (error) {
+    return res.status(400).json({
+      error: error.details[0].message
+    });
+  }
+  next();
+}
 export function ValidateDriverSignup(req: Request, res: Response, next: NextFunction) {
       const { error } = DriverSignupValidator.validate(req.body, options);
   if (error) {
     const errors = error.details.map((err: { message: any; }) => err.message);
+    console.log(errors)
     return res.status(400).json({
       errors
     });
@@ -115,9 +125,12 @@ export const isSuperAdmin = (req: Request, res: Response, next: NextFunction) =>
   }
 };
 export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
+
   try {
+       // Get the JWT token from the Authorization header
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1] || req.cookies.token;
+  
 
     if (!token) {
       return res.status(401).json({ message: 'No token provided' });
@@ -147,7 +160,6 @@ export const validatetripRequest = (req: Request, res: Response, next: NextFunct
   const { error } = tripRequestSchema.validate(req.body, options);
   if (error) {
     const errors = error.details.map((err: { message: any; }) => err.message);
-    console.log(errors);
     return res.status(400).json({
       errors
     });
@@ -161,7 +173,14 @@ export const validateVehicle = (req: Request, res: Response, next: NextFunction)
     }
     next();
 };
-export const validateVoucherCreation = (req: Request, res: Response, next: NextFunction) => {
+export const validateVehicleUpdate = (req: Request, res: Response, next: NextFunction) => {
+    const { error } = updateVehicleSchema.validate(req.body, options);
+  if (error) {
+        return res.status(400).json({ error: error.details[0].message });
+    }
+    next();
+};
+export const validateVoucherCreation = (req: Request, res: Response, next: NextFunction) => { 
   const { error } = createTripSchema.validate(req.body, options);
   if (error) {
     const errors = error.details.map((err: { message: any; }) => err.message);
@@ -177,6 +196,102 @@ export const validateCountryCreation = (req: Request, res: Response, next: NextF
     }
     next();
 }
-  
+export const validateEditPhoneNumber = (req: Request, res: Response, next: NextFunction)=>{
+  const { error } = editPhoneNumberValidator.validate(req.body, options);
+  if (error) {
+        return res.status(400).json({ error: error.details[0].message });
+    }
+    next();
+}
+export const validateEditLocation = (req: Request, res: Response, next: NextFunction) => {
+  const { error } = editLocation.validate(req.body);
 
+  if (error) {
+    return res.status(400).json({
+      message: error.details[0].message
+    });
+  }
 
+  next();
+};
+export const validateHomeAddress = (req: Request, res: Response, next: NextFunction) => {
+  const { error } = editHomeAddress.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({
+      message: error.details[0].message
+    });
+  }
+
+  next();
+};
+export const validateWorkAddress = (req: Request, res: Response, next: NextFunction) => {
+  const { error } = editWorkAddress.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({
+      message: error.details[0].message
+    });
+  }
+
+  next();
+};
+export const validatecommunicationMethod = (req: Request, res: Response, next: NextFunction) => {
+  const { error } = communicationMethod.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({
+      message: error.details[0].message
+    });
+  }
+
+  next();
+};
+export const validateUserRating = (req: Request, res: Response, next: NextFunction) => {
+  const { error } = ratingUserSchema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({
+      message: error.details[0].message
+    });
+  }
+
+  next();
+};
+export const validateDriverRating = (req: Request, res: Response, next: NextFunction) => {
+  const { error } = ratingDriverSchema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({
+      message: error.details[0].message
+    });
+  }
+
+  next();
+};
+
+export const convertFilesToBase64 = (req: Request, res: Response, next: NextFunction) => {
+  if (req.files) {
+    for (const file of Object.values(req.files)) {
+      req.body[file[0].fieldname] = file[0].buffer.toString('base64');
+    }
+  }
+  next();
+};
+
+export const checkInternetConnection = (): Promise<void> => {
+  return new Promise<void>((resolve, reject) => {
+    dns.resolve('www.google.com', (err) => {
+      if (err) {
+        reject(new Error('No internet connection'));
+      } else {
+        resolve();
+      }
+    });
+  });
+};
+export const checkInternetConnectionMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  checkInternetConnection()
+    .then(() => next())
+    .catch((err) => res.status(503).send(err.message));
+};
