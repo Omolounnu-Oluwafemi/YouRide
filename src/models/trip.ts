@@ -1,7 +1,7 @@
 import { DataTypes, Model, Optional, Sequelize, BelongsToGetAssociationMixin } from 'sequelize';
 import { User } from './usersModel';
 import { Driver } from './drivers'
-import { Vehicle } from './vehicle';
+import { VehicleCategory } from './vehicle';
 import { Voucher } from './voucher';
 
     
@@ -11,17 +11,17 @@ interface TripAttributes {
     userId: string;
     userName: string;
     driverName: string | null;
-    vehicleName: string;
+    categoryName: string;
     country: string;
-    vehicleId: string | null;
+    categoryId: string | null;
     paymentMethod: string;
     tripAmount: number;
     pickupLocation: string;
     destination: string;
-    pickupLatitude: number;
-    pickupLongitude: number;
-    destinationLatitude: number;
-    destinationLongitude: number;
+    pickupLatitude: string;
+    pickupLongitude: string;
+    destinationLatitude: string;
+    destinationLongitude: string;
     totalDistance: number;
     pickupTime: Date | null;
     dropoffTime: Date | null;
@@ -36,18 +36,18 @@ class Trip extends Model<TripAttributes, TripCreationAttributes> implements Trip
     public driverId!: string | null;
     public userName!: string;
     public driverName!: string | null;
-    public vehicleName!: string;
+    public categoryName!: string;
     public country!: string;
-    public vehicleId!: string;
+    public categoryId!: string | null;
     public paymentMethod!: string;
     public tripAmount!: number;
     public voucherId!: string | null;
     public pickupLocation!:  string;
     public destination!: string;
-    public pickupLatitude!: number;
-    public pickupLongitude!: number;
-    public destinationLatitude!: number;
-    public destinationLongitude!: number;
+    public pickupLatitude!: string;
+    public pickupLongitude!: string;
+    public destinationLatitude!: string;
+    public destinationLongitude!: string;
     public totalDistance!: number;
     public pickupTime!: Date | null;
     public dropoffTime!: Date | null;
@@ -57,14 +57,14 @@ class Trip extends Model<TripAttributes, TripCreationAttributes> implements Trip
         
     public getDriver!: BelongsToGetAssociationMixin<Driver>;
     public getUser!: BelongsToGetAssociationMixin<User>;
-    public getVehicle!: BelongsToGetAssociationMixin<Vehicle>;
+    public getVehicle!: BelongsToGetAssociationMixin<VehicleCategory>;
     public getVoucher!: BelongsToGetAssociationMixin<Voucher>;
 
     public static associate(models: { [key: string]: any }) {
     Trip.belongsTo(models.User, { foreignKey: 'userId', as: 'users' });
     Trip.belongsTo(models.Driver, { foreignKey: 'driverId', as: 'drivers' });
-    Trip.belongsTo(models.Vehicle, { foreignKey: 'vehicleId', as: 'vehicles' });
-    Trip.belongsTo(models.Voucher, { foreignKey: 'voucherId', as: 'vouchers' });
+    Trip.belongsTo(models.Vehicle, { foreignKey: 'categoryId', as: 'vehicles' });
+    Trip.belongsTo(models.Voucher, { foreignKey: 'categoryId', as: 'vouchers' });
   }
 }
 
@@ -88,7 +88,7 @@ const initTrip = (sequelize: Sequelize) => {
                 type: DataTypes.STRING,
                 allowNull: true
             },
-            vehicleName: {
+             categoryName: {
                 type: DataTypes.STRING,
                 allowNull: false
             },
@@ -96,12 +96,12 @@ const initTrip = (sequelize: Sequelize) => {
                 type: DataTypes.STRING,
                 allowNull: true
             },
-            vehicleId: {
+            categoryId: {
                 type: DataTypes.UUID,
                 allowNull: true,
                 references: {
-                    model: 'Vehicles',
-                    key: 'vehicleId'
+                    model: 'VehicleCategories',
+                    key: 'categoryId'
                 }
             },
             userId: {
@@ -125,19 +125,19 @@ const initTrip = (sequelize: Sequelize) => {
                 allowNull: false,
             },
             pickupLatitude: {
-                type: DataTypes.FLOAT,
+                type: DataTypes.STRING,
                 allowNull: false,
             },
             pickupLongitude: {
-                type: DataTypes.FLOAT,
+                type: DataTypes.STRING,
                 allowNull: false,
             },
             destinationLatitude: {
-                type: DataTypes.FLOAT,
+                type: DataTypes.STRING,
                 allowNull: false,
             },
             destinationLongitude: {
-                type: DataTypes.FLOAT,
+                type: DataTypes.STRING,
                 allowNull: false,
             },
             totalDistance: {
@@ -172,6 +172,8 @@ const initTrip = (sequelize: Sequelize) => {
             tableName: 'Trips',
         },
     );
+
+    return Trip;
 }
 
 export { Trip, initTrip };

@@ -2,14 +2,14 @@ import { Model, DataTypes, Optional, Sequelize } from 'sequelize';
 
 interface CountryVehicleAttributes {
     countryId: string;
-    vehicleId: string;
+    categoryId: string;
 }
 
-interface CountryVehicleCreationAttributes extends Optional<CountryVehicleAttributes, 'countryId' | 'vehicleId'> { }
+interface CountryVehicleCreationAttributes extends Optional<CountryVehicleAttributes, 'countryId' | 'categoryId'> { }
 
 class CountryVehicle extends Model<CountryVehicleAttributes, CountryVehicleCreationAttributes> implements CountryVehicleAttributes {
     public countryId!: string;
-    public vehicleId!: string;
+    public categoryId!: string;
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
@@ -21,22 +21,24 @@ const initCountryVehicle = (sequelize: Sequelize) => {
             type: DataTypes.UUID,
             primaryKey: true,
             references: {
-                model: 'Countries',
+                model: 'countries',
                 key: 'countryId'
             }
         },
-        vehicleId: {
+        categoryId: {
             type: DataTypes.UUID,
             primaryKey: true,
             references: {
-                model: 'Vehicles',
-                key: 'vehicleId'
+                model: 'categories',
+                key: 'categoryId'
             }
         }
     }, {
         sequelize,
-        modelName: 'CountryVehicles',
+        modelName: 'CountryVehicle',
     })
+
+    return CountryVehicle;
 }
 
 export { CountryVehicle, initCountryVehicle };

@@ -2,20 +2,20 @@ import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
 
 interface DriversAttributes {
   driverId: string;
-  vehicleId: string | null;
+  categoryId: string | null;
+  countryId: string | null;
   phoneNumber: string;
   country: string;
   email: string;
   firstName: string;
   lastName: string;
   gender: string;
-  vehicleCategory: string;
+  category: string;
   referralCode: string;
   vehicleYear: number;
   vehicleManufacturer: string;
   vehicleColor: string;
   licensePlate: string;
-  vehicleNumber: string;
   driverLicense: string;
   vehicleLogBook: string;
   privateHireLicenseBadge: string;
@@ -23,7 +23,10 @@ interface DriversAttributes {
   motTestCertificate: string;
   isAvailable: boolean;
   latitude: string; 
-  longitude: string; 
+  longitude: string;
+  driverRating: number | null;
+  numberOfRatings: number;
+  
   verificationCode: string | null;
 }
 
@@ -31,20 +34,20 @@ interface DriverCreationAttributes extends Optional<DriversAttributes, 'driverId
 
 class Driver extends Model<DriversAttributes, DriverCreationAttributes> implements DriversAttributes {
   public driverId!: string;
-  public vehicleId!: string | null;
+  public categoryId!: string | null;
+  public countryId!: string | null;
   public phoneNumber!: string;
   public email!: string;
   public country!: string;
   public firstName!: string;
   public lastName!: string;
   public gender!: string;
-  public vehicleCategory!: string;
+  public category!: string;
   public referralCode!: string;
   public vehicleYear!: number;
   public vehicleManufacturer!: string;
   public vehicleColor!: string;
   public licensePlate!: string;
-  public vehicleNumber!: string;
   public driverLicense!: string;
   public vehicleLogBook!: string;
   public privateHireLicenseBadge!: string;
@@ -54,13 +57,16 @@ class Driver extends Model<DriversAttributes, DriverCreationAttributes> implemen
   public latitude!: string; 
   public longitude!: string; 
   public verificationCode!: string | null;
+  public driverRating!: number | null;
+  public numberOfRatings!: number;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
    public static associate(models: { [key: string]: any }) {
      Driver.hasMany(models.Trip, { foreignKey: 'driverId', as: 'trips' });
-     Driver.belongsTo(models.Vehicle, { foreignKey: 'vehicleId', as: 'vehicles' });
+    Driver.belongsTo(models.VehicleCategory, { foreignKey: 'categoryId', as: 'vehicleCategory' });
+    Driver.belongsTo(models.Country, { foreignKey: 'countryId', as: 'country' });
   }
 }
 
@@ -72,13 +78,21 @@ const initDriver = (sequelize: Sequelize) => {
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
-      vehicleId: {
-                type: DataTypes.UUID,
-                allowNull: true,
-                references: {
-                    model: 'Vehicles',
-                    key: 'vehicleId'
-                }
+      categoryId: {
+        type: DataTypes.UUID,
+        allowNull: true,
+          references: {
+            model: 'VehicleCategories',
+            key: 'categoryId'
+        }
+      },
+      countryId: {
+        type: DataTypes.UUID,
+        allowNull: true,
+          references: {
+            model: 'Countries',
+            key: 'countryId'
+        }
       },
       phoneNumber: {
         type: DataTypes.STRING,
@@ -107,14 +121,23 @@ const initDriver = (sequelize: Sequelize) => {
         values: ['Male', 'Female', 'Other'],
         allowNull: false,
       },
-      vehicleCategory: {
-        type: DataTypes.ENUM,
-        values: ['Private Driver', 'Taxi Driver', 'Delivery Driver'],
+      category: {
+        type: DataTypes.STRING,
         allowNull: false,
       },
       referralCode: {
         type: DataTypes.STRING,
         allowNull: true, 
+      },
+      driverRating: {
+        type: DataTypes.FLOAT,
+        defaultValue: 0,
+        allowNull: true,
+      },
+      numberOfRatings: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+        allowNull: true,
       },
       isAvailable: {
         type: DataTypes.BOOLEAN,
@@ -130,13 +153,11 @@ const initDriver = (sequelize: Sequelize) => {
         allowNull: true,
       },
       vehicleYear: {
-        type: DataTypes.ENUM,
-        values: ['2024', '2023', '2022', '2021', '2020', '2019', '2018'],
+        type: DataTypes.STRING,
         allowNull: false,
       },
       vehicleManufacturer: {
-        type: DataTypes.ENUM,
-        values: ['ACE', 'Acura', 'AIWAYS', 'AKT', 'BMW', 'BYD', 'Chevrolet'],
+        type: DataTypes.STRING,
         allowNull: false,
       },
       vehicleColor: {
@@ -144,10 +165,6 @@ const initDriver = (sequelize: Sequelize) => {
         allowNull: false,
       },
       licensePlate: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      vehicleNumber: {
         type: DataTypes.STRING,
         allowNull: false,
       },
@@ -181,6 +198,8 @@ const initDriver = (sequelize: Sequelize) => {
       tableName: 'Drivers',
     }
   );
+
+  return Driver;
 };
 
 export { Driver, initDriver };

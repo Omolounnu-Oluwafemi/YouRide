@@ -25,8 +25,8 @@ class Country extends Model<CountryAttributes, CountryCreationAttributes> implem
     public readonly updatedAt!: Date;
 
     public static associate(models: { [key: string]: any }) {
-    Country.belongsToMany(models.Vehicle, { through: models.CountryVehicle, foreignKey: 'countryId', as: 'vehicles' });
-}
+        Country.belongsToMany(models.VehicleCategory, { through: 'CountryVehicle', foreignKey: 'countryId' });
+    }
 }
 
 const initCountry = (sequelize: Sequelize) => {
@@ -65,8 +65,9 @@ const initCountry = (sequelize: Sequelize) => {
     }, {
         sequelize,
         modelName: 'Countries',
-        
     })
+
+    return Country;
 };
 
 export { Country, initCountry };

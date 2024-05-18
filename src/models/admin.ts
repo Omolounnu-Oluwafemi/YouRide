@@ -71,6 +71,8 @@ const initAdmin = (sequelize: Sequelize) => {
       tableName: 'Admins',
     },
   )
+
+  return Admin;
 }
 
 export { Admin, initAdmin };
