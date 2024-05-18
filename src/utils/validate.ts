@@ -6,29 +6,6 @@ enum Gender {
   Female = 'Female',
   Other = 'Other'
 }
-enum Category {
-    PrivateDriver = 'Private Driver',
-    TAxiDriver = 'Taxi Driver',
-    DeliveryDriver = 'Delivery Driver'
-}
-enum vehicleYear {
-    TwentyFour = '2024',
-    TwentyThree = '2023',
-    TwentyTwo = '2022',
-    TwentyOne = '2021',
-    Twenty = '2020',
-    Nineteen = '2019',
-    Eighteen = '2018',
-}
-enum Manufacturer {
-    ACE = 'ACE',
-    Acura = 'Acura',
-    AIWAYS = 'AIWAYS',
-    AKT = 'AKT',
-    BMW = 'BMW',
-    BYD = 'BYD',
-    Chevrolet = 'Chevrolet'
-}
 enum Role {
     Admin = 'Admin',
     SuperAdmin = 'Super Admin',
@@ -326,6 +303,15 @@ export const ratingUserSchema = Joi.object({
 export const ratingDriverSchema = Joi.object({
   userId: Joi.string().required(),
   rating: Joi.number().min(1).max(5).precision(1).required(),
+});
+export const paymentOptionCreationSchema = Joi.object({
+    paymentName: Joi.string().required(),
+    privateKey: Joi.string().required(),
+    publicKey: Joi.string().required(),
+});
+export const paymentOptionKeysSchema = Joi.object({
+    privateKey: Joi.string().required(),
+    publicKey: Joi.string().required(),
 });
 
 export const options = {

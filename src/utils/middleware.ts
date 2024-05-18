@@ -1,6 +1,6 @@
 import { NextFunction, Response, Request } from "express";
 import dns from 'dns';
-import { initiialSignUpValidator, finalSignUpValidator, verificationCodeValidator, AdminSignupValidator, AdminSignInValidator, AdminPasswordUpdate,options, createVehicleSchema, createTripSchema, tripRequestSchema, DriverSignupValidator, countrySchema, verificationDriverCodeValidator, updateVehicleSchema, editPhoneNumberValidator, editLocation, editHomeAddress, editWorkAddress, communicationMethod, ratingUserSchema, ratingDriverSchema} from "../utils/validate";
+import { initiialSignUpValidator, finalSignUpValidator, verificationCodeValidator, AdminSignupValidator, AdminSignInValidator, AdminPasswordUpdate,options, createVehicleSchema, createTripSchema, tripRequestSchema, DriverSignupValidator, countrySchema, verificationDriverCodeValidator, updateVehicleSchema, editPhoneNumberValidator, editLocation, editHomeAddress, editWorkAddress, communicationMethod, ratingUserSchema, ratingDriverSchema, paymentOptionCreationSchema, paymentOptionKeysSchema} from "../utils/validate";
 import rateLimit from 'express-rate-limit';
 import { verifyAdminToken } from "./token";
 
@@ -249,6 +249,28 @@ export const validatecommunicationMethod = (req: Request, res: Response, next: N
 };
 export const validateUserRating = (req: Request, res: Response, next: NextFunction) => {
   const { error } = ratingUserSchema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({
+      message: error.details[0].message
+    });
+  }
+
+  next();
+};
+export const validatepaymentOptionCreation = (req: Request, res: Response, next: NextFunction) => {
+  const { error } = paymentOptionCreationSchema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({
+      message: error.details[0].message
+    });
+  }
+
+  next();
+};
+export const validatepaymentOptionKeys = (req: Request, res: Response, next: NextFunction) => {
+  const { error } = paymentOptionKeysSchema.validate(req.body);
 
   if (error) {
     return res.status(400).json({

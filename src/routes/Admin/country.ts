@@ -1,5 +1,5 @@
 import express from 'express'
-import { createCountry, getCountryById, getAllCountries } from '../../controllers/Admin/countries'
+import { createCountry, getCountryById, getAllCountries, updateCountry } from '../../controllers/Admin/countries'
 import { isAdmin, validateCountryCreation } from '../../utils/middleware'
 
 const router = express.Router() 
@@ -51,7 +51,7 @@ const router = express.Router()
  *                 data:
  *                   $ref: '#/components/schemas/Country'
  *       400:
- *         description: Country already exists
+ *         description: Country already exists or Payment option is not available in this region
  *         content:
  *           application/json:
  *             schema:
@@ -219,6 +219,103 @@ router.get('/countries', isAdmin, getAllCountries);
  *                   description: The error message
  */
 router.get('/country/:countryId', isAdmin, getCountryById);
+
+/**
+ * @swagger
+ * /api/v1/admin/country/{countryId}:
+ *   put:
+ *     summary: Update a country
+ *     tags: [Admin Dashboards]
+ *     description: This endpoint allows an admin to update the details of a country.
+ *     operationId: updateCountry
+ *     parameters:
+ *       - in: path
+ *         name: countryId
+ *         required: true
+ *         type: string
+ *         description: The ID of the country to update.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: The new name of the country.
+ *               email:
+ *                 type: string
+ *                 description: The new email of the country.
+ *               currency:
+ *                 type: string
+ *                 description: The new currency of the country.
+ *               usdConversionRatio:
+ *                 type: number
+ *                 description: The new USD conversion ratio of the country.
+ *               distanceUnit:
+ *                 type: string
+ *                 description: The new distance unit of the country.
+ *               paymentOption:
+ *                 type: string
+ *                 description: The new payment option of the country.
+ *     responses:
+ *       '200':
+ *         description: Country updated successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   example: 200
+ *                 message:
+ *                   type: string
+ *                   example: Country edited successfully
+ *                 data:
+ *                   $ref: '#/definitions/Country'
+ *       '400':
+ *         description: Payment option is not available in this region.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   example: 400
+ *                 error:
+ *                   type: string
+ *                   example: Payment option is not available in this region
+ *       '404':
+ *         description: Country not found.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   example: 404
+ *                 error:
+ *                   type: string
+ *                   example: Country not found
+ *       '500':
+ *         description: An error occurred while processing your request.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   example: 500
+ *                 error:
+ *                   type: string
+ *                   example: An error occurred while processing your request
+ */
+router.put('/country/:countryId', isAdmin, updateCountry);
 
 
 /**

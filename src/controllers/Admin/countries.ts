@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { Country } from '../../models/countries';
+import { PaymentOptions } from '../../models/paymentOption';
 import { Op } from 'sequelize'; 
 
 export const createCountry =  async (req: Request, res: Response) => {
@@ -11,13 +12,19 @@ export const createCountry =  async (req: Request, res: Response) => {
             return res.status(400).json({ error: 'Country already exists' });
         }
 
+         // Check if the paymentOption is available
+        const existingPaymentOption = await PaymentOptions.findOne({ where: { paymentName: paymentOption, paymentAvailable: true } });
+        if (!existingPaymentOption) {
+            return res.status(400).json({ error: 'Payment option is not available in this region' });
+        }
+
         const country = await Country.create({
             name,
             email,
             currency,
             usdConversionRatio,
             distanceUnit,
-            paymentOption
+            paymentOptionId: existingPaymentOption.paymentOptionId 
         });
 
         return res.status(201).json(country);
@@ -127,3 +134,45 @@ export const getCountryById = async (req: Request, res: Response) => {
       });
   }
 };
+export const updateCountry = async (req: Request, res: Response) => { 
+    const { countryId } = req.params;
+    const { name, email, currency, usdConversionRatio, distanceUnit, paymentOption } = req.body;
+
+    try {
+        const country = await Country.findOne({ where: { countryId } });
+
+        if (!country) {
+            return res.status(404).json({
+                status: 404,
+                error: 'Country not found'
+            });
+        }
+
+        // Check if the paymentOption is available
+        const existingPaymentOption = await PaymentOptions.findOne({ where: { paymentName: paymentOption, paymentAvailable: true } });
+        if (!existingPaymentOption) {
+            return res.status(400).json({ error: 'Payment option is not available in this region' });
+        }
+
+        await country.update({
+            name,
+            email,
+            currency,
+            usdConversionRatio,
+            distanceUnit,
+            paymentOptionId: existingPaymentOption.paymentOptionId
+        });
+
+        return res.status(200).json({
+            status: 200,
+            message: 'Country edited successfully',
+            data: country
+        });
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            status: 500,
+            error: 'An error occurred while processing your request'
+        });
+    }
+}

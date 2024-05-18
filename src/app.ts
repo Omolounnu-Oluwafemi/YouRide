@@ -27,6 +27,7 @@ import adminTrips from './routes/Admin/trip';
 import voucherRoutes from './routes/Admin/voucher';
 import vehicleRoutes from './routes/Vehicle/vehicle';
 import countryRoutes from './routes/Admin/country';
+import paymentOptionsRoutes from './routes/Admin/paymentOptions';
 
 const app = express();
 
@@ -78,6 +79,7 @@ app.use('/api/v1/admin', usersInfo);
 app.use('/api/v1/admin', driversInfo);
 app.use('/api/v1/admin', voucherRoutes);
 app.use('/api/v1/admin', countryRoutes);
+app.use('/api/v1/admin', paymentOptionsRoutes);
 app.use('/api/v1/admin', adminTrips);
 app.use('/api/v1/user', usersAuth);
 app.use('/api/v1/user', usersTrip);

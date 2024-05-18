@@ -64,7 +64,7 @@ class Trip extends Model<TripAttributes, TripCreationAttributes> implements Trip
     Trip.belongsTo(models.User, { foreignKey: 'userId', as: 'users' });
     Trip.belongsTo(models.Driver, { foreignKey: 'driverId', as: 'drivers' });
     Trip.belongsTo(models.Vehicle, { foreignKey: 'categoryId', as: 'vehicles' });
-    Trip.belongsTo(models.Voucher, { foreignKey: 'categoryId', as: 'vouchers' });
+    Trip.belongsTo(models.Voucher, { foreignKey: 'voucherId', as: 'vouchers' });
   }
 }
 

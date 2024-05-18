@@ -8,6 +8,7 @@ import { VehicleCategory, initVehicleCategory } from '../models/vehicle';
 import { Voucher, initVoucher } from '../models/voucher';
 import { Country, initCountry } from '../models/countries';
 import { CountryVehicle, initCountryVehicle } from '../models/countryVehicle'; 
+import { PaymentOptions, initPaymentOption } from '../models/paymentOption'; 
 
 const database = process.env.DB_NAME || '';
 const username = process.env.DB_USER || '';
@@ -21,6 +22,7 @@ export const sequelize = new Sequelize(database, username, password, {
 });
 
 
+initPaymentOption(sequelize);
 initUser(sequelize);
 initDriver(sequelize);
 initVehicleCategory(sequelize);

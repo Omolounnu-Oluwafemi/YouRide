@@ -7,7 +7,7 @@ interface CountryAttributes {
     currency: string;
     usdConversionRatio: number;
     distanceUnit: string;
-    paymentOption: string;
+    paymentOptionId: string;
 }
 
 interface CountryCreationAttributes extends Optional<CountryAttributes, 'countryId'> { }
@@ -19,14 +19,15 @@ class Country extends Model<CountryAttributes, CountryCreationAttributes> implem
     public currency!: string;
     public usdConversionRatio!: number;
     public distanceUnit!: string;
-    public paymentOption!: string;
+    public paymentOptionId!: string;
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
 
     public static associate(models: { [key: string]: any }) {
-        Country.belongsToMany(models.VehicleCategory, { through: 'CountryVehicle', foreignKey: 'countryId' });
-    }
+    Country.belongsToMany(models.VehicleCategory, { through: 'CountryVehicle', foreignKey: 'countryId' });
+    Country.belongsTo(models.PaymentOption, { foreignKey: 'paymentOptionId', as: 'paymentoption' });
+}
 }
 
 const initCountry = (sequelize: Sequelize) => {
@@ -35,6 +36,14 @@ const initCountry = (sequelize: Sequelize) => {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
             primaryKey: true
+        },
+        paymentOptionId: {
+            type: DataTypes.UUID,
+            allowNull: false,
+            references: {
+                model: 'PaymentOptions',
+                key: 'paymentOptionId',
+            }
         },
         name: {
             type: DataTypes.STRING,
@@ -55,11 +64,6 @@ const initCountry = (sequelize: Sequelize) => {
         distanceUnit: {
             type: DataTypes.ENUM,
             values: ['KM', 'MI'],
-            allowNull: false,
-        },
-        paymentOption: {
-            type: DataTypes.ENUM,
-            values: ['Stripe Payment', 'Paystack Payment'],
             allowNull: false,
         },
     }, {
