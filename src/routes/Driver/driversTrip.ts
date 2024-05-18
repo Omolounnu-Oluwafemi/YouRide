@@ -1,7 +1,10 @@
 import express from 'express'; 
 import { acceptTrip, skipTrip, startTrip, cancelTrip, completeTrip } from '../../controllers/Trip/trip';
+import { checkInternetConnectionMiddleware } from '../../utils/middleware';
 
 const router = express.Router();
+
+router.use(checkInternetConnectionMiddleware);
 
 /**
  * @swagger
@@ -291,7 +294,7 @@ router.patch('/start-trip/:tripId', startTrip);
  *                   description: The HTTP status code
  *                 error:
  *                   type: string
- *                   example: An error occurred while cancelling the trip
+ *                   example: An error occurred while processing your request
  */
 router.patch('/cancel-trip/:tripId', cancelTrip);
 
@@ -302,16 +305,18 @@ router.patch('/cancel-trip/:tripId', cancelTrip);
  *     summary: Complete a trip
  *     tags:
  *       - Driver-Trips
+ *     description: This endpoint allows a driver to complete a trip.
+ *     operationId: completeTrip
  *     parameters:
  *       - in: path
  *         name: tripId
- *         required: true
- *         description: The id of the trip to complete
  *         schema:
  *           type: string
+ *         required: true
+ *         description: The ID of the trip to complete
  *     responses:
- *       200:
- *         description: The trip was successfully completed
+ *       '200':
+ *         description: Trip completed successfully
  *         content:
  *           application/json:
  *             schema:
@@ -319,11 +324,12 @@ router.patch('/cancel-trip/:tripId', cancelTrip);
  *               properties:
  *                 status:
  *                   type: integer
- *                   description: The HTTP status code
+ *                   example: 200
  *                 message:
  *                   type: string
- *       404:
- *         description: Not found, the trip with the given id was not found
+ *                   example: Trip completed successfully
+ *       '404':
+ *         description: Trip not found
  *         content:
  *           application/json:
  *             schema:
@@ -331,12 +337,12 @@ router.patch('/cancel-trip/:tripId', cancelTrip);
  *               properties:
  *                 status:
  *                   type: integer
- *                   description: The HTTP status code
+ *                   example: 404
  *                 error:
  *                   type: string
  *                   example: Trip not found
- *       500:
- *         description: Internal server error
+ *       '500':
+ *         description: An error occurred while processing your request
  *         content:
  *           application/json:
  *             schema:
@@ -344,10 +350,10 @@ router.patch('/cancel-trip/:tripId', cancelTrip);
  *               properties:
  *                 status:
  *                   type: integer
- *                   description: The HTTP status code
+ *                   example: 500
  *                 error:
  *                   type: string
- *                   example: An error occurred while completing the trip
+ *                   example: An error occurred while processing your request
  */
 router.patch('/complete-trip/:tripId', completeTrip);
 

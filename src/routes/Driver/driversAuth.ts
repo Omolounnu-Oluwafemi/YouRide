@@ -1,12 +1,28 @@
 import express from 'express';
+import { Request, Response, NextFunction } from "express";
 import multer from 'multer';
 import { DriverSignup, DriverSignIn, verifyDriverSignIn, getDriverById } from '../../controllers/Driver/driversAuth'
-import { ValidateDriverSignup, validateInitialSignUp, validateVerificationCode, verifySignInLimiter } from '../../utils/middleware';
+import { ValidateDriverSignup, validateInitialSignUp, validateDriverVerificationCode, verifySignInLimiter, convertFilesToBase64, checkInternetConnectionMiddleware } from '../../utils/middleware';
 import { deleteDriver } from '../../controllers/Driver/driversInfo';
 
 const router = express.Router();
-const upload = multer({ dest: 'uploads/' });
 
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // limit file size to 10MB
+  },
+});
+
+ const processUploads = upload.fields([
+  { name: 'driverLicense', maxCount: 1 },
+  { name: 'vehicleLogBook', maxCount: 1 },
+  { name: 'privateHireLicenseBadge', maxCount: 1 },
+  { name: 'insuranceCertificate', maxCount: 1 },
+  { name: 'motTestCertificate', maxCount: 1 },
+]);
+
+router.use(checkInternetConnectionMiddleware);
 /**
  * @swagger
  * /api/v1/driver/signup:
@@ -29,33 +45,20 @@ const upload = multer({ dest: 'uploads/' });
  *                 type: string
  *               lastName:
  *                 type: string
- *               country:
- *                 type: string
- *               latitude:
- *                 type: number
- *                 format: float
- *               longitude:
- *                 type: number
- *                 format: float
  *               gender:
  *                 type: string
  *                 enum: [Male, Female, Other]
  *               category:
  *                 type: string
- *                 enum: [Private Driver, Taxi Driver, Delivery Driver]
  *               referralCode:
  *                 type: string
  *               vehicleYear:
- *                 type: string
- *                 enum: ['2024', '2023', '2022', '2021', '2020', '2019', '2018']
+ *                 type: integer
  *               vehicleManufacturer:
  *                 type: string
- *                 enum: ['ACE', 'Acura', 'AIWAYS', 'AKT', 'BMW', 'BYD', 'Chevrolet']
  *               vehicleColor:
  *                 type: string
  *               licensePlate:
- *                 type: string
- *               vehicleNumber:
  *                 type: string
  *               driverLicense:
  *                 type: string
@@ -74,7 +77,6 @@ const upload = multer({ dest: 'uploads/' });
  *                 format: binary
  *             required:
  *               - phoneNumber
- *               - country
  *               - email
  *               - firstName
  *               - lastName
@@ -84,7 +86,6 @@ const upload = multer({ dest: 'uploads/' });
  *               - vehicleManufacturer
  *               - vehicleColor
  *               - licensePlate
- *               - vehicleNumber
  *               - driverLicense
  *               - vehicleLogBook
  *               - privateHireLicenseBadge
@@ -101,8 +102,21 @@ const upload = multer({ dest: 'uploads/' });
  *                 status:
  *                   type: integer
  *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: The response message
+ *                 token:
+ *                   type: string
+ *                   description: The JWT token
+ *                 refreshToken:
+ *                   type: string
+ *                   description: The refresh token
  *                 data:
- *                   $ref: '#/components/schemas/Driver'
+ *                   type: object
+ *                   properties:
+ *                     Driver:
+ *                       type: object
+ *                       description: The Driver object
  *       400:
  *         description: Bad request
  *         content:
@@ -128,13 +142,7 @@ const upload = multer({ dest: 'uploads/' });
  *                 error:
  *                   type: string
  */
-router.post('/signup',  upload.fields([
-  { name: 'driverLicense', maxCount: 1 },
-  { name: 'vehicleLogBook', maxCount: 1 },
-  { name: 'privateHireLicenseBadge', maxCount: 1 },
-  { name: 'insuranceCertificate', maxCount: 1 },
-  { name: 'motTestCertificate', maxCount: 1 }
-]), ValidateDriverSignup, DriverSignup);
+router.post('/signup', processUploads, convertFilesToBase64, ValidateDriverSignup, DriverSignup);
 
 /**
  * @swagger
@@ -211,9 +219,14 @@ router.post('/signin', validateInitialSignUp, DriverSignIn);
  *         application/json:
  *           schema:
  *             type: object
+ *             required: [verificationCode, driverId]
  *             properties:
  *               verificationCode:
  *                 type: string
+ *                 description: The verification code of the driver.
+ *               driverId:
+ *                 type: string
+ *                 description: The ID of the driver.
  *     responses:
  *       200:
  *         description: User signed in successfully
@@ -265,7 +278,7 @@ router.post('/signin', validateInitialSignUp, DriverSignIn);
  *                 message:
  *                   type: string
  */
-router.post('/verify', validateVerificationCode, verifySignInLimiter, verifyDriverSignIn)
+router.post('/verify', validateDriverVerificationCode, verifySignInLimiter, verifyDriverSignIn)
 
 /**
  * @swagger
@@ -338,7 +351,7 @@ router.get('/getonedriver/:driverId', getDriverById);
 
 /**
  * @swagger
- * /api/v1/driver/deletedriver/{userId}:
+ * /api/v1/driver/deletedriver/{driverId}:
  *   delete:
  *     summary: Driver can delete there account by ID.
  *     tags: [Driver Account]
@@ -390,7 +403,16 @@ router.get('/getonedriver/:driverId', getDriverById);
  *                   type: string
  *                   description: The error message
  */
-router.delete('/deletedriver/:userId', deleteDriver)
+router.delete('/deletedriver/:driverId', deleteDriver);
+
+// Error handling middleware
+router.use(function (err: any, req: Request, res: Response, next: NextFunction) {
+  if (err instanceof multer.MulterError && err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(400).json({ error: 'File size limit exceeded' });
+  }
+  // Handle any other errors
+  next(err);
+});
 
 /**
  * @swagger
@@ -411,7 +433,6 @@ router.delete('/deletedriver/:userId', deleteDriver)
  *         - vehicleManufacturer
  *         - vehicleColor
  *         - licensePlate
- *         - vehicleNumber
  *         - driverLicense
  *         - vehicleLogBook
  *         - privateHireLicenseBadge
@@ -421,9 +442,10 @@ router.delete('/deletedriver/:userId', deleteDriver)
  *         driverId:
  *           type: string
  *           format: uuid
- *         phoneNumber:
+ *         categoryId:
  *           type: string
- *         country:
+ *           format: uuid
+ *         phoneNumber:
  *           type: string
  *         email:
  *           type: string
@@ -432,26 +454,25 @@ router.delete('/deletedriver/:userId', deleteDriver)
  *           type: string
  *         lastName:
  *           type: string
- *         gender:
+ *         country:
  *           type: string
- *           enum: [Male, Female, Other]
  *         latitude:
  *           type: number
  *           format: float
  *         longitude:
  *           type: number
  *           format: float
+ *         gender:
+ *           type: string
+ *           enum: [Male, Female, Other]
  *         category:
  *           type: string
- *           enum: [Private Driver, Taxi Driver, Delivery Driver]
  *         referralCode:
  *           type: string
  *         vehicleYear:
- *           type: string
- *           enum: ['2024', '2023', '2022', '2021', '2020', '2019', '2018']
+ *           type: integer
  *         vehicleManufacturer:
  *           type: string
- *           enum: ['ACE', 'Acura', 'AIWAYS', 'AKT', 'BMW', 'BYD', 'Chevrolet']
  *         vehicleColor:
  *           type: string
  *         licensePlate:
@@ -468,5 +489,10 @@ router.delete('/deletedriver/:userId', deleteDriver)
  *           type: string
  *         motTestCertificate:
  *           type: string
+ *         isAvailable:
+ *           type: boolean
+ *         verificationCode:
+ *           type: string
  */
+
 export default router;

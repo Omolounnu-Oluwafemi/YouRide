@@ -1,10 +1,12 @@
 import express from 'express';
 import { getDriverById } from '../../controllers/Driver/driversAuth';
 import { deleteDriver, getAllDrivers, getAvailableDrivers, getAllDriversLocations } from '../../controllers/Driver/driversInfo';
-import { isAdmin } from '../../utils/middleware';
+import { checkInternetConnectionMiddleware, isAdmin } from '../../utils/middleware';
 
 
 const router = express.Router();
+
+router.use(checkInternetConnectionMiddleware);
 
 /**
  * @swagger
