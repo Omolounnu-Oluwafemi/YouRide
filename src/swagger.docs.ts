@@ -1,5 +1,7 @@
 require("dotenv").config();
+
 import swaggerJsdoc from "swagger-jsdoc";
+
 const { PORT, NODE_ENV, PROD_URL } = process.env;
 
 const servers = [
@@ -8,10 +10,11 @@ const servers = [
     description: NODE_ENV === 'production' ? "Production server" : "Development server",
   },
 ];
+
 const swaggerDefinition = {
   openapi: "3.0.0", 
   info: {
-    title: "DatRide API",
+    title: "YouRide API",
     version: "1.0.0",
     description: "API documentation for Our Amazing Ride"
   },
