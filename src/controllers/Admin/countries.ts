@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { Op } from 'sequelize'; 
 import { Country } from '../../models/countries';
+import { Op } from 'sequelize'; 
 
 export const createCountry =  async (req: Request, res: Response) => {
     try {
@@ -26,7 +26,6 @@ export const createCountry =  async (req: Request, res: Response) => {
         return res.status(500).json({ error: 'An error occurred while processing your request' });
     }
 };
-
 export const getAllCountries = async (req: Request, res: Response) => {
     try {
         const page = Number(req.query.page) || 1;
@@ -107,7 +106,6 @@ export const getAllCountries = async (req: Request, res: Response) => {
         return res.status(500).json({ error: 'An error occurred while processing your request' });
     }
 };
-
 export const getCountryById = async (req: Request, res: Response) => {
   const { countryId } = req.params;
 

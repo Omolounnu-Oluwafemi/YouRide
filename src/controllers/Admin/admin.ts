@@ -71,6 +71,7 @@ export const CreateAdmin = async (req: Request, res: Response) => {
 export const AdminLogin = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
+
     const admin = await Admin.findOne({ where: { email: email} });
 
     if (!admin) {
@@ -85,7 +86,7 @@ export const AdminLogin = async (req: Request, res: Response) => {
     }
 
       // Generate a JWT
-      const token = signAdminToken(admin.adminId, admin.role)
+    const token = signAdminToken(admin.adminId, admin.role)
     
       // Save the token in a cookie
       res.cookie('token', token, { httpOnly: true });
@@ -122,7 +123,6 @@ export const changeTempPassword = async (req: Request, res: Response) => {
     if (newPasswordMatch) {
       return res.status(400).json({ message: 'New password cannot be the same as the current password' });
     }
-
     // Hash the new password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
@@ -136,7 +136,6 @@ export const changeTempPassword = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Error changing password' });
   }
 };
-
 export const updateProfilePicture = async (req: Request, res: Response) => {
   try {
     const token = req.cookies.token;
