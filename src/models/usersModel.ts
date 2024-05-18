@@ -5,8 +5,10 @@ interface UserAttributes {
   userId: string;
   phoneNumber: string;
   email: string;
+  country: string | null;
   firstName: string;
   lastName: string;
+  referralCount: number | null;
   ssoProvider: string;
   googleId: string;
   facebookId: string;
@@ -20,8 +22,10 @@ class User extends Model<UserAttributes, UserCreationAttributes> {
   public userId!: string;
   public phoneNumber!: string;
   public email!: string;
+  public country!: string;
   public firstName!: string;
   public lastName!: string;
+  public referralCount!: number;
   public ssoProvider!: string;
   public googleId!: string;
   public facebookId!: string;
@@ -50,6 +54,10 @@ const initUser = (sequelize: Sequelize) => {
         allowNull: true,
         unique: true,
       },
+      country: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       email: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -62,6 +70,11 @@ const initUser = (sequelize: Sequelize) => {
       lastName: {
         type: DataTypes.STRING,
         allowNull: false,
+      },
+      referralCount: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
       },
       googleId: {
       type: DataTypes.STRING,

@@ -4,6 +4,7 @@ import { CreateAdmin, AdminLogin, changeTempPassword, updateProfilePicture, togg
 import { ValidateAdminSignup, ValidateAdminSignIn, ValidateAdminPAsswordUpdate, isAdmin, isSuperAdmin } from '../../utils/middleware';
 
 const router = express.Router();
+
 const upload = multer({ dest: 'uploads/' });
 
 /**

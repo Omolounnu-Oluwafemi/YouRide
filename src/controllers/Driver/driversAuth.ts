@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { Op } from 'sequelize';
 import { v4 as uuidv4 } from "uuid";
 import { Driver } from '../../models/drivers';
+import { Vehicle } from '../../models/vehicle';
 import cloudinary from '../../utils/cloudinary';
 import  { sendVerificationCode } from '../../utils/email';
 import { signToken, generateVerificationCode, signRefreshToken} from "../../utils/token";
@@ -24,7 +25,7 @@ export const DriverSignup = async (req: Request, res: Response) => {
       lastName,
       country,
       gender,
-      category,
+      vehicleCategory,
       referralCode,
       vehicleYear,
       vehicleManufacturer,
@@ -53,6 +54,16 @@ export const DriverSignup = async (req: Request, res: Response) => {
       return res.status(400).json({
         status: 400,
         message
+      });
+    }
+
+     // Check if the vehicleCategory exists in the Vehicle table
+    const vehicleCategoryExists = await Vehicle.findOne({ where: { vehicleCategory } });
+
+    if (!vehicleCategoryExists) {
+      return res.status(400).json({
+        status: 400,
+        message: 'Invalid vehicle category'
       });
     }
 
@@ -87,7 +98,7 @@ export const DriverSignup = async (req: Request, res: Response) => {
       firstName,
       lastName,
       gender,
-      category,
+      vehicleCategory,
       referralCode,
       vehicleYear,
       vehicleManufacturer,

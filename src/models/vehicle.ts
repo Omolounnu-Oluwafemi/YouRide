@@ -1,7 +1,7 @@
 import { Model, DataTypes, Optional, Sequelize } from 'sequelize';
 
 interface VehicleAttributes {
-    vehicleId: string;
+    categoryId: string;
     driverId: string | null;
     country: string;
     baseFare: number;
@@ -9,8 +9,7 @@ interface VehicleAttributes {
     pricePerMIN: number;
     adminCommission: number;
     status: string;
-    vehicleCategory: string;
-    vehicleName: string;
+    categoryName: string;
     carImage: string;
     documentImage: string;
     isSurge: boolean;
@@ -22,7 +21,7 @@ interface VehicleAttributes {
 
 interface VehicleCreationAttributes extends Optional<VehicleAttributes, 'vehicleId'> { }
 
-class Vehicle extends Model<VehicleAttributes, VehicleCreationAttributes> implements VehicleAttributes {
+class VehicleCategory extends Model<VehicleAttributes, VehicleCreationAttributes> implements VehicleAttributes {
     public vehicleId!: string;
     public driverId!: string | null;
     public country!: string;
@@ -45,18 +44,22 @@ class Vehicle extends Model<VehicleAttributes, VehicleCreationAttributes> implem
     public readonly updatedAt!: Date;
 
     public static associate(models: { [key: string]: any }) {
-    Vehicle.belongsToMany(models.Country, { through: models.CountryVehicle, foreignKey: 'vehicleId', as: 'countries' });
-    Vehicle.hasMany(models.Trip, { foreignKey: 'vehicleId', as: 'trips' });
-    Vehicle.hasMany(models.Driver, { foreignKey: 'driverId', as: 'drivers' });
+    VehicleCategory.belongsToMany(models.Country, { through: models.CountryVehicle, foreignKey: 'vehicleId', as: 'countries' });
+    VehicleCategory.hasMany(models.Trip, { foreignKey: 'vehicleId', as: 'trips' });
+    VehicleCategory.hasMany(models.Driver, { foreignKey: 'driverId', as: 'drivers' });
   }
 }
 
-const initVehicle = (sequelize: Sequelize) => {
-    Vehicle.init({
-        vehicleId: {
+const initVehicleCategory = (sequelize: Sequelize) => {
+    VehicleCategory.init({
+        categoryId: {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
             primaryKey: true
+        },
+        categoryName: {
+            type: DataTypes.STRING,
+            allowNull: false,
         },
          driverId: {
             type: DataTypes.UUID,
@@ -91,16 +94,6 @@ const initVehicle = (sequelize: Sequelize) => {
             values: ['Active', 'Inactive'],
             allowNull: false,
             defaultValue: 'Active',
-        },
-        vehicleCategory: {
-            type: DataTypes.ENUM,
-            values: ['Taxi', 'Bus', 'Delivery'],
-            allowNull: false,
-        },
-        vehicleName: {
-            type: DataTypes.ENUM,
-            values: ['Datride Vehicle', 'Datride Share', 'Datride Delivery'],
-            allowNull: false,
         },
         isSurge: {
             type: DataTypes.BOOLEAN,
@@ -138,4 +131,4 @@ const initVehicle = (sequelize: Sequelize) => {
     })
 }
 
-export { Vehicle, initVehicle };
+export { VehicleCategory, initVehicleCategory };

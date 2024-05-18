@@ -22,29 +22,32 @@ export default function authSetup(sequelize: Sequelize) {
       try {
          const userId = uuidv4();
         
-            let user = await User.findOne({ 
-                where: { 
-                    [Op.or]: [
-                        { userId: userId }, 
-                        { email: profile.emails?.[0]?.value }
-                    ] 
-                } 
-            });
+          let user = await User.findOne({ 
+            where: { 
+              [Op.or]: [
+                { userId: userId }, 
+                { email: profile.emails?.[0]?.value }
+              ] 
+            } 
+          });
 
-            if (!user) {
-                // If user not found, create a new user
-              user = await User.create({
-                    userId,
-                    googleId: profile.id,
-                    phoneNumber: '',
-                    email: profile.emails?.[0]?.value ?? '',
-                    firstName: profile.name?.givenName ?? '',
-                    lastName: profile.name?.familyName ?? '',
-                    ssoProvider: 'Google',
-                    facebookId: '',
-                    appleId: ''
-                });
-            }
+          if (!user) {
+            // If user not found, create a new user
+            user = await User.create({
+              userId,
+              googleId: profile.id,
+              phoneNumber: '',
+              email: profile.emails?.[0]?.value ?? '',
+              firstName: profile.name?.givenName ?? '',
+              lastName: profile.name?.familyName ?? '',
+              ssoProvider: 'Google',
+              facebookId: '',
+              appleId: '',
+              country: '', 
+              numberOfRatings: 0,
+              wallet: 0.0, 
+            });
+          }
             return done(null, user);
         } catch (error) {
             console.error('Error authenticating with Google:', error);
@@ -53,7 +56,6 @@ export default function authSetup(sequelize: Sequelize) {
     }
     )
   );
-
        // Facebook Strategy
   passport.use(
     new FacebookStrategy(
@@ -76,19 +78,21 @@ export default function authSetup(sequelize: Sequelize) {
                     ssoProvider: 'Facebook',
                     phoneNumber: '',
                     googleId: '',
-                    appleId: ''
-                });
+                    appleId: '',
+                    country: '', 
+                    numberOfRatings: 0,
+                    wallet: 0.0,
+                });    
             }
 
-            return done(null, user);
+          return done(null, user);
         } catch (error) {
             console.error('Error authenticating with Facebook:', error);
             return done(error as Error);
         }
-    }
+     }
     )
   );
-
     // Apple Strategy
   passport.use(
     new AppleStrategy(
@@ -113,7 +117,10 @@ export default function authSetup(sequelize: Sequelize) {
                 ssoProvider: 'Apple',
                 phoneNumber: '',
                 facebookId: '',
-                googleId: ''
+                googleId: '',
+                country: '', 
+                numberOfRatings: 0,
+                wallet: 0.0,
               });
             }
 

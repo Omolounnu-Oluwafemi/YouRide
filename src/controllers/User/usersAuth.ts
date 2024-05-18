@@ -5,6 +5,8 @@ import { signToken, generateVerificationCode, signRefreshToken} from "../../util
 import { User } from '../../models/usersModel';
 import { Op } from 'sequelize';
 import jwt from 'jsonwebtoken';
+import { parsePhoneNumberFromString } from 'libphonenumber-js'
+import countries from 'i18n-iso-countries';
 
 
 export const initialSignUp = async (req: Request, res: Response) => {
@@ -12,6 +14,18 @@ export const initialSignUp = async (req: Request, res: Response) => {
     const { phoneNumber, email } = req.body;
 
     const userId = uuidv4();
+
+      // Parse the phone number and extract the country
+    const parsedPhoneNumber = parsePhoneNumberFromString(phoneNumber);
+    let country = parsedPhoneNumber ? parsedPhoneNumber.country : null;
+
+    // Convert country code to country name
+    
+    let countryName: string | null = null;
+    if (country) {
+        countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
+        countryName = countries.getName(country, "en") || null;
+      }
 
     // Check if the email or phoneNumber already exists in the database
     const existingUser = await User.findOne({ 
@@ -44,6 +58,7 @@ export const initialSignUp = async (req: Request, res: Response) => {
       userId,
       phoneNumber,
       email,
+      country: countryName,
       firstName: "",
       lastName: "",
       googleId: "",
@@ -65,6 +80,7 @@ export const initialSignUp = async (req: Request, res: Response) => {
       }
     });
   } catch (error) {
+    console.log(error)
     res.status(500).json({
       status: 500,
       message: 'An error occurred while sending code'
