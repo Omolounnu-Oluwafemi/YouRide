@@ -1,4 +1,5 @@
-import { config } from "dotenv"
+require('dotenv').config();
+import { config } from "dotenv";
 import nocache from 'nocache';
 import createError from 'http-errors';
 import express, { Request, Response, NextFunction } from "express";
@@ -11,17 +12,17 @@ import swaggerUI from "swagger-ui-express";
 import swaggerSpec from "./swagger.docs";
 import session from 'express-session';
 import passport from 'passport';
-import authSetup from './config/passport'; 
+import authSetup from './config/passport';
+import { io, httpServer, driverSocketMap } from './config/socket';
 
-import driverAuth from './routes/Driver/driversAuth';
+import driversAuth from './routes/Driver/driversAuth';
 import driverTrip from './routes/Driver/driversTrip';
 import driversInfo from './routes/Driver/driversInfo';
 import driverDashboard from './routes/Driver/dashboard';
 import usersAuth from './routes/User/usersAuth';
 import usersTrip from './routes/User/usersTrip';
 import usersInfo from './routes/User/usersInfo';
-import adminAuth from './routes/Admin/admin';
-import tripRoutes from './routes/Trip/trip';
+import adminsAuth from './routes/Admin/admin';
 import adminTrips from './routes/Admin/trip';
 import voucherRoutes from './routes/Admin/voucher';
 import vehicleRoutes from './routes/Vehicle/vehicle';
@@ -31,6 +32,12 @@ const app = express();
 
 app.use(nocache());
 app.use(cors());
+
+io.on('connection', (socket) => {
+    socket.on('driverConnected', (driverId) => {
+        driverSocketMap.set(driverId, socket.id);
+    });
+});
 
 app.use(
   session({
@@ -46,7 +53,7 @@ sequelize
   console.log("database synced sucessfully");
 })
 .catch((err)=>{
-  console.log(err.message)
+  console.log(err)
 })
 
 // Initialize Passport.js
@@ -66,21 +73,25 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../public')));
 
-app.use('/api/v1/user', usersAuth);
-app.use('/api/v1/user', usersTrip);
+app.use('/api/v1/admin', adminsAuth);
 app.use('/api/v1/admin', usersInfo);
 app.use('/api/v1/admin', driversInfo);
-app.use('/api/v1/driver', driverAuth);
-app.use('/api/v1/driver', driverTrip);
-app.use('/api/v1/driver/dashboard', driverDashboard);
-app.use('/api/v1/admin', adminAuth);
-app.use('/api/v1/trips', tripRoutes);
 app.use('/api/v1/admin', voucherRoutes);
 app.use('/api/v1/admin', countryRoutes);
 app.use('/api/v1/admin', adminTrips);
-app.use('/api/v1/vehicles', vehicleRoutes);
+app.use('/api/v1/user', usersAuth);
+app.use('/api/v1/user', usersTrip);
+app.use('/api/v1/driver', driversAuth);
+app.use('/api/v1/driver', driverTrip);
+app.use('/api/v1/driver/dashboard', driverDashboard);
+app.use('/api/v1/vehiclecategories', vehicleRoutes);
 
 // SWAGGER
+app.use('/api-docs', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(swaggerSpec);
+});
+
 app.use("/docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 
 // catch 404 and forward to error handler
