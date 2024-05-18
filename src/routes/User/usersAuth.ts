@@ -1,10 +1,12 @@
-import express from 'express'; 
+import express from 'express';
 import passport from 'passport';
-import { initialSignUp, verifySignupCode, verifySigninCode, finalSignUp, signInUser, socialSignInUser, refreshToken, getUserById } from '../../controllers/User/usersAuth'; 
-import { validateInitialSignUp, validateFinalSignUp, validateVerificationCode} from '../../utils/middleware';
+import multer from 'multer';
+import { initialSignUp, verifySignupCode, verifySigninCode, finalSignUp, signInUser, socialSignInUser, refreshToken, getUserById, editName, editPhoneNumber, editLocation,  addHomeAddress, addWorkAddress, communicationMethod, updateProfilePicture, userRating} from '../../controllers/User/usersAuth'; 
+import { validateInitialSignUp, validateFinalSignUp, validateVerificationCode, validateEditPhoneNumber, validateEditLocation, validateHomeAddress, validateWorkAddress, validatecommunicationMethod, validateUserRating } from '../../utils/middleware';
 import { deleteUser } from '../../controllers/User/usersInfo';
 
 const router = express.Router();
+const upload = multer({ dest: 'uploads/' });
 
 /**
  * @swagger
@@ -21,8 +23,10 @@ const router = express.Router();
  *             properties:
  *               phoneNumber:
  *                 type: string
+ *                 description: The phone number of the user, including the country code
  *               email:
  *                 type: string
+ *                 description: The email address of the user
  *     responses:
  *       200:
  *         description: Verification code sent successfully
@@ -45,7 +49,7 @@ const router = express.Router();
  *                     verificationCode:
  *                       type: string
  *       400:
- *         description: Email or phone number already exists
+ *         description: Email or phone number already exists, or country could not be detected from phone number
  *         content:
  *           application/json:
  *             schema:
@@ -67,32 +71,28 @@ const router = express.Router();
  *                 message:
  *                   type: string
  */
-router.post('/initialsignup', validateInitialSignUp, initialSignUp)
+router.post('/initialsignup', validateInitialSignUp, initialSignUp);
 
 /**
  * @swagger
- * /api/v1/user/verifySignupCode/{userId}:
+ * /api/v1/user/verifySignupCode:
  *   post:
- *     summary: Verify the sign-in code and receive tokens directly.
+ *     summary: Verify the sign-up code and receive tokens directly.
  *     tags: [User Authentication]
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *         required: true
- *         description: The user's ID
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required: [verificationCode]
+ *             required: [verificationCode, userId]
  *             properties:
  *               verificationCode:
  *                 type: string
  *                 description: The verification code sent to your email.
+ *               userId:
+ *                 type: string
+ *                 description: The user's ID
  *     responses:
  *       200:
  *         description: Verification successful
@@ -134,28 +134,21 @@ router.post('/initialsignup', validateInitialSignUp, initialSignUp)
  *                   type: string
  *                   description: The error message
  */
-router.post('/verifySignupCode/:userId', validateVerificationCode, verifySignupCode)
+router.post('/verifySignupCode', validateVerificationCode, verifySignupCode);
 
 /**
  * @swagger
- * /api/v1/user/finalSignup/{userId}:
+ * /api/v1/user/finalSignup:
  *   post:
  *     summary: Register a new user with their first name and last name.
  *     tags: [User Authentication]
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *         required: true
- *         description: The user's ID
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required: [firstName, lastName]
+ *             required: [firstName, lastName, userId]
  *             properties:
  *               firstName:
  *                 type: string
@@ -163,6 +156,9 @@ router.post('/verifySignupCode/:userId', validateVerificationCode, verifySignupC
  *               lastName:
  *                 type: string
  *                 description: The last name of the user.
+ *               userId:
+ *                 type: string
+ *                 description: The user's ID.
  *     responses:
  *       200:
  *         description: User updated successfully.
@@ -212,7 +208,7 @@ router.post('/verifySignupCode/:userId', validateVerificationCode, verifySignupC
  *                   type: string
  *                   description: The error message
  */
-router.post('/finalsignup/:userId', validateFinalSignUp, finalSignUp);
+router.post('/finalSignup', validateFinalSignUp, finalSignUp);
 
 /**
  * @swagger
@@ -288,28 +284,24 @@ router.post('/signin', validateInitialSignUp, signInUser);
 
 /**
  * @swagger
- * /api/v1/user/verifySigninCode/{userId}:
+ * /api/v1/user/verifySigninCode:
  *   post:
  *     summary: Verify the signin code for a user.
  *     tags: [User Authentication]
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: The user ID
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required: [verificationCode]
+ *             required: [verificationCode, userId]
  *             properties:
  *               verificationCode:
  *                 type: string
  *                 description: The verification code of the user.
+ *               userId:
+ *                 type: string
+ *                 description: The ID of the user.
  *     responses:
  *       200:
  *         description: User signed in successfully
@@ -366,7 +358,7 @@ router.post('/signin', validateInitialSignUp, signInUser);
  *                   type: string
  *                   description: The error message
  */
-router.post('/verifySigninCode/:userId', validateVerificationCode, verifySigninCode);
+router.post('/verifySigninCode', validateVerificationCode, verifySigninCode);
 
 /**
  * @swagger
@@ -556,18 +548,21 @@ router.get('/apple/redirect',
 
 /**
  * @swagger
- * /api/v1/user/getoneuser/{userId}:
- *   get:
+ * /api/v1/user/getoneuser:
+ *   post:
  *     summary: Retrieve a user by their unique userId
  *     tags: [User Account]
  *     description: This endpoint retrieves a user's details using their unique identifier (userId).
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: The unique identifier of the user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *                 description: The unique identifier of the user
  *     responses:
  *       200:
  *         description: User retrieved successfully
@@ -581,19 +576,6 @@ router.get('/apple/redirect',
  *                   description: The HTTP status code
  *                 data:
  *                   $ref: '#/components/schemas/User'
- *       400:
- *         description: User ID is required
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: integer
- *                   description: The HTTP status code
- *                 message:
- *                   type: string
- *                   description: User ID is required
  *       404:
  *         description: User not found
  *         content:
@@ -621,7 +603,7 @@ router.get('/apple/redirect',
  *                   type: string
  *                   description: An error occurred while retrieving user
  */
-router.get('/getoneuser/:userId', getUserById);
+router.post('/getoneuser', getUserById);
 
 /**
  * @swagger
@@ -677,20 +659,26 @@ router.post('/refresh-token', refreshToken);
 
 /**
  * @swagger
- * /api/v1/user/deleteuser/{id}:
- *   delete:
- *     summary: Delete a user by ID. Only accessible by admins.
+ * /api/v1/user/editName:
+ *   patch:
+ *     summary: Update user's first name and last name
  *     tags: [User Account]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: string
- *         required: true
- *         description: The user ID.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *               userId:
+ *                 type: string
  *     responses:
  *       200:
- *         description: User deleted successfully.
+ *         description: User name updated successfully
  *         content:
  *           application/json:
  *             schema:
@@ -701,9 +689,9 @@ router.post('/refresh-token', refreshToken);
  *                   description: The HTTP status code
  *                 message:
  *                   type: string
- *                   description: The success message
- *       404:
- *         description: User not found.
+ *                   description: The response message
+ *       400:
+ *         description: Invalid request
  *         content:
  *           application/json:
  *             schema:
@@ -711,12 +699,42 @@ router.post('/refresh-token', refreshToken);
  *               properties:
  *                 status:
  *                   type: integer
- *                   description: The HTTP status code
- *                 error:
+ *                 message:
  *                   type: string
- *                   description: The error message
  *       500:
- *         description: An error occurred while processing your request.
+ *         description: An error occurred while updating the user name
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                 message:
+ *                   type: string
+ */
+router.patch('/editName', validateFinalSignUp, editName);
+
+/**
+ * @swagger
+ * /api/v1/user/editPhoneNumber:
+ *   patch:
+ *     summary: Update user's phone number
+ *     tags: [User Account]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               phoneNumber:
+ *                 type: string
+ *               userId:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Phone number updated successfully
  *         content:
  *           application/json:
  *             schema:
@@ -725,12 +743,473 @@ router.post('/refresh-token', refreshToken);
  *                 status:
  *                   type: integer
  *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: The response message
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                 message:
+ *                   type: string
+ *       500:
+ *         description: An error occurred while updating Phone number
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                 message:
+ *                   type: string
+ */
+router.patch('/editPhoneNumber', validateEditPhoneNumber, editPhoneNumber);
+
+/**
+ * @swagger
+ * /api/v1/user/editLocation:
+ *   patch:
+ *     summary: Update user's country and state
+ *     tags: [User Account]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               country:
+ *                 type: string
+ *               state:
+ *                 type: string
+ *               userId:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User location updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The HTTP status code
+ *                 message:
+ *                   type: string
+ *                   description: The response message
+ *       400:
+ *         description: Invalid request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                 message:
+ *                   type: string
+ *       500:
+ *         description: An error occurred while updating the user location
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                 message:
+ *                   type: string
+ */
+router.patch('/editLocation', validateEditLocation, editLocation);
+
+/**
+ * @swagger
+ * /api/v1/user/addHomeAddress:
+ *   patch:
+ *     summary: Add home address for a user
+ *     description: This endpoint adds a home address for a user.
+ *     tags: [User Account]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *                 description: The ID of the user to add the home address for.
+ *               homeAddress:
+ *                 type: string
+ *                 description: The home address to add.
+ *     responses:
+ *       '200':
+ *         description: Home address added successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   example: 200
+ *                 message:
+ *                   type: string
+ *                   example: Home address added successfully
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       $ref: '#/components/schemas/User'
+ *       '404':
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   example: 404
+ *                 message:
+ *                   type: string
+ *                   example: User not found
+ *       '500':
+ *         description: An error occurred while adding the home address
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   example: 500
+ *                 message:
+ *                   type: string
+ *                   example: An error occurred while adding the home address
+ */
+router.patch('/addHomeAddress', validateHomeAddress, addHomeAddress);
+
+/**
+ * @swagger
+ * /api/v1/user/addWorkAddress:
+ *   patch:
+ *     summary: Add Work address for a user
+ *     description: This endpoint adds a work address for a user.
+ *     tags: [User Account]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *                 description: The ID of the user to add the work address for.
+ *               workAddress:
+ *                 type: string
+ *                 description: The work address to add.
+ *     responses:
+ *       '200':
+ *         description: Work address added successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   example: 200
+ *                 message:
+ *                   type: string
+ *                   example: Work address added successfully
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       $ref: '#/components/schemas/User'
+ *       '404':
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   example: 404
+ *                 message:
+ *                   type: string
+ *                   example: User not found
+ *       '500':
+ *         description: An error occurred while adding the work address
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   example: 500
+ *                 message:
+ *                   type: string
+ *                   example: An error occurred while adding the work address
+ */
+router.patch('/addWorkAddress', validateWorkAddress, addWorkAddress);
+
+/**
+ * @swagger
+ * /api/v1/user/communication:
+ *   patch:
+ *     summary: Update communication method for a user
+ *     description: This endpoint updates the communication method for a user.
+ *     tags: [User Account]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *                 description: The ID of the user to update the communication method for.
+ *               communicationMethod:
+ *                 type: string
+ *                 description: The new communication method.
+ *     responses:
+ *       '200':
+ *         description: Communication method updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   example: 200
+ *                 message:
+ *                   type: string
+ *                   example: Communication method updated successfully
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       $ref: '#/components/schemas/User'
+ *       '404':
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   example: 404
+ *                 message:
+ *                   type: string
+ *                   example: User not found
+ *       '500':
+ *         description: An error occurred while updating the communication method
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   example: 500
+ *                 message:
+ *                   type: string
+ *                   example: An error occurred while updating the communication method
+ */
+router.patch('/communication', validatecommunicationMethod, communicationMethod)
+
+/**
+ * @swagger
+ * /api/v1/user/uploadpicture:
+ *   patch:
+ *     summary: Update profile picture for a user
+ *     description: This endpoint updates the profile picture for a user.
+ *     tags: [User Account]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *               profileImage:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       '200':
+ *         description: Profile picture updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   example: 200
+ *                 message:
+ *                   type: string
+ *                   example: Profile picture updated successfully
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       '404':
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   example: 404
  *                 error:
  *                   type: string
- *                   description: The error message
+ *                   example: User not found
+ *       '500':
+ *         description: An error occurred while updating the profile picture
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   example: 500
+ *                 error:
+ *                   type: string
+ *                   example: An error occurred while updating the profile picture
  */
-router.delete('/deleteuser/:userId', deleteUser)
+router.patch('/uploadpicture', upload.single('profileImage'), updateProfilePicture);
 
+/**
+ * @swagger
+ * /api/v1/user/rating:
+ *   patch:
+ *     summary: Rate a user
+ *     tags: [User Account]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *                 description: The user ID
+ *               rating:
+ *                 type: integer
+ *                 description: The rating to give the user
+ *     responses:
+ *       200:
+ *         description: The user was successfully rated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   description: The status code
+ *                 message:
+ *                   type: string
+ *                   description: The status message
+ *                 newAverageRating:
+ *                   type: number
+ *                   description: The new average rating of the user
+ *       404:
+ *         description: The user was not found
+ *       500:
+ *         description: There was an error rating the user
+ */
+router.patch('/rating',validateUserRating,  userRating);
+
+/**
+ * @swagger
+ * /api/v1/user/delete:
+ *   delete:
+ *     summary: Delete a user
+ *     description: This endpoint deletes a user from the system.
+ *     tags: [User Account]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *                 description: The ID of the user to delete.
+ *     responses:
+ *       '200':
+ *         description: User deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   example: 200
+ *                 message:
+ *                   type: string
+ *                   example: User deleted successfully
+ *       '404':
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   example: 404
+ *                 message:
+ *                   type: string
+ *                   example: User not found
+ *       '500':
+ *         description: An error occurred while deleting the user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: integer
+ *                   example: 500
+ *                 message:
+ *                   type: string
+ *                   example: An error occurred while deleting the user
+ */
+router.delete('/deleteuser', deleteUser)
 
 /**
  * @swagger

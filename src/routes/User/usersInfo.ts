@@ -1,5 +1,5 @@
 import express from 'express';
-import { deleteUser, getAllUsers } from '../../controllers/User/usersInfo';
+import { getAllUsers, deleteUser } from '../../controllers/User/usersInfo';
 import { isAdmin } from '../../utils/middleware';
 import { getUserById } from '../../controllers/User/usersAuth';
 
@@ -208,5 +208,46 @@ router.get('/getoneuser/:userId', isAdmin, getUserById);
  *                   description: The error message
  */
 router.delete('/deleteuser/:userId', isAdmin, deleteUser)
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       properties:
+ *         userId:
+ *           type: string
+ *           format: uuid
+ *           description: The unique identifier of the User
+ *         firstName:
+ *           type: string
+ *           description: The firstname of the User
+ *         lastName:
+ *           type: string
+ *           description: The lastname of the User
+ *         phoneNumber:
+ *           type: string
+ *           description: The Phone Number of the User
+ *         email:
+ *           type: string
+ *           format: email
+ *           description: The Email of the User
+ *         googleId:
+ *           type: string
+ *           description: The GoogleID of the User
+ *         facebookId:
+ *           type: string
+ *           description: The FacebookID of the User
+ *         appleId:
+ *           type: string
+ *           description: The AppleID of the User
+ *       required:
+ *         - userId
+ *         - phonenumber
+ *         - email
+ *         - firstName
+ *         - lastName
+ */
 
 export default router;

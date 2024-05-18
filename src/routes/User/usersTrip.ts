@@ -1,124 +1,25 @@
 import express from 'express'; 
 import { validatetripRequest } from '../../utils/middleware';
-import { calculateTripAmount, TripRequest, cancelTrip } from '../../controllers/Trip/trip';
+import { cancelTrip } from '../../controllers/Trip/trip';
+import { GetAvailableRides, requestRide, } from '../../controllers/Trip/trip';
+import { getUserTrips } from '../../controllers/User/usersInfo';
 
 const router = express.Router();
 
 /**
  * @swagger
- * /api/v1/user/trip-price:
+ * /api/v1/user/request/{userId}:
  *   post:
+ *     summary: Request a Trip
  *     tags:
  *       - User-Trips
- *     summary: Calculate trip amount
- *     description: This endpoint calculates the trip amount for different vehicle types based on the provided distance, time, and optional voucher.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               vehicleName:
- *                 type: string
- *                 enum: [Datride Share, Datride Vehicle, Datride Delivery]
- *                 description: The category of the vehicle.
- *               country:
- *                 type: string
- *               totalDistance:
- *                 type: number
- *                 format: float
- *                 description: The distance of the trip in kilometers or miles.
- *               estimatedtime:
- *                 type: number
- *                 format: float
- *                 description: The time of the trip in minutes.
- *               voucher:
- *                 type: string
- *                 description: The voucher code for the trip. This is optional.
- *     responses:
- *       '200':
- *         description: Trip amounts calculated successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: integer
- *                   description: The HTTP status code
- *                 message:
- *                   type: string
- *                   example: Trip amounts calculated successfully
- *                 tripAmounts:
- *                   type: object
- *                   properties:
- *                     Datride Vehicle:
- *                       type: number
- *                       format: float
- *                     Datride Share:
- *                       type: number
- *                       format: float
- *                     Datride Delivery:
- *                       type: number
- *                       format: float
- *       '400':
- *         description: Invalid input or Invalid or inactive voucher
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: integer
- *                   description: The HTTP status code
- *                 message:
- *                   type: string
- *                   example: Invalid input
- *       '404':
- *         description: Vehicle not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: integer
- *                   description: The HTTP status code
- *                 message:
- *                   type: string
- *                   example: Vehicle not found
- *       '500':
- *         description: An error occurred while calculating the trip amounts
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: integer
- *                   description: The HTTP status code
- *                 message:
- *                   type: string
- *                   example: An error occurred while calculating the trip amounts
- */
-router.post('/trip-price', calculateTripAmount);
-
-/**
- * @swagger
- * /api/v1/user/{userId}/trip-request:
- *   post:
- *     tags:
- *       - User-Trips
- *     summary: Create a new trip
- *     description: This endpoint allows for the creation of a new trip.
  *     parameters:
  *       - in: path
  *         name: userId
+ *         required: true
  *         schema:
  *           type: string
- *         required: true
- *         description: The ID of the user
+ *         description: The user ID
  *     requestBody:
  *       required: true
  *       content:
@@ -131,8 +32,6 @@ router.post('/trip-price', calculateTripAmount);
  *               pickupLocation:
  *                 type: string
  *               destination:
- *                 type: string
- *               vehicleName:
  *                 type: string
  *               paymentMethod:
  *                 type: string
@@ -157,37 +56,22 @@ router.post('/trip-price', calculateTripAmount);
  *               type: object
  *               properties:
  *                 status:
- *                   type: integer
- *                   description: The HTTP status code
- *                 message:
+ *                   type: number
+ *                 Success:
  *                   type: string
- *                   example: Trip order created successfully
- *       '400':
- *         description: Invalid trip option
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: integer
- *                   description: The HTTP status code
- *                 message:
- *                   type: string
- *                   example: Invalid trip option
+ *                 data:
+ *                   type: object
  *       '404':
- *         description: User not found or no available drivers found
+ *         description: User not found or No available rides found
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
  *                 status:
- *                   type: integer
- *                   description: The HTTP status code
- *                 message:
+ *                   type: number
+ *                 error:
  *                   type: string
- *                   example: User not found or no available drivers found
  *       '500':
  *         description: An error occurred while processing your request
  *         content:
@@ -196,13 +80,13 @@ router.post('/trip-price', calculateTripAmount);
  *               type: object
  *               properties:
  *                 status:
- *                   type: integer
- *                   description: The HTTP status code
+ *                   type: number
+ *                 error:
+ *                   type: string
  *                 message:
  *                   type: string
- *                   example: An error occurred while processing your request
  */
-router.post('/:userId/trip-request', validatetripRequest, TripRequest);
+router.post('/request/:userId', validatetripRequest, requestRide);
 
 /**
  * @swagger
@@ -260,6 +144,175 @@ router.post('/:userId/trip-request', validatetripRequest, TripRequest);
  *                   example: Internal server error
  */
 router.patch('/cancel-trip/:tripId', cancelTrip);
+
+/**
+ * @swagger
+ * /api/v1/user/availablerides:
+ *   get:
+ *     summary: Get all available rides for a user
+ *     tags: [User-Trips]
+ *     description: Fetch all available rides based on the user's location and destination. 
+ *     parameters:
+ *       - in: query
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The user's ID
+ *       - in: query
+ *         name: pickupLatitude
+ *         required: true
+ *         schema:
+ *           type: number
+ *         description: The pickup latitude
+ *       - in: query
+ *         name: pickupLongitude
+ *         required: true
+ *         schema:
+ *           type: number
+ *         description: The pickup longitude
+ *       - in: query
+ *         name: destinationLatitude
+ *         required: true
+ *         schema:
+ *           type: number
+ *         description: The destination latitude
+ *       - in: query
+ *         name: destinationLongitude
+ *         required: true
+ *         schema:
+ *           type: number
+ *         description: The destination longitude
+ *       - in: query
+ *         name: voucher
+ *         required: false
+ *         schema:
+ *           type: string
+ *         description: The voucher code
+ *     responses:
+ *       200:
+ *         description: A list of available rides for the user.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: number
+ *                   example: 200
+ *                 message:
+ *                   type: string
+ *                   description: The success message
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         description: The vehicle category ID
+ *                       categoryName:
+ *                         type: string
+ *                         description: The category of the vehicle
+ *                       Drivers:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             id:
+ *                               type: string
+ *                               description: The driver's ID
+ *                             name:
+ *                               type: string
+ *                               description: The driver's name
+ *                             latitude:
+ *                               type: number
+ *                               description: The driver's latitude
+ *                             longitude:
+ *                               type: number
+ *                               description: The driver's longitude
+ *                       tripAmount:
+ *                         type: number
+ *                         description: The estimated trip amount
+ *                       driverCount:
+ *                         type: number
+ *                         description: The number of available drivers
+ *                       closestDriverId:
+ *                         type: string
+ *                         description: The ID of the closest driver
+ *                       estimatedPickupTime:
+ *                         type: number
+ *                         description: The estimated pickup time
+ *       400:
+ *         description: Invalid user ID or voucher
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: number
+ *                   example: 400
+ *                 error:
+ *                   type: string
+ *                   example: Invalid user ID
+ *       404:
+ *         description: User not found or no available rides found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: number
+ *                   example: 404
+ *                 error:
+ *                   type: string
+ *                   example: User not found
+ *       500:
+ *         description: An error occurred while processing the request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: number
+ *                   example: 500
+ *                 error:
+ *                   type: string
+ *                   example: An error occurred while processing your request
+ */
+router.get('/availablerides', GetAvailableRides);
+
+/**
+ * @swagger
+ * /api/v1/user/trips:
+ *   get:
+ *     summary: Retrieve a list of trips by user
+ *     tags: [User-Trips]
+ *     description: Retrieve a list of trips that belong to a specific user.
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: A list of trips.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Trip'
+ *       404:
+ *         description: No trips found for this user
+ *       500:
+ *         description: An error occurred while processing your request
+ */
+router.get('/getusertrips', getUserTrips)
 
 /**
  * @swagger
