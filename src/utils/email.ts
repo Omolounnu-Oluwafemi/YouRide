@@ -56,6 +56,7 @@ export async function sendTemporaryPassword(email: string, tempPassword: string)
      // Return true to indicate that the email was successssfully sent
      return true;
    } catch (error) {
+     console.log(tempPassword)
      console.error('Email sending error:', error);
      // Return false to indicate that there was an error sending the email
      return false;

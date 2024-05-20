@@ -82,6 +82,7 @@ export const AdminLogin = async (req: Request, res: Response) => {
     const passwordMatch = await bcrypt.compare(password, admin.password);
 
     if (!passwordMatch) {
+      console.log()
       return res.status(401).json({ message: 'Invalid password' });
     }
 

@@ -1,4 +1,6 @@
 require('dotenv').config();
+import bcrypt from 'bcrypt';
+import { v4 as uuidv4 } from "uuid";
 import { Dialect, Sequelize } from 'sequelize';
 import { User, initUser } from '../models/usersModel';
 import { Driver, initDriver } from '../models/drivers';
@@ -56,3 +58,30 @@ function defineAssociations() {
 }
 
 defineAssociations();
+
+// Create Super Admin
+const createSuperAdmin = async () => {
+  const superAdminEmail = 'superadmin@datride.com';
+  const superAdminPassword = '@datrideSuperAdmin1234!';
+
+  const superAdmin = await Admin.findOne({ where: { email: superAdminEmail, role: 'Super Admin' } });
+
+  if (!superAdmin) {
+    const hashedPassword = await bcrypt.hash(superAdminPassword, 10);
+    await Admin.create({
+      adminId: uuidv4(),
+      firstName: 'DatRide',
+      lastName: 'Super Admin',
+      email: superAdminEmail,
+      role: 'Super Admin',
+      password: hashedPassword,
+      isActive: true,
+    });
+    console.log('Super Admin created');
+  } else {
+    console.log('Super Admin already exists');
+  }
+};
+
+// Call the function after initializing all models and defining associations
+createSuperAdmin().catch(console.error);
