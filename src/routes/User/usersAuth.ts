@@ -1221,34 +1221,84 @@ router.delete('/deleteuser', deleteUser)
  *         userId:
  *           type: string
  *           format: uuid
- *           description: The unique identifier of the User
- *         firstName:
- *           type: string
- *           description: The firstname of the User
- *         lastName:
- *           type: string
- *           description: The lastname of the User
  *         phoneNumber:
  *           type: string
- *           description: The Phone Number of the User
+ *           nullable: true
  *         email:
  *           type: string
  *           format: email
- *           description: The Email of the User
+ *         country:
+ *           type: string
+ *         state:
+ *           type: string
+ *           nullable: true
+ *         firstName:
+ *           type: string
+ *           nullable: true
+ *         lastName:
+ *           type: string
+ *           nullable: true
+ *         referralCount:
+ *           type: integer
+ *           default: 0
+ *         ssoProvider:
+ *           type: string
+ *           nullable: true
  *         googleId:
  *           type: string
- *           description: The GoogleID of the User
+ *           nullable: true
  *         facebookId:
  *           type: string
- *           description: The FacebookID of the User
+ *           nullable: true
  *         appleId:
  *           type: string
- *           description: The AppleID of the User
+ *           nullable: true
+ *         verificationCode:
+ *           type: string
+ *           nullable: true
+ *         userRating:
+ *           type: number
+ *           default: 0
+ *           nullable: true
+ *         numberOfRatings:
+ *           type: integer
+ *           default: 0
+ *           nullable: true
+ *         profileImage:
+ *           type: string
+ *           nullable: true
+ *         communicationMethod:
+ *           type: string
+ *           enum: ['Call', 'Chat', 'Call or Chat']
+ *           nullable: true
+ *         workAddress:
+ *           type: string
+ *           nullable: true
+ *         homeAddress:
+ *           type: string
+ *           nullable: true
+ *         wallet:
+ *           type: number
+ *           default: 0
+ *         status:
+ *           type: string
+ *           enum: ['Active', 'Inactive']
+ *           default: 'Active'
+ *         dateOfBirth:
+ *           type: string
+ *           nullable: true
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
  *       required:
  *         - userId
- *         - phonenumber
  *         - email
- *         - firstName
- *         - lastName
+ *         - country
+ *         - wallet
+ *         - status
  */
+
 export default router;

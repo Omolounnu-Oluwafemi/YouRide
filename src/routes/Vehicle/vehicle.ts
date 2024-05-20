@@ -483,7 +483,7 @@ router.delete('/delete/:categoryId', isAdmin, DeleteVehicleCategory)
  *           type: string
  *           enum: [Active, Inactive]
  *           description: The status of the vehicle.
- *         vehicleCategory:
+ *         categoryName:
  *           type: string
  *           enum: [Taxi, Bus, Delivery]
  *           description: The category of the vehicle.
@@ -519,7 +519,7 @@ router.delete('/delete/:categoryId', isAdmin, DeleteVehicleCategory)
  *         - pricePerMIN
  *         - adminCommission
  *         - status
- *         - vehicleCategory
+ *         - categoryName
  *         - isSurge
  */
 export default router;

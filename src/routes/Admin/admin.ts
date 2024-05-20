@@ -482,7 +482,14 @@ router.get('/admins', isAdmin, getAllAdmins)
  *         isActive:
  *           type: boolean
  *           description: Active status of the admin
- *           nullable: true
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           description: The date when the admin was created
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           description: The date when the admin was last updated
  *       required:
  *         - adminId
  *         - firstName
@@ -490,6 +497,7 @@ router.get('/admins', isAdmin, getAllAdmins)
  *         - email
  *         - role
  *         - password
+ *         - isActive
  */
 
 export default router;

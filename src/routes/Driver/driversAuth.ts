@@ -421,6 +421,114 @@ router.use(function (err: any, req: Request, res: Response, next: NextFunction) 
  *   schemas:
  *     Driver:
  *       type: object
+ *       properties:
+ *         driverId:
+ *           type: string
+ *           format: uuid
+ *           description: The unique identifier for the driver
+ *         categoryId:
+ *           type: string
+ *           format: uuid
+ *           nullable: true
+ *           description: The identifier for the category the driver belongs to
+ *         countryId:
+ *           type: string
+ *           format: uuid
+ *           nullable: true
+ *           description: The identifier for the country the driver is in
+ *         phoneNumber:
+ *           type: string
+ *           description: The driver's phone number
+ *         country:
+ *           type: string
+ *           description: The country the driver is in
+ *         email:
+ *           type: string
+ *           description: The driver's email address
+ *         firstName:
+ *           type: string
+ *           description: The driver's first name
+ *         lastName:
+ *           type: string
+ *           description: The driver's last name
+ *         gender:
+ *           type: string
+ *           description: The driver's gender
+ *         category:
+ *           type: string
+ *           description: The category the driver belongs to
+ *         referralCode:
+ *           type: string
+ *           nullable: true
+ *           description: The driver's referral code
+ *         vehicleYear:
+ *           type: integer
+ *           description: The year of the driver's vehicle
+ *         vehicleManufacturer:
+ *           type: string
+ *           description: The manufacturer of the driver's vehicle
+ *         vehicleColor:
+ *           type: string
+ *           description: The color of the driver's vehicle
+ *         licensePlate:
+ *           type: string
+ *           description: The license plate number of the driver's vehicle
+ *         driverLicense:
+ *           type: string
+ *           description: The driver's license number
+ *         vehicleLogBook:
+ *           type: string
+ *           description: The log book of the driver's vehicle
+ *         privateHireLicenseBadge:
+ *           type: string
+ *           description: The driver's private hire license badge
+ *         insuranceCertificate:
+ *           type: string
+ *           description: The driver's insurance certificate
+ *         motTestCertificate:
+ *           type: string
+ *           description: The driver's MOT test certificate
+ *         isAvailable:
+ *           type: boolean
+ *           description: Whether the driver is available or not
+ *         latitude:
+ *           type: string
+ *           description: The driver's latitude coordinate
+ *         longitude:
+ *           type: string
+ *           description: The driver's longitude coordinate
+ *         driverRating:
+ *           type: number
+ *           nullable: true
+ *           description: The driver's rating
+ *         numberOfRatings:
+ *           type: integer
+ *           description: The number of ratings the driver has received
+ *         status:
+ *           type: string
+ *           enum: [Active, Inactive]
+ *           nullable: true
+ *           description: The driver's status
+ *         dateOfBirth:
+ *           type: string
+ *           nullable: true
+ *           description: The driver's date of birth
+ *         verificationCode:
+ *           type: string
+ *           nullable: true
+ *           description: The driver's verification code
+ *         residenceAddress:
+ *           type: string
+ *           nullable: true
+ *           description: The driver's residence address
+ *         profileImage:
+ *           type: string
+ *           nullable: true
+ *           description: The driver's profile image
+ *         documentUpload:
+ *           type: string
+ *           nullable: true
+ *           description: The driver's document upload
  *       required:
  *         - driverId
  *         - phoneNumber
@@ -439,61 +547,8 @@ router.use(function (err: any, req: Request, res: Response, next: NextFunction) 
  *         - privateHireLicenseBadge
  *         - insuranceCertificate
  *         - motTestCertificate
- *       properties:
- *         driverId:
- *           type: string
- *           format: uuid
- *         categoryId:
- *           type: string
- *           format: uuid
- *         phoneNumber:
- *           type: string
- *         email:
- *           type: string
- *           format: email
- *         firstName:
- *           type: string
- *         lastName:
- *           type: string
- *         country:
- *           type: string
- *         latitude:
- *           type: number
- *           format: float
- *         longitude:
- *           type: number
- *           format: float
- *         gender:
- *           type: string
- *           enum: [Male, Female, Other]
- *         category:
- *           type: string
- *         referralCode:
- *           type: string
- *         vehicleYear:
- *           type: integer
- *         vehicleManufacturer:
- *           type: string
- *         vehicleColor:
- *           type: string
- *         licensePlate:
- *           type: string
- *         vehicleNumber:
- *           type: string
- *         driverLicense:
- *           type: string
- *         vehicleLogBook:
- *           type: string
- *         privateHireLicenseBadge:
- *           type: string
- *         insuranceCertificate:
- *           type: string
- *         motTestCertificate:
- *           type: string
- *         isAvailable:
- *           type: boolean
- *         verificationCode:
- *           type: string
+ *         - isAvailable
+ *         - status
  */
 
 export default router;

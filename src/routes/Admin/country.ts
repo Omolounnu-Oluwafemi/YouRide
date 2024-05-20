@@ -317,7 +317,6 @@ router.get('/country/:countryId', isAdmin, getCountryById);
  */
 router.put('/country/:countryId', isAdmin, validateCountryCreation, updateCountry);
 
-
 /**
  * @swagger
  * components:
@@ -325,6 +324,9 @@ router.put('/country/:countryId', isAdmin, validateCountryCreation, updateCountr
  *     Country:
  *       type: object
  *       properties:
+ *         countryId:
+ *           type: string
+ *           description: Unique identifier for the country
  *         name:
  *           type: string
  *           description: The name of the country
@@ -341,24 +343,33 @@ router.put('/country/:countryId', isAdmin, validateCountryCreation, updateCountr
  *           type: string
  *           description: The distance unit of the country
  *           enum: [KM, MI]
- *         paymentOption:
+ *         paymentOptionId:
  *           type: string
- *           description: The payment option of the country
- *           enum: [Stripe Payment, Paystack Payment]
+ *           description: The payment option ID of the country
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           description: The date when the country was created
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           description: The date when the country was last updated
  *       required:
+ *         - countryId
  *         - name
  *         - email
  *         - currency
  *         - usdConversionRatio
  *         - distanceUnit
- *         - paymentOption
+ *         - paymentOptionId
  *       example:
+ *         countryId: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
  *         name: 'Nigeria'
  *         email: 'country@example.com'
  *         currency: 'NGN'
  *         usdConversionRatio: 1500
  *         distanceUnit: 'KM'
- *         paymentOption: 'Paystack Payment'
+ *         paymentOptionId: '3fa85f64-5717-4562-b3fc-2c963f66afa6'
  */
 
 export default router;

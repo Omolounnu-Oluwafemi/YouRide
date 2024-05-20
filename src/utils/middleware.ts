@@ -313,7 +313,6 @@ export const validateUserUpdateByAdmin = (req: Request, res: Response, next: Nex
 
   next();
 };
-
 export const convertFilesToBase64 = (req: Request, res: Response, next: NextFunction) => {
   if (req.files) {
     for (const file of Object.values(req.files)) {
@@ -322,7 +321,6 @@ export const convertFilesToBase64 = (req: Request, res: Response, next: NextFunc
   }
   next();
 };
-
 export const checkInternetConnection = (): Promise<void> => {
   return new Promise<void>((resolve, reject) => {
     dns.resolve('www.google.com', (err) => {

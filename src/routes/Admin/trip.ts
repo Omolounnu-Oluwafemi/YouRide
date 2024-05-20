@@ -224,72 +224,91 @@ router.get('/trip/:tripId', isAdmin, getAllTrips)
  *   schemas:
  *     Trip:
  *       type: object
- *       required:
- *         - tripId
- *         - userId
- *         - pickupLatitude
- *         - pickupLongitude
- *         - destinationLatitude
- *         - destinationLongitude
- *         - status
  *       properties:
  *         tripId:
  *           type: string
  *           format: uuid
- *           description: The ID of the trip.
+ *           description: Unique identifier for the trip
  *         driverId:
  *           type: string
  *           format: uuid
- *           description: The ID of the driver for the trip.
+ *           description: Identifier for the driver
  *         userId:
  *           type: string
  *           format: uuid
- *           description: The ID of the user who booked the trip.
-*         pickupLocation:
+ *           description: Identifier for the user
+ *         userName:
  *           type: string
- *           description: The pickup location for the trip in strings.
+ *           description: Name of the user
+ *         driverName:
+ *           type: string
+ *           description: Name of the driver
+ *         categoryName:
+ *           type: string
+ *           description: Name of the vehicle category
+ *         country:
+ *           type: string
+ *           description: Country where the trip is taking place
+ *         categoryId:
+ *           type: string
+ *           format: uuid
+ *           description: Identifier for the vehicle category
+ *         paymentMethod:
+ *           type: string
+ *           enum: ['Cash', 'Card Payment', 'Datride Wallet']
+ *           description: Method of payment for the trip
+ *         tripAmount:
+ *           type: number
+ *           description: Amount of the trip
+ *         pickupLocation:
+ *           type: string
+ *           description: Location where the user is picked up
  *         destination:
  *           type: string
- *           description: The dropoff location for the trip in strings.
+ *           description: Destination of the trip
  *         pickupLatitude:
- *           type: number
- *           format: float
- *           description: The latitude of the pickup location for the trip.
+ *           type: string
+ *           description: Latitude of the pickup location
  *         pickupLongitude:
- *           type: number
- *           format: float
- *           description: The longitude of the pickup location for the trip.
+ *           type: string
+ *           description: Longitude of the pickup location
  *         destinationLatitude:
- *           type: number
- *           format: float
- *           description: The latitude of the dropoff location for the trip.
+ *           type: string
+ *           description: Latitude of the destination
  *         destinationLongitude:
+ *           type: string
+ *           description: Longitude of the destination
+ *         totalDistance:
  *           type: number
- *           format: float
- *           description: The longitude of the dropoff location for the trip.
+ *           description: Total distance of the trip
  *         pickupTime:
  *           type: string
  *           format: date-time
- *           description: The pickup time for the trip.
+ *           description: Time when the user is picked up
  *         dropoffTime:
  *           type: string
  *           format: date-time
- *           description: The dropoff time for the trip.
+ *           description: Time when the user is dropped off
  *         status:
  *           type: string
- *           enum: ['pending', 'accepted', 'in-progress', 'completed', 'cancelled']
- *           description: The status of the trip.
- *       example:
- *         tripId: "123e4567-e89b-12d3-a456-426614174000"
- *         driverId: "123e4567-e89b-12d3-a456-426614174000"
- *         userId: "123e4567-e89b-12d3-a456-426614174000"
- *         pickupLatitude: 40.712776
- *         pickupLongitude: -74.005974
- *         destinationLatitude: 34.052235
- *         destinationLongitude: -118.243683
- *         pickupTime: "2022-01-01T00:00:00Z"
- *         dropoffTime: "2022-01-01T01:00:00Z"
- *         status: "pending"
+ *           enum: ['current', 'scheduled', 'completed', 'cancelled']
+ *           description: Status of the trip
+ *       required:
+ *         - tripId
+ *         - userId
+ *         - userName
+ *         - categoryName
+ *         - country
+ *         - paymentMethod
+ *         - tripAmount
+ *         - pickupLocation
+ *         - destination
+ *         - pickupLatitude
+ *         - pickupLongitude
+ *         - destinationLatitude
+ *         - destinationLongitude
+ *         - totalDistance
+ *         - status
  */
 
 export default router;
