@@ -313,6 +313,42 @@ export const paymentOptionKeysSchema = Joi.object({
     privateKey: Joi.string().required(),
     publicKey: Joi.string().required(),
 });
+export const userUpdateByAdmin = Joi.object({
+  country: Joi.string().required(),
+  firstName: Joi.string().required(),
+  lastName: Joi.string().required(),
+  homeAddress: Joi.string().required(),
+  dateOfBirth: Joi.date().required(),
+  status: Joi.string().required()
+});
+export const driverUpdateByAdmin = Joi.object({
+    country: Joi.string().required(),
+    firstName: Joi.string().required().messages({
+    'any.required': 'First name is required'
+    }),
+    lastName: Joi.string().required().messages({
+    'any.required': 'Last name is required'
+    }),
+    gender: Joi.string().valid(...Object.values(Gender)).required().messages({
+    'any.required': 'Gender is required',
+    'any.only': 'Invalid gender'
+    }),
+    category: Joi.string().required().messages({
+    'any.required': 'Category is required',
+    }),
+    vehicleYear: Joi.string().pattern(/^(19|20)\d{2}$/).required().messages({
+    'any.required': 'Vehicle year is required',
+    'string.pattern.base': 'Invalid vehicle year',
+    }),
+    vehicleManufacturer: Joi.string().required(),
+    vehicleColor: Joi.string().required(),
+    licensePlate: Joi.string().required().messages({
+    'any.required': 'License plate is required'
+    }),
+    status: Joi.string().required(),
+    dateOfBirth: Joi.date().required(),
+    residenceAddress: Joi.string().required(),
+});
 
 export const options = {
     abortEarly: false,
@@ -322,4 +358,3 @@ export const options = {
         }
     }
 }
-

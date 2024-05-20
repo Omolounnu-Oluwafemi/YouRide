@@ -10,13 +10,12 @@ import { signToken, generateVerificationCode, signRefreshToken} from "../../util
 import { VehicleCategory } from '../../models/vehicle';
 import { Country } from '../../models/countries';
 
-const uploadToCloudinary = async (fileBuffer: Buffer) => {
+export const uploadToCloudinary = async (fileBuffer: Buffer) => {
   let secure_url: string | undefined;
 
   await new Promise((resolve, reject) => {
     cloudinary.uploader.upload_stream({ resource_type: 'raw' }, (error, result) => {
       if (error) {
-        console.error('Cloudinary error:', error.message); // Log the error message
         reject(error.message);
       }
       if (result) {

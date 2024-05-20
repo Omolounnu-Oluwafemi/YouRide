@@ -1,8 +1,14 @@
 import { Request, Response } from 'express';
 import { User } from '../../models/usersModel';
+import { Country } from '../../models/countries';
 import { Op } from 'sequelize'; 
 import { Trip } from '../../models/trip';
+import cloudinary from '../../utils/cloudinary';
 
+const uploadToCloudinary = async (file: Express.Multer.File) => {
+  const result = await cloudinary.uploader.upload(file.path);
+  return result.secure_url;
+};
 export const getAllUsers = async (req: Request, res: Response) => {
     try {
         const page = Number(req.query.page) || 1;
@@ -137,59 +143,79 @@ export const getUserTrips = async (req: Request, res: Response) => {
         });
     };
 }
-// export const updateUserProfile = async (req: Request, res: Response) => {
-//     const userId = req.params.userId;
-//     const {
-//         email,
-//         country,
-//         firstName,
-//         lastName,
-//         profileImage,
-//         homeAddress,
-//     } = req.body;
-
-//     const profilePictureFile = req.file;
+export const updateUserProfile = async (req: Request, res: Response) => {
+    const userId = req.params.userId;
     
-//     let profilePictureUrl;
-//     try {
-//       if (profilePictureFile) {
-//         profilePictureUrl = await uploadToCloudinary(profilePictureFile);
-//       } else {
-//         throw new Error('Profile picture file is undefined');
-//       }
-//     } catch (error) {
-//       return res.status(500).json({
-//         status: 500,
-//         error: 'Failed to upload image'
-//       });
-//     }
+    const {
+        country,
+        firstName,
+        lastName,
+        homeAddress,
+        dateOfBirth,
+        status
+    } = req.body;
 
-//     try {
-//         const [updated] = await User.update({
-//             email,
-//             country,
-//             firstName,
-//             lastName,
-//             profileImage,
-//             homeAddress,
-//         }, {
-//             where: { userId: userId }
-//         });
+    const profileImageFile = req.file;
 
-//         if (!updated) {
-//             throw new Error('Unable to update user');
-//         }
+     let profileImageUrl;
+    try {
+      if (profileImageFile) {
+        profileImageUrl = await uploadToCloudinary(profileImageFile);
+      } else {
+        throw new Error('Profile picture file is undefined');
+      }
+    } catch (error) {
+      return res.status(500).json({
+        status: 500,
+        error: 'Failed to upload image'
+      });
+    }
 
-//         res.status(200).json({
-//             status: 200,
-//             message: 'User information updated successfully.'
-//         });
-//     } catch (error: any) {
-//         console.log(error)
-//         res.status(500).json({
-//             status: 500,
-//             error: "An error occurred while processing your request",
-//             message: error.message
-//         });
-//     };
-// }
+    try {
+        const user = await User.findOne({ where: { userId: userId } });
+        if (!user) {
+            return res.status(404).json({
+                status: 404,
+                error: "User not found",
+                message: "No user found with the provided userId"
+            });
+        }
+
+        const countryExists = await Country.findOne({ where: { name: country } });
+        if (!countryExists) {
+            return res.status(400).json({
+                status: 400,
+                error: "Invalid country",
+                message: "We do not operate in this region yet."
+            });
+        }
+
+        const [updated] = await User.update({
+            country,
+            firstName,
+            lastName,
+            profileImage: profileImageUrl,
+            homeAddress,
+            dateOfBirth,
+            status
+        }, {
+            where: { userId: userId }
+        });
+
+        if (!updated) {
+            throw new Error('Unable to update user');
+        }
+
+        res.status(200).json({
+            status: 200,
+            message: 'User information updated successfully.'
+        });
+    } catch (error: any) {
+        console.log(error)
+        res.status(500).json({
+            status: 500,
+            error: "An error occurred while processing your request",
+            message: error.message
+        });
+    };
+}

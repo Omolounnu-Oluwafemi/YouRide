@@ -26,8 +26,12 @@ interface DriversAttributes {
   longitude: string;
   driverRating: number | null;
   numberOfRatings: number;
-  
+  status: boolean | null; 
+  dateOfBirth: string | null;
   verificationCode: string | null;
+  residenceAddress: string | null;
+  profileImage: string | null;
+  documentUpload: string | null;
 }
 
 interface DriverCreationAttributes extends Optional<DriversAttributes, 'driverId'> {}
@@ -59,6 +63,11 @@ class Driver extends Model<DriversAttributes, DriverCreationAttributes> implemen
   public verificationCode!: string | null;
   public driverRating!: number | null;
   public numberOfRatings!: number;
+  public status!: boolean | null; 
+  public dateOfBirth!: string | null;
+  public residenceAddress!: string | null;
+  public profileImage!: string | null;
+  public documentUpload!: string | null;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -188,7 +197,28 @@ const initDriver = (sequelize: Sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-        verificationCode: {
+      verificationCode: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      status: {
+        type: DataTypes.ENUM('Active', 'Inactive'),
+        allowNull: false,
+        defaultValue: 'Active',
+      },
+      dateOfBirth: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      profileImage: { 
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      documentUpload: { 
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      residenceAddress: {
         type: DataTypes.STRING,
         allowNull: true,
       },

@@ -1,8 +1,10 @@
 import express from 'express';
+import multer from 'multer';
 import { getDriverById } from '../../controllers/Driver/driversAuth';
-import { deleteDriver, getAllDrivers, getAvailableDrivers, getAllDriversLocations } from '../../controllers/Driver/driversInfo';
-import { checkInternetConnectionMiddleware, isAdmin } from '../../utils/middleware';
+import { deleteDriver, getAllDrivers, getAvailableDrivers, getAllDriversLocations, updateDriverAdmin } from '../../controllers/Driver/driversInfo';
+import { checkInternetConnectionMiddleware, isAdmin, validateDriverUpdateByAdmin } from '../../utils/middleware';
 
+const upload = multer({ dest: 'uploads/' });
 
 const router = express.Router();
 
@@ -343,5 +345,66 @@ router.get('/getLocations', isAdmin, getAllDriversLocations);
  *                   description: The error message
  */
 router.delete('/deletedriver/:driverId', isAdmin, deleteDriver)
+
+/**
+ * @swagger
+ * /api/v1/admin/updatedriver/{driverId}:
+ *   patch:
+ *     summary: Update a driver's information
+ *     tags: [Admin Dashboards]
+ *     parameters:
+ *       - in: path
+ *         name: driverId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The driver's ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               country:
+ *                 type: string
+ *               firstName:
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *               gender:
+ *                 type: string
+ *               category:
+ *                 type: string
+ *               vehicleYear:
+ *                 type: integer
+ *               vehicleManufacturer:
+ *                 type: string
+ *               vehicleColor:
+ *                 type: string
+ *               licensePlate:
+ *                 type: string
+ *               status:
+ *                 type: string
+ *               dateOfBirth:
+ *                 type: string
+ *                 format: date
+ *               residenceAddress:
+ *                 type: string
+ *               profileImage:
+ *                 type: string
+ *                 format: binary
+ *               documentUpload:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: The driver's information was updated successfully
+ *       404:
+ *         description: The driver was not found
+ *       500:
+ *         description: There was an error updating the driver's information
+ */
+router.patch('/updatedriver/:driverId', isAdmin, upload.fields([{ name: 'profileImage', maxCount: 1 }, { name: 'documentUpload', maxCount: 1 }]), validateDriverUpdateByAdmin, updateDriverAdmin);
 
 export default router;

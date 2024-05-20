@@ -1,6 +1,6 @@
 import { NextFunction, Response, Request } from "express";
 import dns from 'dns';
-import { initiialSignUpValidator, finalSignUpValidator, verificationCodeValidator, AdminSignupValidator, AdminSignInValidator, AdminPasswordUpdate,options, createVehicleSchema, createTripSchema, tripRequestSchema, DriverSignupValidator, countrySchema, verificationDriverCodeValidator, updateVehicleSchema, editPhoneNumberValidator, editLocation, editHomeAddress, editWorkAddress, communicationMethod, ratingUserSchema, ratingDriverSchema, paymentOptionCreationSchema, paymentOptionKeysSchema} from "../utils/validate";
+import { initiialSignUpValidator, finalSignUpValidator, verificationCodeValidator, AdminSignupValidator, AdminSignInValidator, AdminPasswordUpdate,options, createVehicleSchema, createTripSchema, tripRequestSchema, DriverSignupValidator, countrySchema, verificationDriverCodeValidator, updateVehicleSchema, editPhoneNumberValidator, editLocation, editHomeAddress, editWorkAddress, communicationMethod, ratingUserSchema, ratingDriverSchema, paymentOptionCreationSchema, paymentOptionKeysSchema, userUpdateByAdmin, driverUpdateByAdmin} from "../utils/validate";
 import rateLimit from 'express-rate-limit';
 import { verifyAdminToken } from "./token";
 
@@ -282,6 +282,28 @@ export const validatepaymentOptionKeys = (req: Request, res: Response, next: Nex
 };
 export const validateDriverRating = (req: Request, res: Response, next: NextFunction) => {
   const { error } = ratingDriverSchema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({
+      message: error.details[0].message
+    });
+  }
+
+  next();
+};
+export const validateDriverUpdateByAdmin = (req: Request, res: Response, next: NextFunction) => {
+  const { error } = driverUpdateByAdmin.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({
+      message: error.details[0].message
+    });
+  }
+
+  next();
+};
+export const validateUserUpdateByAdmin = (req: Request, res: Response, next: NextFunction) => {
+  const { error } = userUpdateByAdmin.validate(req.body);
 
   if (error) {
     return res.status(400).json({

@@ -22,6 +22,8 @@ interface UserAttributes {
   workAddress: string | null;
   homeAddress: string | null;
   wallet: number;
+  status: boolean | null; 
+  dateOfBirth: string | null;
 }
 
 interface UserCreationAttributes extends Optional<UserAttributes, 'userId'> {}
@@ -47,6 +49,8 @@ class User extends Model<UserAttributes, UserCreationAttributes> {
   public workAddress!: string | null;
   public homeAddress!: string | null;
   public wallet!: number;
+  public status!: boolean | null; 
+  public dateOfBirth!: string | null;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -145,6 +149,15 @@ const initUser = (sequelize: Sequelize) => {
         allowNull: true,
       },
       workAddress: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      status: {
+        type: DataTypes.ENUM('Active', 'Inactive'),
+        allowNull: false,
+        defaultValue: 'Active',
+      },
+      dateOfBirth: {
         type: DataTypes.STRING,
         allowNull: true,
       },

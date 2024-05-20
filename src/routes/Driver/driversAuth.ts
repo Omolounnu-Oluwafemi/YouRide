@@ -23,6 +23,7 @@ const upload = multer({
 ]);
 
 router.use(checkInternetConnectionMiddleware);
+
 /**
  * @swagger
  * /api/v1/driver/signup:

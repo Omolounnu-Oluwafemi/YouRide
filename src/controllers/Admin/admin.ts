@@ -100,7 +100,6 @@ export const AdminLogin = async (req: Request, res: Response) => {
    res.status(500).json({ error: 'Error Signing Admin in' });
 }
 };
-
 export const changeTempPassword = async (req: Request, res: Response) => {
   try {
     const { email, tempPassword, newPassword } = req.body;
@@ -218,7 +217,6 @@ export const toggleStaffActiveStatus = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Error updating admin status' });
   }
 };
-
 export const getAllAdmins = async (req: Request, res: Response) => {
   const page = Number(req.query.page) || 1;
   const limit = Number(req.query.limit) || 10; 

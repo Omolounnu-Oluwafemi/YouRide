@@ -7,7 +7,7 @@ import { Op } from 'sequelize';
 import jwt from 'jsonwebtoken';
 import { parsePhoneNumberFromString } from 'libphonenumber-js'
 import countries from 'i18n-iso-countries';
-import cloudinary  from '../../utils/cloudinary';
+import cloudinary from '../../utils/cloudinary';
 
 const uploadToCloudinary = async (file: Express.Multer.File) => {
   const result = await cloudinary.uploader.upload(file.path);
@@ -372,9 +372,9 @@ export const editPhoneNumber = async (req: Request, res: Response) => {
       });
     }
 
-    const existingPhoneNumber = user.phoneNumber
+    const existingUserWithPhoneNumber = await User.findOne({ where: { phoneNumber: phoneNumber } });
 
-      if (existingPhoneNumber) {
+   if (existingUserWithPhoneNumber) {
       return res.status(400).json({
         status: 400,
         message: 'Phone number already in use'
