@@ -73,7 +73,7 @@ const upload = multer({ dest: 'uploads/' });
  *                   type: string
  *                   description: Internal server error
  */
-router.post('/create', ValidateAdminSignup, CreateAdmin);
+router.post('/create', isSuperAdmin, ValidateAdminSignup, CreateAdmin);
 
 /**
  * @swagger
