@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { Driver } from '../../models/drivers';
-import  cloudinary  from '../../utils/cloudinary'; 
 import { decodeDriverIdFromToken } from '../../utils/token';
 import { driverSocketMap } from '../../config/socket';
+import { Trip } from '../../models/trip'; 
 
 export const getVehicleDetails = async (req: Request, res: Response) => {
 
@@ -31,7 +31,9 @@ export const getVehicleDetails = async (req: Request, res: Response) => {
     return res.status(200).json(vehicleDetails);
   } catch (error) {
     console.error(error)
-    return res.status(500).json({ error: 'An error occurred while retrieving vehicle details' });
+    return res.status(500).json({
+      error: 'An error occurred while retrieving vehicle details'
+    });
   }
 };
 export const updateVehicleDetails = async (req: Request, res: Response) => {
@@ -128,4 +130,40 @@ export const driverRating = async (req: Request, res: Response) => {
       error: 'Error rating driver' 
     });
   }
+};
+export const getDriverRideHistory = async (req: Request, res: Response) => {
+  const driverId = req.query.driverId as string;
+
+    try {
+      const driver = await Driver.findByPk(driverId);
+      
+        if (!driver) {
+          return res.status(404).json({
+            status: 404,
+            message: 'Driver not found'
+          });
+        }
+
+        const trips = await Trip.findAll({ where: { driverId: driverId as string } });
+      
+          if (trips.length === 0) {
+            return res.status(404).json({
+                status: 404,
+                error: "No trips found for this Driver"
+            });
+        }
+      
+        const totalTrips = trips.length;
+        const rideHistory = trips;
+
+      return res.status(200).json({
+        status: 200,
+        rideHistory,
+        totalTrips
+      });
+    } catch (error) {
+      return res.status(500).json({
+        message: 'An error occurred while fetching the ride history'
+      });
+    }
 };
