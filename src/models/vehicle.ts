@@ -9,11 +9,12 @@ interface VehicleAttributes {
     adminCommission: number;
     status: string;
     categoryName: string;
+    vehicleName: string;
     carImage: string;
     documentImage: string;
     isSurge: boolean;
     surgeStartTime: string;
-    surgeEndTime: number;
+    surgeEndTime: string;
     surgeType: string;
     isDocVerified: boolean;
 }
@@ -26,18 +27,18 @@ interface VehicleInstance extends Model<VehicleAttributes, VehicleCreationAttrib
 
 class VehicleCategory extends Model<VehicleAttributes, VehicleCreationAttributes> implements VehicleAttributes {
     public categoryId!: string;
-    // public driverId!: string | null;
     public baseFare!: number;
     public pricePerKMorMI!: number;
     public pricePerMIN!: number;
     public adminCommission!: number;
     public status!: string;
     public categoryName!: string;
+    public vehicleName!: string;
     public carImage!: string;
     public documentImage!: string;
     public isSurge!: boolean;
     public surgeStartTime!: string;
-    public surgeEndTime!: number;
+    public surgeEndTime!: string;
     public surgeType!: string;
     public isDocVerified!: boolean;
 
@@ -83,7 +84,13 @@ const initVehicleCategory = (sequelize: Sequelize) => {
             defaultValue: 'Active',
         },
         categoryName: {
-            type: DataTypes.STRING,
+            type: DataTypes.ENUM,
+            values: ['Taxi Driver', 'Bus Driver', 'Delivery Driver'],
+            allowNull: false,
+        },
+        vehicleName: {
+            type: DataTypes.ENUM,
+            values: ['Datride Vehicle', 'Datride Share', 'Datride Delivery'],
             allowNull: false,
         },
         isSurge: {

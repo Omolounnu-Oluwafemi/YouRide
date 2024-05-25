@@ -23,17 +23,6 @@ export const sequelize = new Sequelize(database, username, password, {
   dialect: dialect as Dialect,
 });
 
-
-initPaymentOption(sequelize);
-initUser(sequelize);
-initDriver(sequelize);
-initVehicleCategory(sequelize);
-initAdmin(sequelize);
-initVoucher(sequelize);
-initTrip(sequelize);
-initCountry(sequelize);
-initCountryVehicle(sequelize);
-
 function defineAssociations() {
     User.hasMany(Trip, { foreignKey: 'userId' });
     Driver.hasMany(Trip, { foreignKey: 'driverId' });
@@ -57,9 +46,7 @@ function defineAssociations() {
     Driver.belongsTo(Country, { foreignKey: 'countryId' });
 }
 
-defineAssociations();
-
-// Create Super Admin
+// Create Master details in the Db
 const createSuperAdmin = async () => {
   const superAdminEmail = 'superadmin@datride.com';
   const superAdminPassword = '@datrideSuperAdmin1234!';
@@ -82,6 +69,112 @@ const createSuperAdmin = async () => {
     console.log('Super Admin already exists');
   }
 };
+const createDefaultPaymentOption = async () => {
+  const defaultPaymentOption = {
+    paymentOptionId: uuidv4(),
+    paymentName: 'Stripe Payment', 
+    privateKey: 'yourPrivateKeyHere',
+    publicKey: 'yourPublicKeyHere',
+    paymentAvailable: true 
+  };
 
-// Call the function after initializing all models and defining associations
-createSuperAdmin().catch(console.error);
+  const [paymentOption, created] = await PaymentOptions.findOrCreate({
+    where: { paymentName: defaultPaymentOption.paymentName },
+    defaults: defaultPaymentOption
+  });
+
+  if (created) {
+    console.log('Default payment option created');
+  } else {
+    console.log('Default payment option already exists');
+  }
+
+  return paymentOption;
+};
+const createDefaultCountry = async () => {
+  const paymentOption = await createDefaultPaymentOption();
+
+  const defaultCountry = {
+    countryId: uuidv4(),
+    name: 'Nigeria',
+    email: 'nigeria@datride.com',
+    currency: 'NGN',
+    usdConversionRatio: 0.0026, 
+    distanceUnit: 'KM',
+    paymentOptionId: paymentOption.paymentOptionId 
+  };
+
+  const [country, countryCreated] = await Country.findOrCreate({
+    where: { name: defaultCountry.name },
+    defaults: defaultCountry
+  });
+
+  if (countryCreated) {
+    console.log('Default country created');
+  } else {
+    console.log('Default country already exists');
+  }
+
+  return country
+};
+const createDefaultVehicleCategory = async () => {
+  if (!VehicleCategory) {
+    console.error('VehicleCategory model is not defined');
+    return;
+  }
+
+  const country = await createDefaultCountry(); 
+
+  const defaultVehicleCategory = {
+    baseFare: 100,
+    pricePerKMorMI: 10,
+    pricePerMIN: 5,
+    adminCommission: 20,
+    status: 'Active',
+    categoryName: 'Taxi Driver',
+    vehicleName: 'Datride Vehicle',
+    carImage: 'defaultCarImage.png',
+    documentImage: 'defaultDocumentImage.png',
+    isSurge: false,
+    surgeStartTime: '20:00:00',
+    surgeEndTime: '23:00:00',
+    surgeType: 'Percentage',
+    isDocVerified: false
+  };
+
+  const [vehicleCategory, vehicleCategoryCreated] = await VehicleCategory.findOrCreate({
+    where: { categoryName: defaultVehicleCategory.categoryName },
+    defaults: defaultVehicleCategory
+  });
+
+  if (vehicleCategoryCreated) {
+    console.log('Default vehicle category created');
+  } else {
+    console.log('Default vehicle category already exists');
+  }
+
+  await vehicleCategory.addCountry(country);
+};
+
+async function initialize() {
+  await initPaymentOption(sequelize);
+  await initUser(sequelize);
+  await initDriver(sequelize);
+  await initVehicleCategory(sequelize);
+  await initAdmin(sequelize);
+  await initVoucher(sequelize);
+  await initTrip(sequelize);
+  await initCountry(sequelize);
+  await initCountryVehicle(sequelize);
+
+  defineAssociations();
+
+  await sequelize.sync({ force: false });
+
+  await createSuperAdmin();
+  await createDefaultPaymentOption();
+  await createDefaultCountry();
+  await createDefaultVehicleCategory();
+}
+
+initialize().catch(console.error);
