@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-import { getDriverById } from '../../controllers/Driver/driversAuth';
+import { getDriverById } from '../../controllers/Driver/dashboard';
 import { deleteDriver, getAllDrivers, getAvailableDrivers, getAllDriversLocations, updateDriverAdmin } from '../../controllers/Driver/driversInfo';
 import { checkInternetConnectionMiddleware, isAdmin, validateDriverUpdateByAdmin } from '../../utils/middleware';
 
@@ -35,7 +35,7 @@ router.use(checkInternetConnectionMiddleware);
  *                 status:
  *                   type: integer
  *                   description: The HTTP status code
- *                 data:
+ *                 Driver:
  *                   $ref: '#/components/schemas/Driver'
  *       400:
  *         description: Driver ID is required
@@ -133,7 +133,7 @@ router.get('/getonedriver/:driverId', isAdmin, getDriverById);
  *                 status:
  *                   type: integer
  *                   description: The HTTP status code
- *                 data:
+ *                 drivers:
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/Driver'
