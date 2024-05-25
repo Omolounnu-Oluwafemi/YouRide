@@ -12,7 +12,7 @@ interface DriversAttributes {
   gender: string;
   category: string;
   referralCode: string;
-  vehicleYear: number;
+  vehicleYear: string;
   vehicleManufacturer: string;
   vehicleColor: string;
   licensePlate: string;
@@ -48,7 +48,7 @@ class Driver extends Model<DriversAttributes, DriverCreationAttributes> implemen
   public gender!: string;
   public category!: string;
   public referralCode!: string;
-  public vehicleYear!: number;
+  public vehicleYear!: string;
   public vehicleManufacturer!: string;
   public vehicleColor!: string;
   public licensePlate!: string;
@@ -131,8 +131,9 @@ const initDriver = (sequelize: Sequelize) => {
         allowNull: false,
       },
       category: {
-        type: DataTypes.STRING,
-        allowNull: false,
+        type: DataTypes.ENUM,
+        values: ['Taxi Driver', 'Bus Driver', 'Delivery Driver'],
+        allowNull: false, 
       },
       referralCode: {
         type: DataTypes.STRING,
@@ -233,5 +234,3 @@ const initDriver = (sequelize: Sequelize) => {
 };
 
 export { Driver, initDriver };
-
-  
