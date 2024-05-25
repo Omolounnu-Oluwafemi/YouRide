@@ -69,7 +69,7 @@ export const CreateVehicleCategory = async (req: Request, res: Response) => {
     try {
         const categoryId = uuidv4();
         
-        const { country, baseFare, pricePerKMorMI, pricePerMIN, adminCommission, status, categoryName, isSurge, surgeStartTime, surgeEndTime, surgeType, isDocVerified } = req.body;
+        const { country, baseFare, pricePerKMorMI, pricePerMIN, adminCommission, status, categoryName, vehicleName, isSurge, surgeStartTime, surgeEndTime, surgeType, isDocVerified } = req.body;
 
         // Check if the country exists in the database
         const countryRecord = await Country.findOne({ where: { name: country } });
@@ -79,9 +79,10 @@ export const CreateVehicleCategory = async (req: Request, res: Response) => {
             error: 'The specified country does not exist'
           });
         }
-          // Check if a VehicleCategory with the same vehicleName already exists for the specified country
+      
+        // Check if a VehicleCategory with the same vehicleName already exists for the specified country
           const existingVehicleCategory = await VehicleCategory.findOne({ 
-            where: { categoryName }, 
+            where: { vehicleName }, 
             include: [{
                 model: Country,
                 where: { name: country },
@@ -91,7 +92,7 @@ export const CreateVehicleCategory = async (req: Request, res: Response) => {
         if (existingVehicleCategory) {
             return res.status(400).json({
                 status: 400,
-                error: 'A Vehicle Category with the same name already exists for the specified country'
+                error: 'A Vehicle Category with the same vehicle name already exists for the specified country'
             });
         }
 
@@ -126,6 +127,7 @@ export const CreateVehicleCategory = async (req: Request, res: Response) => {
             surgeType,
             status,
             categoryName,
+            vehicleName,
             carImage,
             documentImage,
             isDocVerified
