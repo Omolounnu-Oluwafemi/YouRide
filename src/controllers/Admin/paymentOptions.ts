@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { PaymentOptions } from '../../models/paymentOption';
 
-
 export const createPaymentOption = async (req: Request, res: Response) => {
     const { paymentName, privateKey, publicKey } = req.body;
 
