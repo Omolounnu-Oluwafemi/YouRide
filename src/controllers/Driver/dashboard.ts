@@ -167,3 +167,32 @@ export const getDriverRideHistory = async (req: Request, res: Response) => {
       });
     }
 };
+export const getDriverById = async (req: Request, res: Response) => {
+  try {
+    const { driverId } = req.params;
+
+    if (!driverId) {
+      return res.status(400).json({
+        status: 400,
+        message: "Driver ID is required"
+      });
+    }
+
+    const driver = await Driver.findOne({ where: { driverId } });
+
+    if (!driver) {
+      return res.status(404).json({ message: "Driver not found" });
+    }
+
+    return res.status(200).json({
+      status: 200,
+      message: 'Driver retrieved successfully',
+      Driver:  driver 
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: 'An error occurred while retrieving driver'
+    });
+  }
+};

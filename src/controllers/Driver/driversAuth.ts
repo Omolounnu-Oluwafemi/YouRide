@@ -10,12 +10,13 @@ import { signToken, generateVerificationCode, signRefreshToken} from "../../util
 import { VehicleCategory } from '../../models/vehicle';
 import { Country } from '../../models/countries';
 
-export const uploadToCloudinary = async (fileBuffer: Buffer) => {
+const uploadToCloudinary = async (fileBuffer: Buffer) => {
   let secure_url: string | undefined;
 
   await new Promise((resolve, reject) => {
     cloudinary.uploader.upload_stream({ resource_type: 'raw' }, (error, result) => {
       if (error) {
+        console.error('Cloudinary error:', error.message); // Log the error message
         reject(error.message);
       }
       if (result) {
@@ -177,7 +178,7 @@ export const DriverSignup = async (req: Request, res: Response) => {
       message: 'Driver created successfully',
       token: token,
       refreshToken: refreshToken,
-      data: { driver }
+      Driver: driver 
     });
   // Continue with your code...
 } catch (error) {
@@ -265,7 +266,7 @@ export async function verifyDriverSignIn(req: Request, res: Response) {
       message: 'Driver signed in successfully',
       // token: token,
       // refreshToken: refreshToken,
-      data: { driver }
+      Driver:  driver 
     });
   } catch (error) {
     console.error(error);
@@ -275,34 +276,6 @@ export async function verifyDriverSignIn(req: Request, res: Response) {
     });
   }
 };
-export const getDriverById = async (req: Request, res: Response) => {
-  try {
-    const { driverId } = req.params;
 
-    if (!driverId) {
-      return res.status(400).json({
-        status: 400,
-        message: "Driver ID is required"
-      });
-    }
-
-    const driver = await Driver.findOne({ where: { driverId } });
-
-    if (!driver) {
-      return res.status(404).json({ message: "Driver not found" });
-    }
-
-    return res.status(200).json({
-      status: 200,
-      message: 'Driver retrieved successfully',
-      data: { driver }
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: 500,
-      message: 'An error occurred while retrieving driver'
-    });
-  }
-};
 
    
