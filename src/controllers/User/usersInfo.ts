@@ -118,12 +118,12 @@ export const deleteUser = async (req: Request, res: Response) => {
   }
 };
 export const getUserTrips = async (req: Request, res: Response) => {
-    const { userId } = req.query;
+    const userId = req.query.userId;
 
     try {
         const trips = await Trip.findAll({ where: { userId: userId as string } });
 
-        if (!trips) {
+        if (trips.length === 0) {
             return res.status(404).json({
                 status: 404,
                 error: "No trips found for this user"
