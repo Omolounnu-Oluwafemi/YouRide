@@ -1,12 +1,11 @@
 import express from 'express';
 import { Request, Response, NextFunction } from "express";
 import multer from 'multer';
-import { DriverSignup, DriverSignIn, verifyDriverSignIn, getDriverById } from '../../controllers/Driver/driversAuth'
+import { DriverSignup, DriverSignIn, verifyDriverSignIn } from '../../controllers/Driver/driversAuth'
 import { ValidateDriverSignup, validateInitialSignUp, validateDriverVerificationCode, verifySignInLimiter, convertFilesToBase64, checkInternetConnectionMiddleware } from '../../utils/middleware';
 import { deleteDriver } from '../../controllers/Driver/driversInfo';
 
 const router = express.Router();
-
 const upload = multer({ 
   storage: multer.memoryStorage(),
   limits: {
@@ -51,10 +50,11 @@ router.use(checkInternetConnectionMiddleware);
  *                 enum: [Male, Female, Other]
  *               category:
  *                 type: string
+ *                 enum: [Taxi Driver, Bus Driver, Delivery Driver]
  *               referralCode:
  *                 type: string
  *               vehicleYear:
- *                 type: integer
+ *                 type: string
  *               vehicleManufacturer:
  *                 type: string
  *               vehicleColor:
@@ -112,12 +112,8 @@ router.use(checkInternetConnectionMiddleware);
  *                 refreshToken:
  *                   type: string
  *                   description: The refresh token
- *                 data:
- *                   type: object
- *                   properties:
- *                     Driver:
- *                       type: object
- *                       description: The Driver object
+ *                 Driver:
+ *                   $ref: '#/components/schemas/Driver'
  *       400:
  *         description: Bad request
  *         content:
@@ -150,7 +146,7 @@ router.post('/signup', processUploads, convertFilesToBase64, ValidateDriverSignu
  * /api/v1/driver/signin:
  *   post:
  *     summary: Sign in a driver
- *     tags: [Drivers]
+ *     tags: [Drivers Auth]
  *     requestBody:
  *       required: true
  *       content:
@@ -176,11 +172,8 @@ router.post('/signup', processUploads, convertFilesToBase64, ValidateDriverSignu
  *                   description: The HTTP status code
  *                 message:
  *                   type: string
- *                 data:
- *                   type: object
- *                   properties:
- *                     verificationCode:
- *                       type: string
+ *                 Driver:
+ *                   $ref: '#/components/schemas/Driver'
  *       400:
  *         description: User not found
  *         content:
@@ -213,7 +206,7 @@ router.post('/signin', validateInitialSignUp, DriverSignIn);
  * /api/v1/driver/verify:
  *   post:
  *     summary: Verify a driver's sign in
- *     tags: [Drivers]
+ *     tags: [Drivers Auth]
  *     requestBody:
  *       required: true
  *       content:
@@ -241,7 +234,7 @@ router.post('/signin', validateInitialSignUp, DriverSignIn);
  *                   description: The HTTP status code
  *                 message:
  *                   type: string
- *                 data:
+ *                 Driver:
  *                   $ref: '#/components/schemas/Driver'
  *       400:
  *         description: Invalid verification code
@@ -280,75 +273,6 @@ router.post('/signin', validateInitialSignUp, DriverSignIn);
  *                   type: string
  */
 router.post('/verify', validateDriverVerificationCode, verifySignInLimiter, verifyDriverSignIn)
-
-/**
- * @swagger
- * /api/v1/driver/getonedriver/{driverId}:
- *   get:
- *     summary: Retrieve a Driver by their unique driverId
- *     tags: [Driver Account]
- *     description: This endpoint retrieves driver's details using their unique identifier (driverId).
- *     parameters:
- *       - in: path
- *         name: driverId
- *         required: true
- *         schema:
- *           type: string
- *         description: The unique identifier of the driver
- *     responses:
- *       200:
- *         description: Driver retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: integer
- *                   description: The HTTP status code
- *                 data:
- *                   $ref: '#/components/schemas/Driver'
- *       400:
- *         description: Driver ID is required
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: integer
- *                   description: The HTTP status code
- *                 message:
- *                   type: string
- *                   description: Driver ID is required
- *       404:
- *         description: Driver not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: integer
- *                   description: The HTTP status code
- *                 message:
- *                   type: string
- *                   description: Driver not found
- *       500:
- *         description: An error occurred while retrieving driver
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: integer
- *                   description: The HTTP status code
- *                 message:
- *                   type: string
- *                   description: An error occurred while retrieving driver
- */
-router.get('/getonedriver/:driverId', getDriverById);
 
 /**
  * @swagger
@@ -462,7 +386,7 @@ router.use(function (err: any, req: Request, res: Response, next: NextFunction) 
  *           nullable: true
  *           description: The driver's referral code
  *         vehicleYear:
- *           type: integer
+ *           type: string
  *           description: The year of the driver's vehicle
  *         vehicleManufacturer:
  *           type: string
