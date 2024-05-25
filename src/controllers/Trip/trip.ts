@@ -406,18 +406,15 @@ export const fetchAvailableRides = async (userId: string, pickupLatitude: string
 
     for (const category of vehicleCategories) {
         let closestDriver = null;
-        let shortestETA = Infinity;
+        let shortestETA = null;
         let driverCount = 0;
-
-
-           console.log("category", category.Drivers)
 
         for (const driver of category.Drivers) {
          
             const eta = await getETA(pickupLatitude, pickupLongitude, driver.latitude, driver.longitude);
             driverCount++
 
-            if (eta < shortestETA) {
+            if (shortestETA === null || eta < shortestETA) {
                 shortestETA = eta;
                 closestDriver = driver;
             }
@@ -434,17 +431,17 @@ export const fetchAvailableRides = async (userId: string, pickupLatitude: string
         
          // Only add to responseData if tripAmount is not 0
         if (tripAmount !== 0) {
-            const categoryData = {
+            let categoryData = {
                 totalDistance,
                 country,
                 categoryId: category.categoryId,
                 categoryName: category.categoryName,
                 tripAmount,
                 driverCount,
-                closestDriverId: closestDriver ? closestDriver.driverId : null,
-                estimatedPickupTime: shortestETA,
-                closesetDriverLatitude: closestDriver.latitude,
-                closesetDriverLongtitude: closestDriver.longitude,
+                closestDriverId: closestDriver ? closestDriver.driverId.toString() : 'N/A',
+                estimatedPickupTime: shortestETA ? shortestETA.toString() : 'N/A',
+                closesetDriverLatitude: closestDriver ? closestDriver.latitude : null,
+                closesetDriverLongtitude: closestDriver ? closestDriver.longitude : null,
             };
 
             responseData.push(categoryData);
@@ -453,6 +450,7 @@ export const fetchAvailableRides = async (userId: string, pickupLatitude: string
 
     return responseData;
 };
+
 export const requestRide = async (req: Request, res: Response) => {
     const tripId = uuidv4();
     const userId = req.params.userId;
