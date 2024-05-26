@@ -1,3 +1,5 @@
+import {DriverSocketController} from "./controllers/Socket/driver";
+
 require('dotenv').config();
 import { config } from "dotenv";
 import nocache from 'nocache';
@@ -35,10 +37,33 @@ app.use(nocache());
 app.use(cors());
 
 io.on('connection', (socket) => {
-    socket.on('driverConnected', (driverId) => {
-        driverSocketMap.set(driverId, socket.id);
+    const driverId = socket.handshake.query.driverId;
+
+    socket.on('driverConnected', ({ driverId, latitude, longitude }) => {
+      driverSocketMap.set('driverId', driverId);
+      driverSocketMap.set('socketId', socket.id);
+
+      console.log("driverSocketMap:", driverSocketMap)
+      console.log(driverSocketMap.get('driverId'))
+      
+        // Assuming you have a method to update the driver's status and location
+        DriverSocketController.updateDriverStatusAndLocation(driverId, true, latitude, longitude);
+
+        socket.emit('connectionSuccess', {
+            message: 'You are successfully connected and your location is updated.',
+            driverId: driverId,
+            socketId: socket.id
+        });
+    });
+
+  socket.on('disconnect', () => {
+    const driverId = driverSocketMap.get('driverId');
+        DriverSocketController.updateDriverAvailability(driverId, false);
+        console.log(`Driver ${driverId} disconnected.`);
     });
 });
+
+httpServer.on('request', app);
 
 app.use(
   session({

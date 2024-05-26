@@ -172,10 +172,15 @@ router.post('/signup', processUploads, convertFilesToBase64, ValidateDriverSignu
  *                   description: The HTTP status code
  *                 message:
  *                   type: string
- *                 Driver:
- *                   $ref: '#/components/schemas/Driver'
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     verificationCode:
+ *                       type: string
+ *                     driverId:
+ *                       type: string
  *       400:
- *         description: User not found
+ *         description: Driver not found
  *         content:
  *           application/json:
  *             schema:

@@ -264,7 +264,7 @@ router.patch('/rating',validateDriverRating,  driverRating);
 
 /**
  * @swagger
- * /api/v1/driver/dashboard/{driverId}/ridehistory:
+ * /api/v1/driver/dashboard/ridehistory:
  *   get:
  *     summary: Retrieve a list of rides by driver
  *     tags: [Driver Account]
@@ -298,7 +298,7 @@ router.patch('/rating',validateDriverRating,  driverRating);
  *       500:
  *         description: An error occurred while processing your request
  */
-router.get('/:driverId/ridehistory', getDriverRideHistory);
+router.get('/ridehistory', getDriverRideHistory);
 
 /**
  * @swagger

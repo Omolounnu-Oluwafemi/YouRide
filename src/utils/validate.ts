@@ -113,9 +113,7 @@ export const DriverSignupValidator = Joi.object({
     'any.required': 'Gender is required',
     'any.only': 'Invalid gender'
   }),
-  category: Joi.string().required().messages({
-    'any.required': 'Category is required',
-  }),
+  category: Joi.string().valid('Taxi Driver', 'Bus Driver', 'Delivery Driver'),
   referralCode: Joi.string().optional().allow(''),
   vehicleYear: Joi.string().pattern(/^(19|20)\d{2}$/).required().messages({
     'any.required': 'Vehicle year is required',
@@ -206,7 +204,8 @@ export const createVehicleSchema = Joi.object({
     pricePerMIN: Joi.number().required(),
     adminCommission: Joi.number().required(),
     status: Joi.string().valid('Active', 'Inactive').required(),
-    categoryName: Joi.string().required(),
+    categoryName: Joi.string().valid('Taxi Driver', 'Bus Driver', 'Delivery Driver'),
+    vehicleName: Joi.string().valid('Datride Share', 'Datride Vehicle', 'Datride Delivery'),
     isSurge: Joi.boolean().required(),
     surgeStartTime: Joi.string().pattern(/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/),
     surgeEndTime: Joi.string().pattern(/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/),
@@ -221,7 +220,7 @@ export const updateVehicleSchema = Joi.object({
     pricePerMIN: Joi.number(),
     adminCommission: Joi.number(),
     status: Joi.string().valid('Active', 'Inactive'),
-    vehicleCategory: Joi.string().valid('Taxi', 'Bus', 'Delivery'),
+    categoryName: Joi.string().valid('Taxi Driver', 'Bus Driver', 'Delivery Driver'),
     vehicleName: Joi.string().valid('Datride Share', 'Datride Vehicle', 'Datride Delivery'),
     isSurge: Joi.boolean(),
     surgeStartTime: Joi.string().pattern(/^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/),

@@ -6,7 +6,7 @@
 
 const app = require('../dist/app').default;
 const debug = require('debug')('youride:server');
-const http = require('http');
+const httpServer = require('../dist/config/socket').httpServer;
 
 /**
  * Get port from environment and store in Express.
@@ -16,18 +16,12 @@ const port = normalizePort(process.env.PORT || '4000');
 app.set('port', port);
 
 /**
- * Create HTTP server.
- */
-
-const server = http.createServer(app);
-
-/**
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+httpServer.listen(port);
+httpServer.on('error', onError);
+httpServer.on('listening', onListening);
 
 /**
  * Normalize a port into a number, string, or false.

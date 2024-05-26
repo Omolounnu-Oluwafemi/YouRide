@@ -287,7 +287,7 @@ router.get('/availablerides', GetAvailableRides);
 
 /**
  * @swagger
- * /api/v1/user/{userId}/getusertrips:
+ * /api/v1/user/getusertrips:
  *   get:
  *     summary: Retrieve a list of trips by user
  *     tags: [User-Trips]
@@ -312,7 +312,7 @@ router.get('/availablerides', GetAvailableRides);
  *       500:
  *         description: An error occurred while processing your request
  */
-router.get('/:userId/getusertrips', getUserTrips)
+router.get('/getusertrips', getUserTrips)
 
 /**
  * @swagger
