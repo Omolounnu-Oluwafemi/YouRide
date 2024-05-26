@@ -1,5 +1,5 @@
 import express from 'express'; 
-import { acceptTrip, skipTrip, startTrip, cancelTrip, completeTrip } from '../../controllers/Trip/trip';
+import { acceptTrip, startTrip, cancelTrip, completeTrip } from '../../controllers/Trip/trip';
 import { checkInternetConnectionMiddleware } from '../../utils/middleware';
 
 const router = express.Router();
@@ -103,63 +103,63 @@ router.use(checkInternetConnectionMiddleware);
  */
 router.patch('/:driverId/accept-trip', acceptTrip);
 
-/**
- * @swagger
- * /api/v1/driver/skip-trip/{tripId}:
- *   patch:
- *     summary: Skip a trip
- *     tags:
- *       - Driver-Trips
- *     parameters:
- *       - in: path
- *         name: tripId
- *         required: true
- *         description: The id of the trip to skip
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: The trip was successfully skipped
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: integer
- *                   description: The HTTP status code
- *                 message:
- *                   type: string
- *                 trip:
- *                   type: object
- *       404:
- *         description: Not found, the trip with the given id was not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: integer
- *                   description: The HTTP status code
- *                 error:
- *                   type: string
- *                   example: Trip not found
- *       500:
- *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: integer
- *                   description: The HTTP status code
- *                 error:
- *                   type: string
- *                   example: "An error occurred while processing your request"
- */
-router.patch('/skip-trip/:tripId', skipTrip);
+// /**
+//  * @swagger
+//  * /api/v1/driver/skip-trip/{tripId}:
+//  *   patch:
+//  *     summary: Skip a trip
+//  *     tags:
+//  *       - Driver-Trips
+//  *     parameters:
+//  *       - in: path
+//  *         name: tripId
+//  *         required: true
+//  *         description: The id of the trip to skip
+//  *         schema:
+//  *           type: string
+//  *     responses:
+//  *       200:
+//  *         description: The trip was successfully skipped
+//  *         content:
+//  *           application/json:
+//  *             schema:
+//  *               type: object
+//  *               properties:
+//  *                 status:
+//  *                   type: integer
+//  *                   description: The HTTP status code
+//  *                 message:
+//  *                   type: string
+//  *                 trip:
+//  *                   type: object
+//  *       404:
+//  *         description: Not found, the trip with the given id was not found
+//  *         content:
+//  *           application/json:
+//  *             schema:
+//  *               type: object
+//  *               properties:
+//  *                 status:
+//  *                   type: integer
+//  *                   description: The HTTP status code
+//  *                 error:
+//  *                   type: string
+//  *                   example: Trip not found
+//  *       500:
+//  *         description: Internal server error
+//  *         content:
+//  *           application/json:
+//  *             schema:
+//  *               type: object
+//  *               properties:
+//  *                 status:
+//  *                   type: integer
+//  *                   description: The HTTP status code
+//  *                 error:
+//  *                   type: string
+//  *                   example: "An error occurred while processing your request"
+//  */
+// router.patch('/skip-trip/:tripId', skipTrip);
 
 /**
  * @swagger

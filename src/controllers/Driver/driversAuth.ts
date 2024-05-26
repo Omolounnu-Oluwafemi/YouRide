@@ -258,14 +258,14 @@ export async function verifyDriverSignIn(req: Request, res: Response) {
     driver.verificationCode = null;
     await driver.save();
 
-    // const token = signToken(driver.driverId);
-    // const refreshToken = signRefreshToken(driver.driverId); 
+    const token = signToken(driver.driverId);
+    const refreshToken = signRefreshToken(driver.driverId); 
 
     return res.status(200).json({
       status: 200,
       message: 'Driver signed in successfully',
-      // token: token,
-      // refreshToken: refreshToken,
+      token: token,
+      refreshToken: refreshToken,
       Driver:  driver 
     });
   } catch (error) {

@@ -3,6 +3,7 @@ import { User } from './usersModel';
 import { Driver } from './drivers'
 import { VehicleCategory } from './vehicle';
 import { Voucher } from './voucher';
+
     
 interface TripAttributes {
     tripId: string;
@@ -10,9 +11,9 @@ interface TripAttributes {
     userId: string;
     userName: string;
     driverName: string | null;
-    categoryName: string;
+    // categoryName: string;
     country: string;
-    categoryId: string | null;
+    // categoryId: string | null;
     paymentMethod: string;
     tripAmount: number;
     pickupLocation: string;
@@ -35,9 +36,9 @@ class Trip extends Model<TripAttributes, TripCreationAttributes> implements Trip
     public driverId!: string | null;
     public userName!: string;
     public driverName!: string | null;
-    public categoryName!: string;
+    // public categoryName!: string;
     public country!: string;
-    public categoryId!: string | null;
+    // public categoryId!: string | null;
     public paymentMethod!: string;
     public tripAmount!: number;
     public voucherId!: string | null;
@@ -87,22 +88,22 @@ const initTrip = (sequelize: Sequelize) => {
                 type: DataTypes.STRING,
                 allowNull: true
             },
-             categoryName: {
-                type: DataTypes.STRING,
-                allowNull: false
-            },
+            //  categoryName: {
+            //     type: DataTypes.STRING,
+            //     allowNull: false
+            // },
             userName: {
                 type: DataTypes.STRING,
                 allowNull: true
             },
-            categoryId: {
-                type: DataTypes.UUID,
-                allowNull: true,
-                references: {
-                    model: 'VehicleCategories',
-                    key: 'categoryId'
-                }
-            },
+            // categoryId: {
+            //     type: DataTypes.UUID,
+            //     allowNull: true,
+            //     references: {
+            //         model: 'VehicleCategories',
+            //         key: 'categoryId'
+            //     }
+            // },
             userId: {
                 type: DataTypes.UUID,
                 allowNull: false,

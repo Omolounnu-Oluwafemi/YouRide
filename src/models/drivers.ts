@@ -1,4 +1,5 @@
 import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
+import { VehicleCategory } from '../models/vehicle'
 
 interface DriversAttributes {
   driverId: string;
@@ -35,6 +36,10 @@ interface DriversAttributes {
 }
 
 interface DriverCreationAttributes extends Optional<DriversAttributes, 'driverId'> {}
+
+interface DriverModel extends Model<DriversAttributes, DriverCreationAttributes> {
+  vehicleCategory: VehicleCategory;
+}
 
 class Driver extends Model<DriversAttributes, DriverCreationAttributes> implements DriversAttributes {
   public driverId!: string;
@@ -73,11 +78,14 @@ class Driver extends Model<DriversAttributes, DriverCreationAttributes> implemen
   public readonly updatedAt!: Date;
 
    public static associate(models: { [key: string]: any }) {
-     Driver.hasMany(models.Trip, { foreignKey: 'driverId', as: 'trips' });
+    Driver.hasMany(models.Trip, { foreignKey: 'driverId', as: 'trips' });
     Driver.belongsTo(models.VehicleCategory, { foreignKey: 'categoryId', as: 'vehicleCategory' });
     Driver.belongsTo(models.Country, { foreignKey: 'countryId', as: 'country' });
   }
 }
+
+// Merge the Driver class with the DriverModel interface
+interface Driver extends DriverModel {}
 
 const initDriver = (sequelize: Sequelize) => {
   Driver.init(
@@ -234,3 +242,5 @@ const initDriver = (sequelize: Sequelize) => {
 };
 
 export { Driver, initDriver };
+
+  

@@ -179,48 +179,48 @@ export const acceptTrip = async (req: Request, res: Response) => {
         });
     };
 }
-export const skipTrip = async (req: Request, res: Response) => {
-    try {
-        const { tripId } = req.params;
+// export const skipTrip = async (req: Request, res: Response) => {
+//     try {
+//         const { tripId } = req.params;
 
-        // Find the trip with the given ID
-        const trip = await Trip.findOne({ where: { tripId: tripId } });
+//         // Find the trip with the given ID
+//         const trip = await Trip.findOne({ where: { tripId: tripId } });
 
-        if (!trip) {
-            return res.status(404).json({
-                status: 400,
-                error: 'Trip not found'
-            });
-        }
+//         if (!trip) {
+//             return res.status(404).json({
+//                 status: 400,
+//                 error: 'Trip not found'
+//             });
+//         }
 
-        // Find the next closest driver
-        const nextDriver = await findClosestDriver(Number(trip.pickupLatitude), Number(trip.pickupLongitude), trip.categoryName);
+//         // Find the next closest driver
+//         const nextDriver = await findClosestDriver(Number(trip.pickupLatitude), Number(trip.pickupLongitude), trip.categoryName);
 
-        if (!nextDriver) {
-            return res.status(404).json({
-                status: 404,
-                error: 'No available drivers found'
-            });
-        }
+//         if (!nextDriver) {
+//             return res.status(404).json({
+//                 status: 404,
+//                 error: 'No available drivers found'
+//             });
+//         }
 
-        // Emit the trip to the next driver
-        const driverSocketId = driverSocketMap.get(nextDriver.driverId);
-        if (driverSocketId) {
-            io.to(driverSocketId).emit('newTrip', trip);
-        }
+//         // Emit the trip to the next driver
+//         const driverSocketId = driverSocketMap.get(nextDriver.driverId);
+//         if (driverSocketId) {
+//             io.to(driverSocketId).emit('newTrip', trip);
+//         }
 
-        return res.status(200).json({
-            status: 200,
-            message: 'Trip skipped successfully',
-            trip
-        });
-    } catch (error) {
-        return res.status(500).json({
-            status: 500,
-            error: 'An error occurred while processing your request'
-        });
-    }
-}
+//         return res.status(200).json({
+//             status: 200,
+//             message: 'Trip skipped successfully',
+//             trip
+//         });
+//     } catch (error) {
+//         return res.status(500).json({
+//             status: 500,
+//             error: 'An error occurred while processing your request'
+//         });
+//     }
+// }
 export const startTrip = async (req: Request, res: Response) => {
     try {
         const { tripId } = req.params;
@@ -493,8 +493,6 @@ export const requestRide = async (req: Request, res: Response) => {
             userId: userData.userId, 
             driverId: null,
             userName: userData.firstName + ' ' + userData.lastName,
-            categoryId: selectedRide.categoryId,
-            categoryName: selectedRide.categoryName,
             paymentMethod,
             totalDistance,
             tripAmount: tripAmountInt,

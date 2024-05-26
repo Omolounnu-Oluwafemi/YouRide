@@ -1,5 +1,3 @@
-import {DriverSocketController} from "./controllers/Socket/driver";
-
 require('dotenv').config();
 import { config } from "dotenv";
 import nocache from 'nocache';
@@ -15,7 +13,9 @@ import swaggerSpec from "./swagger.docs";
 import session from 'express-session';
 import passport from 'passport';
 import authSetup from './config/passport';
-import { io, httpServer, driverSocketMap } from './config/socket';
+import { io, httpServer, driverSocketMap, userSocketMap } from './config/socket';
+import { DriverSocketController } from "./controllers/Socket/driver";
+import { UserSocketController } from "./controllers/Socket/user";
 
 import driversAuth from './routes/Driver/driversAuth';
 import driverTrip from './routes/Driver/driversTrip';
@@ -31,36 +31,96 @@ import vehicleRoutes from './routes/Vehicle/vehicle';
 import countryRoutes from './routes/Admin/country';
 import paymentOptionsRoutes from './routes/Admin/paymentOptions';
 
+
 const app = express();
 
 app.use(nocache());
 app.use(cors());
 
 io.on('connection', (socket) => {
+    const userType = socket.handshake.query.userType;
+    const userId = socket.handshake.query.userId;
     const driverId = socket.handshake.query.driverId;
 
+  if (userType === 'driver') {
+    driverSocketMap.set(socket.id, userId);
+    driverSocketMap.set(`${socket.id}-driverId`, driverId);
+    
     socket.on('driverConnected', ({ driverId, latitude, longitude }) => {
-      driverSocketMap.set('driverId', driverId);
-      driverSocketMap.set('socketId', socket.id);
+      // driverSocketMap.set('socketId', socket.id);
 
       console.log("driverSocketMap:", driverSocketMap)
       console.log(driverSocketMap.get('driverId'))
       
-        // Assuming you have a method to update the driver's status and location
-        DriverSocketController.updateDriverStatusAndLocation(driverId, true, latitude, longitude);
+      // Assuming you have a method to update the driver's status and location
+      DriverSocketController.updateDriverStatusAndLocation(driverId, true, latitude, longitude);
 
-        socket.emit('connectionSuccess', {
-            message: 'You are successfully connected and your location is updated.',
-            driverId: driverId,
-            socketId: socket.id
-        });
+      socket.emit('connectionSuccess', {
+        message: 'You are successfully connected and your location is updated.',
+        driverId: driverId,
+        socketId: socket.id
+      });
     });
 
-  socket.on('disconnect', () => {
-    const driverId = driverSocketMap.get('driverId');
+        // Listen for acceptRide event from drivers
+    socket.on('acceptRide', async ({ tripId }) => {
+      // Check if tripId and driverId are strings before passing them to updateTripWithDriverDetails
+      if (typeof tripId === 'string' && typeof driverId === 'string') {
+        // Assuming you have a method to update the trip with the driver's details
+        const response = await DriverSocketController.updateTripWithDriverDetails(tripId, driverId);
+
+        if (response.status === 'success') {
+          socket.emit('rideAccepted', response);
+        } else {
+          socket.emit('error', response);
+        }
+      } else {
+        console.error('tripId or driverId is not a string');
+      }
+    });
+        
+  } else if (userType === 'user') {
+        if (typeof userId === 'string') {
+            userSocketMap.set(socket.id, userId);
+            socket.on('confirmPickup', async (pickupDetails) => {
+                const response = await UserSocketController.requestRide(
+                    userId,
+                    pickupDetails.pickupLocation,
+                    pickupDetails.destination,
+                    pickupDetails.paymentMethod,
+                    pickupDetails.tripAmount,
+                    pickupDetails.totalDistance,
+                    pickupDetails.pickupLatitude,
+                    pickupDetails.pickupLongitude,
+                    pickupDetails.destinationLatitude,
+                    pickupDetails.destinationLongitude,
+                    socket.id
+                );
+
+                if (response.status === 'success') {
+                    socket.emit('rideRequested', response);
+                } else {
+                    socket.emit('error', response);
+                }
+            });
+        } else {
+            console.error('userId is not defined or not a string');
+        }
+  
+  }
+  
+      socket.on('disconnect', () => {
+        if (userType === 'driver') {
+        const driverId = driverSocketMap.get(`${socket.id}-driverId`); // Retrieve the driverId using the unique key
         DriverSocketController.updateDriverAvailability(driverId, false);
         console.log(`Driver ${driverId} disconnected.`);
+
+        } else if (userType === 'user') {
+            userSocketMap.delete(socket.id);
+        }
+        console.log(`${userType} ${userId} disconnected.`);
     });
+
 });
 
 httpServer.on('request', app);
