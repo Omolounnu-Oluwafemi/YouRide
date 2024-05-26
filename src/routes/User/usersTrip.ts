@@ -226,10 +226,10 @@ router.patch('/cancel-trip/:tripId', cancelTrip);
  *                               type: string
  *                               description: The driver's name
  *                             latitude:
- *                               type: number
+ *                               type: string
  *                               description: The driver's latitude
  *                             longitude:
- *                               type: number
+ *                               type: string
  *                               description: The driver's longitude
  *                       tripAmount:
  *                         type: number
@@ -241,7 +241,7 @@ router.patch('/cancel-trip/:tripId', cancelTrip);
  *                         type: string
  *                         description: The ID of the closest driver
  *                       estimatedPickupTime:
- *                         type: number
+ *                         type: string
  *                         description: The estimated pickup time
  *       400:
  *         description: Invalid user ID or voucher
@@ -287,17 +287,17 @@ router.get('/availablerides', GetAvailableRides);
 
 /**
  * @swagger
- * /api/v1/user/trips:
+ * /api/v1/user/{userId}/getusertrips:
  *   get:
  *     summary: Retrieve a list of trips by user
  *     tags: [User-Trips]
  *     description: Retrieve a list of trips that belong to a specific user.
  *     parameters:
- *       - in: path
+ *       - in: query
  *         name: userId
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *     responses:
  *       200:
  *         description: A list of trips.
@@ -312,7 +312,7 @@ router.get('/availablerides', GetAvailableRides);
  *       500:
  *         description: An error occurred while processing your request
  */
-router.get('/getusertrips', getUserTrips)
+router.get('/:userId/getusertrips', getUserTrips)
 
 /**
  * @swagger
