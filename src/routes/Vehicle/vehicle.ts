@@ -216,6 +216,8 @@ router.get('/get/:categoryId', isAdmin, GetOneVehicleCategory);
  *                 type: string
  *               categoryName:
  *                 type: string
+ *               vehicleName:
+ *                 type: string
  *               isSurge:
  *                 type: boolean
  *               surgeStartTime:
@@ -278,6 +280,8 @@ router.get('/get/:categoryId', isAdmin, GetOneVehicleCategory);
  *                       type: string
  *                     categoryName:
  *                       type: string
+ *                     vehicleName:
+ *                       type: string
  *                     carImage:
  *                       type: string
  *                     documentImage:
@@ -300,7 +304,8 @@ router.get('/get/:categoryId', isAdmin, GetOneVehicleCategory);
  *                 surgeEndTime: "23:00"
  *                 surgeType: "Peak"
  *                 status: "Active"
- *                 categoryName: "Economy"
+ *                 categoryName: "Taxi Driver"
+ *                 vehicleName: "Datride Vehicle"
  *                 carImage: "https://example.com/car.jpg"
  *                 documentImage: "https://example.com/doc.jpg"
  *                 isDocVerified: true
@@ -485,7 +490,11 @@ router.delete('/delete/:categoryId', isAdmin, DeleteVehicleCategory)
  *           description: The status of the vehicle.
  *         categoryName:
  *           type: string
- *           enum: [Taxi, Bus, Delivery]
+ *           enum: [Taxi Driver, Bus Driver, Delivery Driver]
+ *           description: The category of the vehicle.
+ *         vehicleName:
+ *           type: string  
+ *           enum: [Datride Vehicle, Datride Share, Datride Delivery]
  *           description: The category of the vehicle.
  *         carImage:
  *           type: string
